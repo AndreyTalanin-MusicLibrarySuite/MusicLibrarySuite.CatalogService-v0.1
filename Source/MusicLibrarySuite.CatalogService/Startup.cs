@@ -37,6 +37,8 @@ public class Startup
     /// <remarks>This method gets called by the runtime. Use this method to add services to the container.</remarks>
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddAutoMapper(options => { });
+
         services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
         {
             var connectionStringName = "CatalogServiceConnectionString";
