@@ -1,7 +1,15 @@
+using System;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using MusicLibrarySuite.CatalogService.Data.Contexts;
+using MusicLibrarySuite.CatalogService.Data.Extensions;
+using MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
 
 namespace MusicLibrarySuite.CatalogService;
 
@@ -11,6 +19,17 @@ namespace MusicLibrarySuite.CatalogService;
 /// </summary>
 public class Startup
 {
+    private readonly IConfiguration m_configuration;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Startup" /> type using the specified application configuration.
+    /// </summary>
+    /// <param name="configuration">The application configuration.</param>
+    public Startup(IConfiguration configuration)
+    {
+        m_configuration = configuration;
+    }
+
     /// <summary>
     /// Adds services to the container.
     /// </summary>
@@ -18,6 +37,24 @@ public class Startup
     /// <remarks>This method gets called by the runtime. Use this method to add services to the container.</remarks>
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
+        {
+            var connectionStringName = "CatalogServiceConnectionString";
+            var connectionString = m_configuration.GetConnectionString(connectionStringName);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException($"Unable to get the connection string using the \"{connectionStringName}\" configuration key.");
+            }
+
+            contextOptionsBuilder.UseSqlServer(connectionString, sqlServerOptionsBuilder =>
+            {
+                sqlServerOptionsBuilder
+                    .MigrationsAssembly(typeof(SqlServerCatalogServiceDbContext).Assembly.FullName)
+                    .MigrationsHistoryTable("MigrationsHistory", "dbo")
+                    .CommandTimeout(120);
+            });
+        });
+
         services.AddControllers();
 
         services.AddEndpointsApiExplorer();
