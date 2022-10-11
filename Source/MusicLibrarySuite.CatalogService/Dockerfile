@@ -7,6 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
 WORKDIR "/src"
 COPY ["MusicLibrarySuite.CatalogService/MusicLibrarySuite.CatalogService.csproj", "MusicLibrarySuite.CatalogService/"]
+COPY ["MusicLibrarySuite.CatalogService.Interfaces/MusicLibrarySuite.CatalogService.Interfaces.csproj", "MusicLibrarySuite.CatalogService.Interfaces/"]
 RUN dotnet restore "MusicLibrarySuite.CatalogService/MusicLibrarySuite.CatalogService.csproj"
 COPY "." "."
 
