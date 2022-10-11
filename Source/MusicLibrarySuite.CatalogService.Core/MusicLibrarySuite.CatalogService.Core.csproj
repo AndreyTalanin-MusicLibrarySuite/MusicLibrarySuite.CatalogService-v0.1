@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Data\MusicLibrarySuite.CatalogService.Data.csproj" />
     <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Interfaces\MusicLibrarySuite.CatalogService.Interfaces.csproj" />
   </ItemGroup>
