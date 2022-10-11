@@ -1,0 +1,13 @@
+name: Main workflow
+
+on: [push]
+
+jobs:
+  build-solution:
+    name: Build solution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Build service project
+        run: docker build -f ./Source/MusicLibrarySuite.CatalogService/Dockerfile ./Source
