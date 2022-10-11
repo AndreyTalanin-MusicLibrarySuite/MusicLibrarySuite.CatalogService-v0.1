@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Data\MusicLibrarySuite.CatalogService.Data.csproj" />
-    <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Interfaces\MusicLibrarySuite.CatalogService.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>
