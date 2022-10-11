@@ -1,0 +1,471 @@
+###############################################################################
+# Remove the line below if you want to inherit .editorconfig settings from
+# higher directories.
+###############################################################################
+root = true
+
+###############################################################################
+# Watched file types - All source code files
+###############################################################################
+[*]
+
+###############################################################################
+# Core EditorConfig options - Encoding
+###############################################################################
+charset = utf-8
+
+###############################################################################
+# Core EditorConfig options - Indentation and spacing
+###############################################################################
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+###############################################################################
+# Core EditorConfig options - New line preferences
+###############################################################################
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+###############################################################################
+# Watched file types - C# source code files
+###############################################################################
+[*.cs]
+
+###############################################################################
+# .NET coding conventions - Organize usings
+###############################################################################
+dotnet_separate_import_directive_groups = true
+dotnet_sort_system_directives_first = true
+file_header_template = unset
+
+###############################################################################
+# .NET coding conventions - this. and Me. preferences
+###############################################################################
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+###############################################################################
+# .NET coding conventions - Language keywords vs BCL types preferences
+###############################################################################
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+###############################################################################
+# .NET coding conventions - Parentheses preferences
+###############################################################################
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_operators = never_if_unnecessary:suggestion
+
+###############################################################################
+# .NET coding conventions - Modifier preferences
+###############################################################################
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+
+###############################################################################
+# .NET coding conventions - Expression-level preferences
+###############################################################################
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_namespace_match_folder = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_operator_placement_when_wrapping = beginning_of_line:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+
+###############################################################################
+# .NET coding conventions - Field preferences
+###############################################################################
+dotnet_style_readonly_field = true:suggestion
+
+###############################################################################
+# .NET coding conventions - Parameter preferences
+###############################################################################
+dotnet_code_quality_unused_parameters = all:silent
+
+###############################################################################
+# .NET coding conventions - Suppression preferences
+###############################################################################
+dotnet_remove_unnecessary_suppression_exclusions = none:suggestion
+
+###############################################################################
+# .NET coding conventions - New line preferences
+###############################################################################
+dotnet_style_allow_multiple_blank_lines_experimental = false:suggestion
+dotnet_style_allow_statement_immediately_after_block_experimental = true
+
+###############################################################################
+# C# coding conventions - var preferences
+###############################################################################
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+###############################################################################
+# C# coding conventions - Pattern matching preferences
+###############################################################################
+csharp_style_prefer_pattern_matching = false:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_prefer_extended_property_pattern = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_not_pattern = true:suggestion
+
+###############################################################################
+# C# coding conventions - Null-checking preferences
+###############################################################################
+csharp_style_conditional_delegate_call = true:suggestion
+csharp_style_prefer_parameter_null_checking = false:suggestion
+
+###############################################################################
+# C# coding conventions - Modifier preferences
+###############################################################################
+csharp_prefer_static_local_function = true:suggestion
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
+
+###############################################################################
+# C# coding conventions - Code-block preferences
+###############################################################################
+csharp_prefer_braces = when_multiline:silent
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_prefer_method_group_conversion = true:suggestion
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+###############################################################################
+# C# coding conventions - Expression-level preferences
+###############################################################################
+csharp_prefer_simple_default_expression = false:suggestion
+csharp_style_deconstructed_variable_declaration = true:suggestion
+csharp_style_implicit_object_creation_when_type_is_apparent = false:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+csharp_style_throw_expression = true:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:silent
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+
+###############################################################################
+# C# coding conventions - 'using' directive preferences
+###############################################################################
+csharp_using_directive_placement = outside_namespace:suggestion
+
+###############################################################################
+# C# coding conventions - New line preferences
+###############################################################################
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false:suggestion
+csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false:suggestion
+csharp_style_allow_embedded_statements_on_same_line_experimental = false:suggestion
+
+###############################################################################
+# C# formatting rules - New line preferences
+###############################################################################
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_catch = true
+csharp_new_line_before_else = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_between_query_expression_clauses = true
+
+###############################################################################
+# C# formatting rules - Indentation preferences
+###############################################################################
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = true
+csharp_indent_labels = one_less_than_current
+csharp_indent_switch_labels = true
+
+###############################################################################
+# C# formatting rules - Space preferences
+###############################################################################
+csharp_space_after_cast = false
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_after_comma = true
+csharp_space_after_dot = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_around_declaration_statements = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+csharp_space_before_open_square_brackets = false
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_between_square_brackets = false
+
+###############################################################################
+# C# formatting rules - Wrapping preferences
+###############################################################################
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = true
+
+###############################################################################
+# Naming styles
+###############################################################################
+
+# Pascal Case - ExampleIdentifier
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# Pascal Case beginning with 'I' - IExampleIdentifier
+dotnet_naming_style.pascal_case_beginning_with_i.required_prefix = I
+dotnet_naming_style.pascal_case_beginning_with_i.capitalization = pascal_case
+
+# Pascal Case beginning with 'T' - TExampleIdentifier
+dotnet_naming_style.pascal_case_beginning_with_t.required_prefix = T
+dotnet_naming_style.pascal_case_beginning_with_t.capitalization = pascal_case
+
+# Camel Case - exampleIdentifier
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+# Camel Case beginning with 'c' - c_exampleIdentifier
+dotnet_naming_style.camel_case_beginning_with_c.required_prefix = c_
+dotnet_naming_style.camel_case_beginning_with_c.capitalization = camel_case
+
+# Camel Case beginning with 's' - s_exampleIdentifier
+dotnet_naming_style.camel_case_beginning_with_s.required_prefix = s_
+dotnet_naming_style.camel_case_beginning_with_s.capitalization = camel_case
+
+# Camel Case beginning with 'm' - m_exampleIdentifier
+dotnet_naming_style.camel_case_beginning_with_m.required_prefix = m_
+dotnet_naming_style.camel_case_beginning_with_m.capitalization = camel_case
+
+###############################################################################
+# Identifier specifications
+###############################################################################
+
+# Types - Classes
+dotnet_naming_symbols.classes.applicable_kinds = class
+dotnet_naming_symbols.classes.applicable_accessibilities = public, internal
+
+# Types - Interfaces
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = public, internal
+
+# Types - Delegates
+dotnet_naming_symbols.delegates.applicable_kinds = delegate
+dotnet_naming_symbols.delegates.applicable_accessibilities = public, internal
+
+# Types - Structs
+dotnet_naming_symbols.structs.applicable_kinds = struct
+dotnet_naming_symbols.structs.applicable_accessibilities = public, internal
+
+# Types - Enums
+dotnet_naming_symbols.enums.applicable_kinds = enum
+dotnet_naming_symbols.enums.applicable_accessibilities = public, internal
+
+# Members - Private Const Fields
+dotnet_naming_symbols.private_const_fields.applicable_kinds = field
+dotnet_naming_symbols.private_const_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_const_fields.required_modifiers = const
+
+# Members - Private Static Fields
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+
+# Members - Private Instance Fields
+dotnet_naming_symbols.private_instance_fields.applicable_kinds = field
+dotnet_naming_symbols.private_instance_fields.applicable_accessibilities = private
+
+# Members - Public Instance Fields
+dotnet_naming_symbols.public_instance_fields.applicable_kinds = field
+dotnet_naming_symbols.public_instance_fields.applicable_accessibilities = public
+
+# Members - Fields
+dotnet_naming_symbols.fields.applicable_kinds = field
+
+# Members - Properties
+dotnet_naming_symbols.properties.applicable_kinds = property
+dotnet_naming_symbols.properties.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+
+# Members - Events
+dotnet_naming_symbols.events.applicable_kinds = event
+dotnet_naming_symbols.events.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+
+# Members - Methods
+dotnet_naming_symbols.methods.applicable_kinds = method
+dotnet_naming_symbols.methods.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+
+# Parameters - Parameters
+dotnet_naming_symbols.parameters.applicable_kinds = parameter
+
+# Parameters - Type Parameters
+dotnet_naming_symbols.type_parameters.applicable_kinds = type_parameter
+
+# Locals - Locals
+dotnet_naming_symbols.locals.applicable_kinds = local
+
+# Locals - Const Locals
+dotnet_naming_symbols.const_locals.applicable_kinds = local
+dotnet_naming_symbols.const_locals.required_modifiers = const
+
+# Locals - Local Functions
+dotnet_naming_symbols.local_functions.applicable_kinds = local_function
+
+###############################################################################
+# Naming rules
+###############################################################################
+
+# Types - Classes should be Pascal Case
+dotnet_naming_rule.classes_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.classes_should_be_pascal_case.symbols = classes
+dotnet_naming_rule.classes_should_be_pascal_case.style = pascal_case
+
+# Types - Interfaces should be Pascal Case beginning with 'I'
+dotnet_naming_rule.interfaces_should_be_pascal_case_beginning_with_i.severity = suggestion
+dotnet_naming_rule.interfaces_should_be_pascal_case_beginning_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_should_be_pascal_case_beginning_with_i.style = pascal_case_beginning_with_i
+
+# Types - Delegates should be Pascal Case
+dotnet_naming_rule.delegates_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.delegates_should_be_pascal_case.symbols = delegates
+dotnet_naming_rule.delegates_should_be_pascal_case.style = pascal_case
+
+# Types - Structs should be Pascal Case
+dotnet_naming_rule.structs_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.structs_should_be_pascal_case.symbols = structs
+dotnet_naming_rule.structs_should_be_pascal_case.style = pascal_case
+
+# Types - Enums should be Pascal Case
+dotnet_naming_rule.enums_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.enums_should_be_pascal_case.symbols = enums
+dotnet_naming_rule.enums_should_be_pascal_case.style = pascal_case
+
+# Members - Private const fields should be Camel Case beginning with 'c_'
+dotnet_naming_rule.private_const_fields_should_be_camel_case_beginning_with_c.severity = suggestion
+dotnet_naming_rule.private_const_fields_should_be_camel_case_beginning_with_c.symbols = private_const_fields
+dotnet_naming_rule.private_const_fields_should_be_camel_case_beginning_with_c.style = camel_case_beginning_with_c
+
+# Members - Private static fields should be Camel Case beginning with 's_'
+dotnet_naming_rule.private_static_fields_should_be_camel_case_beginning_with_s.severity = suggestion
+dotnet_naming_rule.private_static_fields_should_be_camel_case_beginning_with_s.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_should_be_camel_case_beginning_with_s.style = camel_case_beginning_with_s
+
+# Members - Private instance fields should be Camel Case beginning with 'm_'
+dotnet_naming_rule.private_instance_fields_should_be_camel_case_beginning_with_c.severity = suggestion
+dotnet_naming_rule.private_instance_fields_should_be_camel_case_beginning_with_c.symbols = private_instance_fields
+dotnet_naming_rule.private_instance_fields_should_be_camel_case_beginning_with_c.style = camel_case_beginning_with_m
+
+# Members - Public instance fields should be Pascal Case
+dotnet_naming_rule.public_instance_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.public_instance_fields_should_be_pascal_case.symbols = public_instance_fields
+dotnet_naming_rule.public_instance_fields_should_be_pascal_case.style = pascal_case
+
+# Members - Other fields should be Camel Case
+dotnet_naming_rule.fields_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.fields_should_be_camel_case.symbols = fields
+dotnet_naming_rule.fields_should_be_camel_case.style = camel_case
+
+# Members - Properties should be Pascal Case
+dotnet_naming_rule.properties_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.properties_should_be_pascal_case.symbols = properties
+dotnet_naming_rule.properties_should_be_pascal_case.style = pascal_case
+
+# Members - Events should be Pascal Case
+dotnet_naming_rule.events_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.events_should_be_pascal_case.symbols = events
+dotnet_naming_rule.events_should_be_pascal_case.style = pascal_case
+
+# Members - Methods should be Pascal Case
+dotnet_naming_rule.methods_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.methods_should_be_pascal_case.symbols = methods
+dotnet_naming_rule.methods_should_be_pascal_case.style = pascal_case
+
+# Parameters - Parameters should be Camel Case
+dotnet_naming_rule.parameters_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.parameters_should_be_camel_case.symbols = parameters
+dotnet_naming_rule.parameters_should_be_camel_case.style = camel_case
+
+# Parameters - Type parameters should be Pascal Case beginning with 'T'
+dotnet_naming_rule.type_parameters_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.type_parameters_should_be_pascal_case.symbols = type_parameters
+dotnet_naming_rule.type_parameters_should_be_pascal_case.style = pascal_case_beginning_with_t
+
+# Locals - Locals should be Camel Case
+dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel_case.symbols = locals
+dotnet_naming_rule.locals_should_be_camel_case.style = camel_case
+
+# Locals - Const Locals should be Camel Case
+dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel_case.symbols = const_locals
+dotnet_naming_rule.locals_should_be_camel_case.style = camel_case
+
+# Locals - Local functions should be Pascal Case
+dotnet_naming_rule.local_functions_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.local_functions_should_be_pascal_case.symbols = local_functions
+dotnet_naming_rule.local_functions_should_be_pascal_case.style = pascal_case
+
+###############################################################################
+# Watched file types - MD, HTML, JavaScript, TypeScript, CSS, LESS files
+###############################################################################
+[*.{md,html,js,jsx,ts,tsx,css,less}]
+
+###############################################################################
+# Core EditorConfig options - Indentation and spacing
+###############################################################################
+indent_size = 2
+indent_style = space
+tab_width = 2
+
+###############################################################################
+# Watched file types - XML, JSON, YML, YAML files
+###############################################################################
+[*.{xml,json,yml,yaml}]
+
+###############################################################################
+# Core EditorConfig options - Indentation and spacing
+###############################################################################
+indent_size = 2
+indent_style = space
+tab_width = 2
+
+###############################################################################
+# Watched file types - C#/F#/VB.NET XML project files
+###############################################################################
+[*.{csproj,fsproj,vbproj,shproj,projitems}]
+
+###############################################################################
+# Core EditorConfig options - Indentation and spacing
+###############################################################################
+indent_size = 2
+indent_style = space
+tab_width = 2
+
+###############################################################################
+# Watched file types - Config files
+###############################################################################
+[*.{config,nuspec,props,targets,builds,resx,stylecop,ruleset}]
+
+###############################################################################
+# Core EditorConfig options - Indentation and spacing
+###############################################################################
+indent_size = 2
+indent_style = space
+tab_width = 2
