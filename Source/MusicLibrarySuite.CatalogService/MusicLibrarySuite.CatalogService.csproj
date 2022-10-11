@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>dcea64d0-ae5b-4e6a-b115-ec61d276bc71</UserSecretsId>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Core\MusicLibrarySuite.CatalogService.Core.csproj" />
+    <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Data\MusicLibrarySuite.CatalogService.Data.csproj" />
+    <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Data.SqlServer\MusicLibrarySuite.CatalogService.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\MusicLibrarySuite.CatalogService.Interfaces\MusicLibrarySuite.CatalogService.Interfaces.csproj" />
+  </ItemGroup>
+
+</Project>
