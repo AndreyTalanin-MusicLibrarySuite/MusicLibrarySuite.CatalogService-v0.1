@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+using MusicLibrarySuite.CatalogService.Data.Entities;
+
 namespace MusicLibrarySuite.CatalogService.Data.Contexts;
 
 /// <summary>
@@ -8,11 +10,17 @@ namespace MusicLibrarySuite.CatalogService.Data.Contexts;
 public abstract class CatalogServiceDbContext : DbContext
 {
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreDto" /> type.
+    /// </summary>
+    public DbSet<GenreDto> Genres { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CatalogServiceDbContext" /> type.
     /// </summary>
     protected CatalogServiceDbContext()
         : base()
     {
+        Genres = Set<GenreDto>();
     }
 
     /// <summary>
@@ -22,5 +30,6 @@ public abstract class CatalogServiceDbContext : DbContext
     protected CatalogServiceDbContext(DbContextOptions contextOptions)
         : base(contextOptions)
     {
+        Genres = Set<GenreDto>();
     }
 }
