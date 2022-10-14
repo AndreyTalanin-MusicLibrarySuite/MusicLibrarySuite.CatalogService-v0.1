@@ -9,9 +9,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 using MusicLibrarySuite.CatalogService.Core.AutoMapper;
+using MusicLibrarySuite.CatalogService.Core.Services;
+using MusicLibrarySuite.CatalogService.Core.Services.Abstractions;
 using MusicLibrarySuite.CatalogService.Data.Contexts;
 using MusicLibrarySuite.CatalogService.Data.Extensions;
+using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 using MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
+using MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 namespace MusicLibrarySuite.CatalogService;
 
@@ -42,6 +46,7 @@ public class Startup
         services.AddAutoMapper(options =>
         {
             options.AddProfile<CommonDatabaseProfile>();
+            options.AddProfile<GenreDatabaseProfile>();
         });
 
         services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
@@ -91,6 +96,10 @@ public class Startup
                 License = license,
             });
         });
+
+        services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
+
+        services.AddScoped<IGenreService, GenreService>();
     }
 
     /// <summary>
