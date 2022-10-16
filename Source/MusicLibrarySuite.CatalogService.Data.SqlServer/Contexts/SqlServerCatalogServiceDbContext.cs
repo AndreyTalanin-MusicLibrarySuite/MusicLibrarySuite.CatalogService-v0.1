@@ -35,6 +35,31 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<GenreRelationshipDto>().ToTable("GenreRelationship", "dbo");
+        modelBuilder.Entity<GenreRelationshipDto>().HasKey(entity => new { entity.GenreId, entity.DependentGenreId });
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasOne<GenreDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasOne<GenreDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentGenreId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasIndex(entity => entity.GenreId)
+            .HasDatabaseName("IX_GenreRelationship_GenreId");
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasIndex(entity => entity.DependentGenreId)
+            .HasDatabaseName("IX_GenreRelationship_DependentGenreId");
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasIndex(entity => new { entity.GenreId, entity.Order })
+            .HasDatabaseName("UIX_GenreRelationship_GenreId_Order")
+            .IsUnique();
+        modelBuilder.Entity<GenreRelationshipDto>().HasCheckConstraint("CK_GenreRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<GenreRelationshipDto>().HasCheckConstraint("CK_GenreRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         base.OnModelCreating(modelBuilder);
     }
 }
