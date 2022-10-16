@@ -7,3 +7,25 @@ Table "dbo"."Genre" {
     "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
     "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
 }
+
+Table "dbo"."GenreRelationship" {
+    "GenreId" uniqueidentifier [primary key, not null]
+    "DependentGenreId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+
+    Indexes {
+        "GenreId" [name: "IX_GenreRelationship_GenreId"]
+        "DependentGenreId" [name: "IX_GenreRelationship_DependentGenreId"]
+        ("GenreId", "Order") [name: "UIX_GenreRelationship_GenreId_Order", unique]
+    }
+}
+
+Ref "FK_GenreRelationship_Genre_GenreId" {
+    "dbo"."GenreRelationship"."GenreId" > "dbo"."Genre"."Id"
+}
+
+Ref "FK_GenreRelationship_Genre_DependentGenreId" {
+    "dbo"."GenreRelationship"."DependentGenreId" > "dbo"."Genre"."Id"
+}
