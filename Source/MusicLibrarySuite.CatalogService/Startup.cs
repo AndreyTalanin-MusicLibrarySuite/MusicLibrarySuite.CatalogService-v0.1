@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
 using MusicLibrarySuite.CatalogService.Data.Contexts;
 using MusicLibrarySuite.CatalogService.Data.Extensions;
@@ -61,7 +62,29 @@ public class Startup
 
         services.AddEndpointsApiExplorer();
 
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            var contact = new OpenApiContact()
+            {
+                Name = "Andrey Talanin",
+                Email = "andrey.talanin@outlook.com",
+                Url = new Uri("https://github.com/AndreyTalanin"),
+            };
+            var license = new OpenApiLicense()
+            {
+                Name = "The MIT License",
+                Url = new Uri("https://github.com/AndreyTalanin-MusicLibrarySuite/MusicLibrarySuite.CatalogService/blob/main/LICENSE.md"),
+            };
+
+            options.SwaggerDoc("MusicLibrarySuite.CatalogService", new OpenApiInfo()
+            {
+                Title = "Music Library Suite - Catalog Service API v0.1",
+                Description = "Initial pre-release (unstable) API version.",
+                Version = "v0.1",
+                Contact = contact,
+                License = license,
+            });
+        });
     }
 
     /// <summary>
@@ -75,7 +98,11 @@ public class Startup
         if (webHostEnvironment.IsDevelopment())
         {
             applicationBuilder.UseSwagger();
-            applicationBuilder.UseSwaggerUI();
+            applicationBuilder.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint($"/swagger/MusicLibrarySuite.CatalogService/swagger.json", $"MusicLibrarySuite.CatalogService");
+            });
+
             applicationBuilder.UseDeveloperExceptionPage();
         }
         else
