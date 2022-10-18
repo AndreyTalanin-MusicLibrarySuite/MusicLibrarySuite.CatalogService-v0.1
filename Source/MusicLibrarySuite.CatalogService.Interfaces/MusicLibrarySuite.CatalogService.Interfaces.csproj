@@ -5,6 +5,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Authors>Andrey Talanin</Authors>
+    <Description>Interfaces for the MusicLibrarySuite.CatalogService service.</Description>
+    <RepositoryUrl>https://github.com/AndreyTalanin-MusicLibrarySuite/MusicLibrarySuite.CatalogService.git</RepositoryUrl>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
