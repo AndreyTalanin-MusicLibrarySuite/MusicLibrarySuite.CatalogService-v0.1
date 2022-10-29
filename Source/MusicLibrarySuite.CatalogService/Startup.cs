@@ -64,6 +64,8 @@ public class Startup
 
         services.AddSwaggerGen(options =>
         {
+            options.SupportNonNullableReferenceTypes();
+
             var contact = new OpenApiContact()
             {
                 Name = "Andrey Talanin",
