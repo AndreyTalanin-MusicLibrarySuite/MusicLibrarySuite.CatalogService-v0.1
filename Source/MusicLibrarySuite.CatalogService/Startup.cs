@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
+using MusicLibrarySuite.CatalogService.Core.AutoMapper;
 using MusicLibrarySuite.CatalogService.Data.Contexts;
 using MusicLibrarySuite.CatalogService.Data.Extensions;
 using MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
@@ -38,7 +39,10 @@ public class Startup
     /// <remarks>This method gets called by the runtime. Use this method to add services to the container.</remarks>
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddAutoMapper(options => { });
+        services.AddAutoMapper(options =>
+        {
+            options.AddProfile<CommonDatabaseProfile>();
+        });
 
         services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
         {
