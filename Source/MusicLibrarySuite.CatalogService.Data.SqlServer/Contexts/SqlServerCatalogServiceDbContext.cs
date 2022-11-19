@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using MusicLibrarySuite.CatalogService.Data.Contexts;
+using MusicLibrarySuite.CatalogService.Data.Entities;
 
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
 
@@ -24,5 +25,16 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
     public SqlServerCatalogServiceDbContext(DbContextOptions contextOptions)
         : base(contextOptions)
     {
+    }
+
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
+        modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
+        base.OnModelCreating(modelBuilder);
     }
 }

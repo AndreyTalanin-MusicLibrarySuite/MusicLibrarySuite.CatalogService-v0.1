@@ -1,0 +1,9 @@
+Table "dbo"."Genre" {
+    "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "SystemEntity" bit [not null]
+    "Enabled" bit [not null]
+    "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+    "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+}
