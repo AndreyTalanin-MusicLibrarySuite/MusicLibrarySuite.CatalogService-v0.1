@@ -39,7 +39,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<GenreRelationshipDto>().HasKey(entity => new { entity.GenreId, entity.DependentGenreId });
         modelBuilder.Entity<GenreRelationshipDto>()
             .HasOne<GenreDto>()
-            .WithMany()
+            .WithMany(entity => entity.GenreRelationships)
             .HasForeignKey(entity => entity.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<GenreRelationshipDto>()
