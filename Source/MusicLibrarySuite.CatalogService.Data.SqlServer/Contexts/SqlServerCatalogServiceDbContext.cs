@@ -38,12 +38,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<GenreRelationshipDto>().ToTable("GenreRelationship", "dbo");
         modelBuilder.Entity<GenreRelationshipDto>().HasKey(entity => new { entity.GenreId, entity.DependentGenreId });
         modelBuilder.Entity<GenreRelationshipDto>()
-            .HasOne<GenreDto>()
+            .HasOne(entity => entity.Genre)
             .WithMany(entity => entity.GenreRelationships)
             .HasForeignKey(entity => entity.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<GenreRelationshipDto>()
-            .HasOne<GenreDto>()
+            .HasOne(entity => entity.DependentGenre)
             .WithMany()
             .HasForeignKey(entity => entity.DependentGenreId)
             .OnDelete(DeleteBehavior.Restrict);
