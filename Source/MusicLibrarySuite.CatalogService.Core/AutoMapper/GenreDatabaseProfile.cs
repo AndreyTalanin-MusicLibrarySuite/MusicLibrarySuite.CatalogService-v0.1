@@ -21,6 +21,7 @@ public class GenreDatabaseProfile : Profile
         DestinationMemberNamingConvention = ExactMatchNamingConvention.Instance;
 
         CreateMap<Genre, GenreDto>().ReverseMap();
+        CreateMap<GenreRelationship, GenreRelationshipDto>().ReverseMap();
         CreateMap<GenreRequest, GenreRequestDto>().ReverseMap();
         CreateMap<GenrePageResponse, PageResponseDto<GenreDto>>().ReverseMap();
         CreateMap<PageResponse<Genre>, PageResponseDto<GenreDto>>().ReverseMap();
