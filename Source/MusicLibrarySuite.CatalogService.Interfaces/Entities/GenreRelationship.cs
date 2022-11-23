@@ -30,4 +30,16 @@ public class GenreRelationship
     /// Gets or sets the relationship's description.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the principal genre.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Genre? Genre { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dependent genre.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Genre? DependentGenre { get; set; }
 }
