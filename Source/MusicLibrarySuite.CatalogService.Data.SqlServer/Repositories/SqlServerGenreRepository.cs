@@ -41,8 +41,17 @@ public class SqlServerGenreRepository : IGenreRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetGenre] (@{genreIdParameter.ParameterName})";
 
-        return await context.Genres.FromSqlRaw(query, genreIdParameter).AsNoTracking()
+        GenreDto? genre = await context.Genres.FromSqlRaw(query, genreIdParameter).AsNoTracking()
+            .Include(genre => genre.GenreRelationships)
+            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .FirstOrDefaultAsync();
+
+        if (genre is not null)
+        {
+            OrderGenreRelationships(genre);
+        }
+
+        return genre;
     }
 
     /// <inheritdoc />
@@ -50,8 +59,17 @@ public class SqlServerGenreRepository : IGenreRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        return await context.Genres.AsNoTracking()
+        GenreDto[] genres = await context.Genres.AsNoTracking()
+            .Include(genre => genre.GenreRelationships)
+            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .ToArrayAsync();
+
+        foreach (GenreDto genre in genres)
+        {
+            OrderGenreRelationships(genre);
+        }
+
+        return genres;
     }
 
     /// <inheritdoc />
@@ -68,8 +86,17 @@ public class SqlServerGenreRepository : IGenreRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetGenres] (@{genreIdsParameter.ParameterName})";
 
-        return await context.Genres.FromSqlRaw(query, genreIdsParameter).AsNoTracking()
+        GenreDto[] genres = await context.Genres.FromSqlRaw(query, genreIdsParameter).AsNoTracking()
+            .Include(genre => genre.GenreRelationships)
+            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .ToArrayAsync();
+
+        foreach (GenreDto genre in genres)
+        {
+            OrderGenreRelationships(genre);
+        }
+
+        return genres;
     }
 
     /// <inheritdoc />
@@ -77,8 +104,17 @@ public class SqlServerGenreRepository : IGenreRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        return await collectionProcessor(context.Genres.AsNoTracking())
+        GenreDto[] genres = await collectionProcessor(context.Genres.AsNoTracking())
+            .Include(genre => genre.GenreRelationships)
+            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .ToArrayAsync();
+
+        foreach (GenreDto genre in genres)
+        {
+            OrderGenreRelationships(genre);
+        }
+
+        return genres;
     }
 
     /// <inheritdoc />
@@ -96,11 +132,18 @@ public class SqlServerGenreRepository : IGenreRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<GenreDto> genres = await baseCollection
+            .Include(genre => genre.GenreRelationships)
+            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .OrderByDescending(genre => genre.SystemEntity)
             .ThenBy(genre => genre.Name)
             .Skip(genreRequest.PageSize * genreRequest.PageIndex)
             .Take(genreRequest.PageSize)
             .ToListAsync();
+
+        foreach (GenreDto genre in genres)
+        {
+            OrderGenreRelationships(genre);
+        }
 
         return new PageResponseDto<GenreDto>()
         {
@@ -116,6 +159,24 @@ public class SqlServerGenreRepository : IGenreRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetGenreRelationshipOrders(genre.GenreRelationships);
+
+        using var genreRelationshipsDataTable = new DataTable();
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.GenreId), typeof(Guid));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.DependentGenreId), typeof(Guid));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.Name), typeof(string));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.Description), typeof(string));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.Order), typeof(int));
+        foreach (GenreRelationshipDto genreRelationship in genre.GenreRelationships)
+        {
+            genreRelationshipsDataTable.Rows.Add(
+                genreRelationship.GenreId.AsDbValue(),
+                genreRelationship.DependentGenreId.AsDbValue(),
+                genreRelationship.Name.AsDbValue(),
+                genreRelationship.Description.AsDbValue(),
+                genreRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -126,6 +187,7 @@ public class SqlServerGenreRepository : IGenreRepository
             new SqlParameter(nameof(GenreDto.Description), genre.Description.AsDbValue()),
             new SqlParameter(nameof(GenreDto.SystemEntity), genre.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(GenreDto.Enabled), genre.Enabled.AsDbValue()),
+            new SqlParameter(nameof(GenreDto.GenreRelationships), SqlDbType.Structured) { TypeName = "[dbo].[GenreRelationship]", Value = genreRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(GenreDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(GenreDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(GenreDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -138,6 +200,7 @@ public class SqlServerGenreRepository : IGenreRepository
                 @{nameof(GenreDto.Description)},
                 @{nameof(GenreDto.SystemEntity)},
                 @{nameof(GenreDto.Enabled)},
+                @{nameof(GenreDto.GenreRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -156,6 +219,24 @@ public class SqlServerGenreRepository : IGenreRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetGenreRelationshipOrders(genre.GenreRelationships);
+
+        using var genreRelationshipsDataTable = new DataTable();
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.GenreId), typeof(Guid));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.DependentGenreId), typeof(Guid));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.Name), typeof(string));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.Description), typeof(string));
+        genreRelationshipsDataTable.Columns.Add(nameof(GenreRelationshipDto.Order), typeof(int));
+        foreach (GenreRelationshipDto genreRelationship in genre.GenreRelationships)
+        {
+            genreRelationshipsDataTable.Rows.Add(
+                genreRelationship.GenreId.AsDbValue(),
+                genreRelationship.DependentGenreId.AsDbValue(),
+                genreRelationship.Name.AsDbValue(),
+                genreRelationship.Description.AsDbValue(),
+                genreRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -164,6 +245,7 @@ public class SqlServerGenreRepository : IGenreRepository
             new SqlParameter(nameof(GenreDto.Description), genre.Description.AsDbValue()),
             new SqlParameter(nameof(GenreDto.SystemEntity), genre.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(GenreDto.Enabled), genre.Enabled.AsDbValue()),
+            new SqlParameter(nameof(GenreDto.GenreRelationships), SqlDbType.Structured) { TypeName = "[dbo].[GenreRelationship]", Value = genreRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -174,6 +256,7 @@ public class SqlServerGenreRepository : IGenreRepository
                 @{nameof(GenreDto.Description)},
                 @{nameof(GenreDto.SystemEntity)},
                 @{nameof(GenreDto.Enabled)},
+                @{nameof(GenreDto.GenreRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -203,5 +286,21 @@ public class SqlServerGenreRepository : IGenreRepository
 
         var rowsDeleted = (int)resultRowsDeletedParameter.Value;
         return rowsDeleted > 0;
+    }
+
+    private static void OrderGenreRelationships(GenreDto genre)
+    {
+        genre.GenreRelationships = genre.GenreRelationships
+            .OrderBy(genreRelationship => genreRelationship.Order)
+            .ToList();
+    }
+
+    private static void SetGenreRelationshipOrders(ICollection<GenreRelationshipDto> genreRelationships)
+    {
+        var i = 0;
+        foreach (GenreRelationshipDto genreRelationship in genreRelationships)
+        {
+            genreRelationship.Order = i++;
+        }
     }
 }
