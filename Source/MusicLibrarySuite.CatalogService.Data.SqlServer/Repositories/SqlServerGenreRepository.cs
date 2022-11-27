@@ -155,6 +155,35 @@ public class SqlServerGenreRepository : IGenreRepository
     }
 
     /// <inheritdoc />
+    public async Task<GenreRelationshipDto[]> GetGenreRelationshipsAsync(Guid genreId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<GenreRelationshipDto> baseCollection = context.GenreRelationships.AsNoTracking()
+            .Include(genreRelationship => genreRelationship.Genre)
+            .Include(genreRelationship => genreRelationship.DependentGenre);
+
+        GenreRelationshipDto[] genreRelationships = await baseCollection
+            .Where(genreRelationship => genreRelationship.GenreId == genreId)
+            .OrderBy(genreRelationship => genreRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            GenreRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(genreRelationship => genreRelationship.DependentGenreId == genreId)
+                .OrderBy(genreRelationship => genreRelationship.Genre.Name)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            genreRelationships = genreRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return genreRelationships;
+    }
+
+    /// <inheritdoc />
     public async Task<GenreDto> CreateGenreAsync(GenreDto genre)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
