@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -67,7 +68,11 @@ public class Startup
             });
         });
 
-        services.AddControllers();
+        IMvcBuilder mvcBuilder = services.AddControllers();
+        mvcBuilder.AddJsonOptions(jsonOptions =>
+        {
+            jsonOptions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        });
 
         services.AddEndpointsApiExplorer();
 
