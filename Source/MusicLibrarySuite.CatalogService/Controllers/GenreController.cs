@@ -110,6 +110,24 @@ public class GenreController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all genre relationships by a genre's unique identifier.
+    /// </summary>
+    /// <param name="genreId">The genre's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all genre relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<GenreRelationship[]>> GetGenreRelationshipsAsync([Required][FromQuery] Guid genreId, [FromQuery] bool includeReverseRelationships)
+    {
+        GenreRelationship[] genreRelationships = await m_genreService.GetGenreRelationshipsAsync(genreId, includeReverseRelationships);
+        return Ok(genreRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new genre.
     /// </summary>
     /// <param name="genre">The genre to create.</param>

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -46,4 +48,10 @@ public class Genre
     /// Gets or sets a value representing the moment of time when the entity was updated the last time.
     /// </summary>
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of genre-to-genre relationships where the current genre is the principal entity.
+    /// </summary>
+    [Required]
+    public ICollection<GenreRelationship> GenreRelationships { get; set; } = Enumerable.Empty<GenreRelationship>().ToList();
 }

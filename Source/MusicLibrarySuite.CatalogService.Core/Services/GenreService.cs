@@ -68,6 +68,14 @@ public class GenreService : IGenreService
     }
 
     /// <inheritdoc />
+    public async Task<GenreRelationship[]> GetGenreRelationshipsAsync(Guid genreId, bool includeReverseRelationships = false)
+    {
+        GenreRelationshipDto[] genreRelationshipDtoArray = await m_genreRepository.GetGenreRelationshipsAsync(genreId, includeReverseRelationships);
+        GenreRelationship[] genreRelationshipArray = m_mapper.Map<GenreRelationship[]>(genreRelationshipDtoArray);
+        return genreRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Genre> CreateGenreAsync(Genre genre)
     {
         GenreDto genreDto = m_mapper.Map<GenreDto>(genre);

@@ -62,6 +62,17 @@ public interface IGenreRepository
     public Task<PageResponseDto<GenreDto>> GetGenresAsync(GenreRequestDto genreRequest);
 
     /// <summary>
+    /// Asynchronously gets all genre relationships by a genre's unique identifier.
+    /// </summary>
+    /// <param name="genreId">The genre's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all genre relationships.
+    /// </returns>
+    public Task<GenreRelationshipDto[]> GetGenreRelationshipsAsync(Guid genreId, bool includeReverseRelationships = false);
+
+    /// <summary>
     /// Asynchronously creates a new genre.
     /// </summary>
     /// <param name="genre">The genre to create in the database.</param>
