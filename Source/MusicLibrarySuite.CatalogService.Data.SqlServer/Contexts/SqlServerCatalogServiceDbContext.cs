@@ -30,6 +30,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ArtistDto>().ToTable("Artist", "dbo");
+        modelBuilder.Entity<ArtistDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<ArtistDto>().HasCheckConstraint("CK_Artist_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ArtistDto>().HasCheckConstraint("CK_Artist_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<ArtistDto>().HasCheckConstraint("CK_Artist_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+
         modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
         modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
