@@ -42,7 +42,14 @@ public class SqlServerArtistRepository : IArtistRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetArtist] (@{artistIdParameter.ParameterName})";
 
         ArtistDto? artist = await context.Artists.FromSqlRaw(query, artistIdParameter).AsNoTracking()
+            .Include(artist => artist.ArtistRelationships)
+            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
             .FirstOrDefaultAsync();
+
+        if (artist is not null)
+        {
+            OrderArtistRelationships(artist);
+        }
 
         return artist;
     }
@@ -53,7 +60,14 @@ public class SqlServerArtistRepository : IArtistRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ArtistDto[] artists = await context.Artists.AsNoTracking()
+            .Include(artist => artist.ArtistRelationships)
+            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
             .ToArrayAsync();
+
+        foreach (ArtistDto artist in artists)
+        {
+            OrderArtistRelationships(artist);
+        }
 
         return artists;
     }
@@ -73,7 +87,14 @@ public class SqlServerArtistRepository : IArtistRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetArtists] (@{artistIdsParameter.ParameterName})";
 
         ArtistDto[] artists = await context.Artists.FromSqlRaw(query, artistIdsParameter).AsNoTracking()
+            .Include(artist => artist.ArtistRelationships)
+            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
             .ToArrayAsync();
+
+        foreach (ArtistDto artist in artists)
+        {
+            OrderArtistRelationships(artist);
+        }
 
         return artists;
     }
@@ -84,7 +105,14 @@ public class SqlServerArtistRepository : IArtistRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ArtistDto[] artists = await collectionProcessor(context.Artists.AsNoTracking())
+            .Include(artist => artist.ArtistRelationships)
+            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
             .ToArrayAsync();
+
+        foreach (ArtistDto artist in artists)
+        {
+            OrderArtistRelationships(artist);
+        }
 
         return artists;
     }
@@ -104,11 +132,18 @@ public class SqlServerArtistRepository : IArtistRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<ArtistDto> artists = await baseCollection
+            .Include(artist => artist.ArtistRelationships)
+            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
             .OrderByDescending(artist => artist.SystemEntity)
             .ThenBy(artist => artist.Name)
             .Skip(artistRequest.PageSize * artistRequest.PageIndex)
             .Take(artistRequest.PageSize)
             .ToListAsync();
+
+        foreach (ArtistDto artist in artists)
+        {
+            OrderArtistRelationships(artist);
+        }
 
         return new PageResponseDto<ArtistDto>()
         {
@@ -124,6 +159,24 @@ public class SqlServerArtistRepository : IArtistRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetArtistRelationshipOrders(artist.ArtistRelationships);
+
+        using var artistRelationshipsDataTable = new DataTable();
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.ArtistId), typeof(Guid));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.DependentArtistId), typeof(Guid));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.Name), typeof(string));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.Description), typeof(string));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.Order), typeof(int));
+        foreach (ArtistRelationshipDto artistRelationship in artist.ArtistRelationships)
+        {
+            artistRelationshipsDataTable.Rows.Add(
+                artistRelationship.ArtistId.AsDbValue(),
+                artistRelationship.DependentArtistId.AsDbValue(),
+                artistRelationship.Name.AsDbValue(),
+                artistRelationship.Description.AsDbValue(),
+                artistRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -135,6 +188,7 @@ public class SqlServerArtistRepository : IArtistRepository
             new SqlParameter(nameof(ArtistDto.DisambiguationText), artist.DisambiguationText.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.SystemEntity), artist.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.Enabled), artist.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ArtistDto.ArtistRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ArtistRelationship]", Value = artistRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ArtistDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ArtistDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ArtistDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -148,6 +202,7 @@ public class SqlServerArtistRepository : IArtistRepository
                 @{nameof(ArtistDto.DisambiguationText)},
                 @{nameof(ArtistDto.SystemEntity)},
                 @{nameof(ArtistDto.Enabled)},
+                @{nameof(ArtistDto.ArtistRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -166,6 +221,24 @@ public class SqlServerArtistRepository : IArtistRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetArtistRelationshipOrders(artist.ArtistRelationships);
+
+        using var artistRelationshipsDataTable = new DataTable();
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.ArtistId), typeof(Guid));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.DependentArtistId), typeof(Guid));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.Name), typeof(string));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.Description), typeof(string));
+        artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.Order), typeof(int));
+        foreach (ArtistRelationshipDto artistRelationship in artist.ArtistRelationships)
+        {
+            artistRelationshipsDataTable.Rows.Add(
+                artistRelationship.ArtistId.AsDbValue(),
+                artistRelationship.DependentArtistId.AsDbValue(),
+                artistRelationship.Name.AsDbValue(),
+                artistRelationship.Description.AsDbValue(),
+                artistRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -175,6 +248,7 @@ public class SqlServerArtistRepository : IArtistRepository
             new SqlParameter(nameof(ArtistDto.DisambiguationText), artist.DisambiguationText.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.SystemEntity), artist.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.Enabled), artist.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ArtistDto.ArtistRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ArtistRelationship]", Value = artistRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -186,6 +260,7 @@ public class SqlServerArtistRepository : IArtistRepository
                 @{nameof(ArtistDto.DisambiguationText)},
                 @{nameof(ArtistDto.SystemEntity)},
                 @{nameof(ArtistDto.Enabled)},
+                @{nameof(ArtistDto.ArtistRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -215,5 +290,21 @@ public class SqlServerArtistRepository : IArtistRepository
 
         var rowsDeleted = (int)resultRowsDeletedParameter.Value;
         return rowsDeleted > 0;
+    }
+
+    private static void OrderArtistRelationships(ArtistDto artist)
+    {
+        artist.ArtistRelationships = artist.ArtistRelationships
+            .OrderBy(artistRelationship => artistRelationship.Order)
+            .ToList();
+    }
+
+    private static void SetArtistRelationshipOrders(ICollection<ArtistRelationshipDto> artistRelationships)
+    {
+        var i = 0;
+        foreach (ArtistRelationshipDto artistRelationship in artistRelationships)
+        {
+            artistRelationship.Order = i++;
+        }
     }
 }
