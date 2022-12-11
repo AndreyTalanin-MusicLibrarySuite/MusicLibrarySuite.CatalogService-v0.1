@@ -47,6 +47,7 @@ public class Startup
         services.AddAutoMapper(options =>
         {
             options.AddProfile<CommonDatabaseProfile>();
+            options.AddProfile<ArtistDatabaseProfile>();
             options.AddProfile<GenreDatabaseProfile>();
         });
 
@@ -102,8 +103,10 @@ public class Startup
             });
         });
 
+        services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
         services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
 
+        services.AddScoped<IArtistService, ArtistService>();
         services.AddScoped<IGenreService, GenreService>();
     }
 
