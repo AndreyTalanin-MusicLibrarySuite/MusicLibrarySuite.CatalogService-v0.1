@@ -36,6 +36,31 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ArtistDto>().HasCheckConstraint("CK_Artist_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
         modelBuilder.Entity<ArtistDto>().HasCheckConstraint("CK_Artist_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
 
+        modelBuilder.Entity<ArtistRelationshipDto>().ToTable("ArtistRelationship", "dbo");
+        modelBuilder.Entity<ArtistRelationshipDto>().HasKey(entity => new { entity.ArtistId, entity.DependentArtistId });
+        modelBuilder.Entity<ArtistRelationshipDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ArtistRelationshipDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentArtistId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ArtistRelationshipDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ArtistRelationship_ArtistId");
+        modelBuilder.Entity<ArtistRelationshipDto>()
+            .HasIndex(entity => entity.DependentArtistId)
+            .HasDatabaseName("IX_ArtistRelationship_DependentArtistId");
+        modelBuilder.Entity<ArtistRelationshipDto>()
+            .HasIndex(entity => new { entity.ArtistId, entity.Order })
+            .HasDatabaseName("UIX_ArtistRelationship_ArtistId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ArtistRelationshipDto>().HasCheckConstraint("CK_ArtistRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ArtistRelationshipDto>().HasCheckConstraint("CK_ArtistRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
         modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
