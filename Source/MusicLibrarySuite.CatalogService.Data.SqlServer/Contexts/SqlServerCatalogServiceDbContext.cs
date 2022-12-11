@@ -40,7 +40,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ArtistRelationshipDto>().HasKey(entity => new { entity.ArtistId, entity.DependentArtistId });
         modelBuilder.Entity<ArtistRelationshipDto>()
             .HasOne<ArtistDto>()
-            .WithMany()
+            .WithMany(entity => entity.ArtistRelationships)
             .HasForeignKey(entity => entity.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ArtistRelationshipDto>()

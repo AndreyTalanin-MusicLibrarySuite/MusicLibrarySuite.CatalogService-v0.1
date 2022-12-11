@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -55,4 +57,9 @@ public class ArtistDto
     /// </summary>
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of artist-to-artist relationships where the current artist is the principal entity.
+    /// </summary>
+    public ICollection<ArtistRelationshipDto> ArtistRelationships { get; set; } = Enumerable.Empty<ArtistRelationshipDto>().ToList();
 }
