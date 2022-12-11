@@ -34,4 +34,16 @@ public class ArtistRelationshipDto
     /// Gets or sets the relationship's display order.
     /// </summary>
     public int Order { get; set; }
+
+    /// <summary>
+    /// Gets or sets the principal artist.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ArtistDto? Artist { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dependent artist.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ArtistDto? DependentArtist { get; set; }
 }
