@@ -7,111 +7,112 @@ using MusicLibrarySuite.CatalogService.Data.Entities;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations;
 
 /// <summary>
-/// Represents a database migration adding the <see cref="GenreRelationshipDto" /> entity.
+/// Represents a database migration adding the <see cref="ArtistRelationshipDto" /> entity.
 /// </summary>
-public partial class GenreRelationshipsMigration : Migration
+public partial class ArtistRelationshipsMigration : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
-            name: "GenreRelationship",
+            name: "ArtistRelationship",
             schema: "dbo",
             columns: table => new
             {
-                GenreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                DependentGenreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                DependentArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                 Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
                 Order = table.Column<int>(type: "int", nullable: false)
             },
             constraints: table =>
             {
-                table.PrimaryKey(name: "PK_GenreRelationship", columns: x => new { x.GenreId, x.DependentGenreId });
+                table.PrimaryKey(name: "PK_ArtistRelationship", columns: x => new { x.ArtistId, x.DependentArtistId });
                 table.ForeignKey(
-                    name: "FK_GenreRelationship_Genre_GenreId",
-                    column: x => x.GenreId,
+                    name: "FK_ArtistRelationship_Artist_ArtistId",
+                    column: x => x.ArtistId,
                     principalSchema: "dbo",
-                    principalTable: "Genre",
+                    principalTable: "Artist",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
-                    name: "FK_GenreRelationship_Genre_DependentGenreId",
-                    column: x => x.DependentGenreId,
+                    name: "FK_ArtistRelationship_Artist_DependentArtistId",
+                    column: x => x.DependentArtistId,
                     principalSchema: "dbo",
-                    principalTable: "Genre",
+                    principalTable: "Artist",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Restrict);
-                table.CheckConstraint(name: "CK_GenreRelationship_Name", sql: "LEN(TRIM([Name])) > 0");
-                table.CheckConstraint(name: "CK_GenreRelationship_Description", sql: "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+                table.CheckConstraint(name: "CK_ArtistRelationship_Name", sql: "LEN(TRIM([Name])) > 0");
+                table.CheckConstraint(name: "CK_ArtistRelationship_Description", sql: "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
             });
 
         migrationBuilder.CreateIndex(
-            name: "IX_GenreRelationship_GenreId",
+            name: "IX_ArtistRelationship_ArtistId",
             schema: "dbo",
-            table: "GenreRelationship",
-            column: "GenreId");
+            table: "ArtistRelationship",
+            column: "ArtistId");
 
         migrationBuilder.CreateIndex(
-            name: "IX_GenreRelationship_DependentGenreId",
+            name: "IX_ArtistRelationship_DependentArtistId",
             schema: "dbo",
-            table: "GenreRelationship",
-            column: "DependentGenreId");
+            table: "ArtistRelationship",
+            column: "DependentArtistId");
 
         migrationBuilder.CreateIndex(
-            name: "UIX_GenreRelationship_GenreId_Order",
+            name: "UIX_ArtistRelationship_ArtistId_Order",
             schema: "dbo",
-            table: "GenreRelationship",
-            columns: new[] { "GenreId", "Order" },
+            table: "ArtistRelationship",
+            columns: new[] { "ArtistId", "Order" },
             unique: true);
 
         migrationBuilder.Sql(@"
-            CREATE TRIGGER [dbo].[TR_GenreRelationship_AfterInsertUpdateDelete_SetGenreUpdatedOn]
-            ON [dbo].[GenreRelationship]
+            CREATE TRIGGER [dbo].[TR_ArtistRelationship_AfterInsertUpdateDelete_SetArtistUpdatedOn]
+            ON [dbo].[ArtistRelationship]
             AFTER INSERT, UPDATE, DELETE
             AS
             BEGIN
                 SET NOCOUNT ON;
 
-                WITH [UpdatedGenre] AS
+                WITH [UpdatedArtist] AS
                 (
-                    SELECT [insertedGenreRelationship].[GenreId] AS [Id]
-                    FROM [inserted] AS [insertedGenreRelationship]
+                    SELECT [insertedArtistRelationship].[ArtistId] AS [Id]
+                    FROM [inserted] AS [insertedArtistRelationship]
                     UNION
-                    SELECT [deletedGenreRelationship].[GenreId] AS [Id]
-                    FROM [deleted] AS [deletedGenreRelationship]
+                    SELECT [deletedArtistRelationship].[ArtistId] AS [Id]
+                    FROM [deleted] AS [deletedArtistRelationship]
                 )
-                UPDATE [dbo].[Genre]
+                UPDATE [dbo].[Artist]
                 SET [UpdatedOn] = SYSDATETIMEOFFSET()
-                FROM [dbo].[Genre] AS [genre]
-                INNER JOIN [UpdatedGenre] AS [updatedGenre] ON [updatedGenre].[Id] = [genre].[Id];
+                FROM [dbo].[Artist] AS [artist]
+                INNER JOIN [UpdatedArtist] AS [updatedArtist] ON [updatedArtist].[Id] = [artist].[Id];
             END;");
 
         migrationBuilder.Sql(@"
-            CREATE TYPE [dbo].[GenreRelationship] AS TABLE
+            CREATE TYPE [dbo].[ArtistRelationship] AS TABLE
             (
-                [GenreId] UNIQUEIDENTIFIER NOT NULL,
-                [DependentGenreId] UNIQUEIDENTIFIER NOT NULL,
+                [ArtistId] UNIQUEIDENTIFIER NOT NULL,
+                [DependentArtistId] UNIQUEIDENTIFIER NOT NULL,
                 [Name] NVARCHAR(256) NOT NULL,
                 [Description] NVARCHAR(2048) NULL,
                 [Order] INT NOT NULL
             );");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateArtist];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateArtist];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteArtist];");
 
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_CreateGenre]
+            CREATE PROCEDURE [dbo].[sp_CreateArtist]
             (
                 @Id UNIQUEIDENTIFIER,
                 @Name NVARCHAR(256),
                 @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
                 @SystemEntity BIT,
                 @Enabled BIT,
-                @GenreRelationships [dbo].[GenreRelationship] READONLY,
+                @ArtistRelationships [dbo].[ArtistRelationship] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
                 @ResultCreatedOn DATETIMEOFFSET OUTPUT,
                 @ResultUpdatedOn DATETIMEOFFSET OUTPUT
@@ -127,11 +128,12 @@ public partial class GenreRelationshipsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Genre]
+                INSERT INTO [dbo].[Artist]
                 (
                     [Id],
                     [Name],
                     [Description],
+                    [DisambiguationText],
                     [SystemEntity],
                     [Enabled]
                 )
@@ -140,29 +142,30 @@ public partial class GenreRelationshipsMigration : Migration
                     @Id,
                     @Name,
                     @Description,
+                    @DisambiguationText,
                     @SystemEntity,
                     @Enabled
                 );
 
-                WITH [SourceGenreRelationship] AS
+                WITH [SourceArtistRelationship] AS
                 (
-                    SELECT * FROM @GenreRelationships WHERE [GenreId] = @Id
+                    SELECT * FROM @ArtistRelationships WHERE [ArtistId] = @Id
                 )
-                MERGE INTO [dbo].[GenreRelationship] AS [target]
-                USING [SourceGenreRelationship] AS [source]
-                ON [target].[GenreId] = [source].[GenreId] AND [target].[DependentGenreId] = [source].[DependentGenreId]
+                MERGE INTO [dbo].[ArtistRelationship] AS [target]
+                USING [SourceArtistRelationship] AS [source]
+                ON [target].[ArtistId] = [source].[ArtistId] AND [target].[DependentArtistId] = [source].[DependentArtistId]
                 WHEN NOT MATCHED THEN INSERT
                 (
-                    [GenreId],
-                    [DependentGenreId],
+                    [ArtistId],
+                    [DependentArtistId],
                     [Name],
                     [Description],
                     [Order]
                 )
                 VALUES
                 (
-                    [source].[GenreId],
-                    [source].[DependentGenreId],
+                    [source].[ArtistId],
+                    [source].[DependentArtistId],
                     [source].[Name],
                     [source].[Description],
                     [source].[Order]
@@ -172,44 +175,46 @@ public partial class GenreRelationshipsMigration : Migration
 
                 SELECT TOP (1)
                     @ResultId = @Id,
-                    @ResultCreatedOn = [genre].[CreatedOn],
-                    @ResultUpdatedOn = [genre].[UpdatedOn]
-                FROM [dbo].[Genre] AS [genre]
-                WHERE [genre].[Id] = @Id;
+                    @ResultCreatedOn = [artist].[CreatedOn],
+                    @ResultUpdatedOn = [artist].[UpdatedOn]
+                FROM [dbo].[Artist] AS [artist]
+                WHERE [artist].[Id] = @Id;
             END;");
 
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_UpdateGenre]
+            CREATE PROCEDURE [dbo].[sp_UpdateArtist]
             (
                 @Id UNIQUEIDENTIFIER,
                 @Name NVARCHAR(256),
                 @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
                 @SystemEntity BIT,
                 @Enabled BIT,
-                @GenreRelationships [dbo].[GenreRelationship] READONLY,
+                @ArtistRelationships [dbo].[ArtistRelationship] READONLY,
                 @ResultRowsUpdated INT OUTPUT
             )
             AS
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Genre]
+                UPDATE [dbo].[Artist]
                 SET
                     [Name] = @Name,
                     [Description] = @Description,
+                    [DisambiguationText] = @DisambiguationText,
                     [SystemEntity] = @SystemEntity,
                     [Enabled] = @Enabled
                 WHERE [Id] = @Id;
 
                 SET @ResultRowsUpdated = @@ROWCOUNT;
 
-                WITH [SourceGenreRelationship] AS
+                WITH [SourceArtistRelationship] AS
                 (
-                    SELECT * FROM @GenreRelationships WHERE [GenreId] = @Id
+                    SELECT * FROM @ArtistRelationships WHERE [ArtistId] = @Id
                 )
-                MERGE INTO [dbo].[GenreRelationship] AS [target]
-                USING [SourceGenreRelationship] AS [source]
-                ON [target].[GenreId] = [source].[GenreId] AND [target].[DependentGenreId] = [source].[DependentGenreId]
+                MERGE INTO [dbo].[ArtistRelationship] AS [target]
+                USING [SourceArtistRelationship] AS [source]
+                ON [target].[ArtistId] = [source].[ArtistId] AND [target].[DependentArtistId] = [source].[DependentArtistId]
                 WHEN MATCHED THEN UPDATE
                 SET
                     [target].[Name] = [source].[Name],
@@ -217,21 +222,21 @@ public partial class GenreRelationshipsMigration : Migration
                     [target].[Order] = [source].[Order]
                 WHEN NOT MATCHED THEN INSERT
                 (
-                    [GenreId],
-                    [DependentGenreId],
+                    [ArtistId],
+                    [DependentArtistId],
                     [Name],
                     [Description],
                     [Order]
                 )
                 VALUES
                 (
-                    [source].[GenreId],
-                    [source].[DependentGenreId],
+                    [source].[ArtistId],
+                    [source].[DependentArtistId],
                     [source].[Name],
                     [source].[Description],
                     [source].[Order]
                 )
-                WHEN NOT MATCHED BY SOURCE AND [target].[GenreId] = @Id THEN DELETE;
+                WHEN NOT MATCHED BY SOURCE AND [target].[ArtistId] = @Id THEN DELETE;
 
                 SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
 
@@ -239,14 +244,14 @@ public partial class GenreRelationshipsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteGenre]
+            CREATE PROCEDURE [dbo].[sp_DeleteArtist]
             (
                 @Id UNIQUEIDENTIFIER,
                 @ResultRowsDeleted INT OUTPUT
             )
             AS
             BEGIN
-                DELETE FROM [dbo].[Genre] WHERE [Id] = @Id;
+                DELETE FROM [dbo].[Artist] WHERE [Id] = @Id;
 
                 SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
@@ -255,22 +260,23 @@ public partial class GenreRelationshipsMigration : Migration
     /// <inheritdoc />
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateArtist];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateArtist];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteArtist];");
 
-        migrationBuilder.DropTable(name: "GenreRelationship", schema: "dbo");
+        migrationBuilder.DropTable(name: "ArtistRelationship", schema: "dbo");
 
-        migrationBuilder.Sql("DROP TYPE [dbo].[GenreRelationship];");
+        migrationBuilder.Sql("DROP TYPE [dbo].[ArtistRelationship];");
 
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_CreateGenre]
+            CREATE PROCEDURE [dbo].[sp_CreateArtist]
             (
                 @Id UNIQUEIDENTIFIER,
                 @Name NVARCHAR(256),
                 @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
                 @SystemEntity BIT,
                 @Enabled BIT,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
@@ -286,11 +292,12 @@ public partial class GenreRelationshipsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Genre]
+                INSERT INTO [dbo].[Artist]
                 (
                     [Id],
                     [Name],
                     [Description],
+                    [DisambiguationText],
                     [SystemEntity],
                     [Enabled]
                 )
@@ -299,34 +306,37 @@ public partial class GenreRelationshipsMigration : Migration
                     @Id,
                     @Name,
                     @Description,
+                    @DisambiguationText,
                     @SystemEntity,
                     @Enabled
                 );
 
                 SELECT TOP (1)
                     @ResultId = @Id,
-                    @ResultCreatedOn = [genre].[CreatedOn],
-                    @ResultUpdatedOn = [genre].[UpdatedOn]
-                FROM [dbo].[Genre] AS [genre]
-                WHERE [genre].[Id] = @Id;
+                    @ResultCreatedOn = [artist].[CreatedOn],
+                    @ResultUpdatedOn = [artist].[UpdatedOn]
+                FROM [dbo].[Artist] AS [artist]
+                WHERE [artist].[Id] = @Id;
             END;");
 
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_UpdateGenre]
+            CREATE PROCEDURE [dbo].[sp_UpdateArtist]
             (
                 @Id UNIQUEIDENTIFIER,
                 @Name NVARCHAR(256),
                 @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
                 @SystemEntity BIT,
                 @Enabled BIT,
                 @ResultRowsUpdated INT OUTPUT
             )
             AS
             BEGIN
-                UPDATE [dbo].[Genre]
+                UPDATE [dbo].[Artist]
                 SET
                     [Name] = @Name,
                     [Description] = @Description,
+                    [DisambiguationText] = @DisambiguationText,
                     [SystemEntity] = @SystemEntity,
                     [Enabled] = @Enabled
                 WHERE [Id] = @Id;
@@ -335,14 +345,14 @@ public partial class GenreRelationshipsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteGenre]
+            CREATE PROCEDURE [dbo].[sp_DeleteArtist]
             (
                 @Id UNIQUEIDENTIFIER,
                 @ResultRowsDeleted INT OUTPUT
             )
             AS
             BEGIN
-                DELETE FROM [dbo].[Genre] WHERE [Id] = @Id;
+                DELETE FROM [dbo].[Artist] WHERE [Id] = @Id;
 
                 SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
