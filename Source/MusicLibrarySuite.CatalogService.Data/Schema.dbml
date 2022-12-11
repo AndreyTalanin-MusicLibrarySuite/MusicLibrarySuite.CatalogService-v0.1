@@ -41,3 +41,25 @@ Table "dbo"."Artist" {
     "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
     "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
 }
+
+Table "dbo"."ArtistRelationship" {
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "DependentArtistId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+
+    Indexes {
+        "ArtistId" [name: "IX_ArtistRelationship_ArtistId"]
+        "DependentArtistId" [name: "IX_ArtistRelationship_DependentArtistId"]
+        ("ArtistId", "Order") [name: "UIX_ArtistRelationship_ArtistId_Order", unique]
+    }
+}
+
+Ref "FK_ArtistRelationship_Artist_ArtistId" {
+    "dbo"."ArtistRelationship"."ArtistId" > "dbo"."Artist"."Id"
+}
+
+Ref "FK_ArtistRelationship_Artist_DependentArtistId" {
+    "dbo"."ArtistRelationship"."DependentArtistId" > "dbo"."Artist"."Id"
+}
