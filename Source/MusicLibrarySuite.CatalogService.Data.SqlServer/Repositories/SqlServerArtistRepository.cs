@@ -155,6 +155,35 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
+    public async Task<ArtistRelationshipDto[]> GetArtistRelationshipsAsync(Guid artistId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<ArtistRelationshipDto> baseCollection = context.ArtistRelationships.AsNoTracking()
+            .Include(artistRelationship => artistRelationship.Artist)
+            .Include(artistRelationship => artistRelationship.DependentArtist);
+
+        ArtistRelationshipDto[] artistRelationships = await baseCollection
+            .Where(artistRelationship => artistRelationship.ArtistId == artistId)
+            .OrderBy(artistRelationship => artistRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            ArtistRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(artistRelationship => artistRelationship.DependentArtistId == artistId)
+                .OrderBy(artistRelationship => artistRelationship.Artist.Name)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            artistRelationships = artistRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return artistRelationships;
+    }
+
+    /// <inheritdoc />
     public async Task<ArtistDto> CreateArtistAsync(ArtistDto artist)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();

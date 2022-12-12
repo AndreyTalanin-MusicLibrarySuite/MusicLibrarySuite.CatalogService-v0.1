@@ -68,6 +68,14 @@ public class ArtistService : IArtistService
     }
 
     /// <inheritdoc />
+    public async Task<ArtistRelationship[]> GetArtistRelationshipsAsync(Guid artistId, bool includeReverseRelationships = false)
+    {
+        ArtistRelationshipDto[] artistRelationshipDtoArray = await m_artistRepository.GetArtistRelationshipsAsync(artistId, includeReverseRelationships);
+        ArtistRelationship[] artistRelationshipArray = m_mapper.Map<ArtistRelationship[]>(artistRelationshipDtoArray);
+        return artistRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Artist> CreateArtistAsync(Artist artist)
     {
         ArtistDto artistDto = m_mapper.Map<ArtistDto>(artist);
