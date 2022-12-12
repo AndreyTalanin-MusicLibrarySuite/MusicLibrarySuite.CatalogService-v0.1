@@ -21,6 +21,7 @@ public class ArtistDatabaseProfile : Profile
         DestinationMemberNamingConvention = ExactMatchNamingConvention.Instance;
 
         CreateMap<Artist, ArtistDto>().ReverseMap();
+        CreateMap<ArtistRelationship, ArtistRelationshipDto>().ReverseMap();
         CreateMap<ArtistRequest, ArtistRequestDto>().ReverseMap();
         CreateMap<ArtistPageResponse, PageResponseDto<ArtistDto>>().ReverseMap();
         CreateMap<PageResponse<Artist>, PageResponseDto<ArtistDto>>().ReverseMap();
