@@ -30,4 +30,16 @@ public class ArtistRelationship
     /// Gets or sets the relationship's description.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the principal artist.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Artist? Artist { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dependent artist.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Artist? DependentArtist { get; set; }
 }
