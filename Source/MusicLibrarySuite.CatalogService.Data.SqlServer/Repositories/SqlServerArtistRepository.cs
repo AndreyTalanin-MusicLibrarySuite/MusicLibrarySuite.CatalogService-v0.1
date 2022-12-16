@@ -44,11 +44,14 @@ public class SqlServerArtistRepository : IArtistRepository
         ArtistDto? artist = await context.Artists.FromSqlRaw(query, artistIdParameter).AsNoTracking()
             .Include(artist => artist.ArtistRelationships)
             .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
+            .Include(artist => artist.ArtistGenres)
+            .ThenInclude(artistGenre => artistGenre.Genre)
             .FirstOrDefaultAsync();
 
         if (artist is not null)
         {
             OrderArtistRelationships(artist);
+            OrderArtistGenres(artist);
         }
 
         return artist;
@@ -62,11 +65,14 @@ public class SqlServerArtistRepository : IArtistRepository
         ArtistDto[] artists = await context.Artists.AsNoTracking()
             .Include(artist => artist.ArtistRelationships)
             .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
+            .Include(artist => artist.ArtistGenres)
+            .ThenInclude(artistGenre => artistGenre.Genre)
             .ToArrayAsync();
 
         foreach (ArtistDto artist in artists)
         {
             OrderArtistRelationships(artist);
+            OrderArtistGenres(artist);
         }
 
         return artists;
@@ -89,11 +95,14 @@ public class SqlServerArtistRepository : IArtistRepository
         ArtistDto[] artists = await context.Artists.FromSqlRaw(query, artistIdsParameter).AsNoTracking()
             .Include(artist => artist.ArtistRelationships)
             .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
+            .Include(artist => artist.ArtistGenres)
+            .ThenInclude(artistGenre => artistGenre.Genre)
             .ToArrayAsync();
 
         foreach (ArtistDto artist in artists)
         {
             OrderArtistRelationships(artist);
+            OrderArtistGenres(artist);
         }
 
         return artists;
@@ -107,11 +116,14 @@ public class SqlServerArtistRepository : IArtistRepository
         ArtistDto[] artists = await collectionProcessor(context.Artists.AsNoTracking())
             .Include(artist => artist.ArtistRelationships)
             .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
+            .Include(artist => artist.ArtistGenres)
+            .ThenInclude(artistGenre => artistGenre.Genre)
             .ToArrayAsync();
 
         foreach (ArtistDto artist in artists)
         {
             OrderArtistRelationships(artist);
+            OrderArtistGenres(artist);
         }
 
         return artists;
@@ -134,6 +146,8 @@ public class SqlServerArtistRepository : IArtistRepository
         List<ArtistDto> artists = await baseCollection
             .Include(artist => artist.ArtistRelationships)
             .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
+            .Include(artist => artist.ArtistGenres)
+            .ThenInclude(artistGenre => artistGenre.Genre)
             .OrderByDescending(artist => artist.SystemEntity)
             .ThenBy(artist => artist.Name)
             .Skip(artistRequest.PageSize * artistRequest.PageIndex)
@@ -143,6 +157,7 @@ public class SqlServerArtistRepository : IArtistRepository
         foreach (ArtistDto artist in artists)
         {
             OrderArtistRelationships(artist);
+            OrderArtistGenres(artist);
         }
 
         return new PageResponseDto<ArtistDto>()
@@ -189,6 +204,7 @@ public class SqlServerArtistRepository : IArtistRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         SetArtistRelationshipOrders(artist.ArtistRelationships);
+        SetArtistGenreOrders(artist.ArtistGenres);
 
         using var artistRelationshipsDataTable = new DataTable();
         artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.ArtistId), typeof(Guid));
@@ -206,6 +222,18 @@ public class SqlServerArtistRepository : IArtistRepository
                 artistRelationship.Order.AsDbValue());
         }
 
+        using var artistGenresDataTable = new DataTable();
+        artistGenresDataTable.Columns.Add(nameof(ArtistGenreDto.ArtistId), typeof(Guid));
+        artistGenresDataTable.Columns.Add(nameof(ArtistGenreDto.GenreId), typeof(Guid));
+        artistGenresDataTable.Columns.Add(nameof(ArtistGenreDto.Order), typeof(int));
+        foreach (ArtistGenreDto artistGenre in artist.ArtistGenres)
+        {
+            artistGenresDataTable.Rows.Add(
+                artistGenre.ArtistId.AsDbValue(),
+                artistGenre.GenreId.AsDbValue(),
+                artistGenre.Order.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -218,6 +246,7 @@ public class SqlServerArtistRepository : IArtistRepository
             new SqlParameter(nameof(ArtistDto.SystemEntity), artist.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.Enabled), artist.Enabled.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.ArtistRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ArtistRelationship]", Value = artistRelationshipsDataTable },
+            new SqlParameter(nameof(ArtistDto.ArtistGenres), SqlDbType.Structured) { TypeName = "[dbo].[ArtistGenre]", Value = artistGenresDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ArtistDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ArtistDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ArtistDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -232,6 +261,7 @@ public class SqlServerArtistRepository : IArtistRepository
                 @{nameof(ArtistDto.SystemEntity)},
                 @{nameof(ArtistDto.Enabled)},
                 @{nameof(ArtistDto.ArtistRelationships)},
+                @{nameof(ArtistDto.ArtistGenres)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -251,6 +281,7 @@ public class SqlServerArtistRepository : IArtistRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         SetArtistRelationshipOrders(artist.ArtistRelationships);
+        SetArtistGenreOrders(artist.ArtistGenres);
 
         using var artistRelationshipsDataTable = new DataTable();
         artistRelationshipsDataTable.Columns.Add(nameof(ArtistRelationshipDto.ArtistId), typeof(Guid));
@@ -268,6 +299,18 @@ public class SqlServerArtistRepository : IArtistRepository
                 artistRelationship.Order.AsDbValue());
         }
 
+        using var artistGenresDataTable = new DataTable();
+        artistGenresDataTable.Columns.Add(nameof(ArtistGenreDto.ArtistId), typeof(Guid));
+        artistGenresDataTable.Columns.Add(nameof(ArtistGenreDto.GenreId), typeof(Guid));
+        artistGenresDataTable.Columns.Add(nameof(ArtistGenreDto.Order), typeof(int));
+        foreach (ArtistGenreDto artistGenre in artist.ArtistGenres)
+        {
+            artistGenresDataTable.Rows.Add(
+                artistGenre.ArtistId.AsDbValue(),
+                artistGenre.GenreId.AsDbValue(),
+                artistGenre.Order.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -278,6 +321,7 @@ public class SqlServerArtistRepository : IArtistRepository
             new SqlParameter(nameof(ArtistDto.SystemEntity), artist.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.Enabled), artist.Enabled.AsDbValue()),
             new SqlParameter(nameof(ArtistDto.ArtistRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ArtistRelationship]", Value = artistRelationshipsDataTable },
+            new SqlParameter(nameof(ArtistDto.ArtistGenres), SqlDbType.Structured) { TypeName = "[dbo].[ArtistGenre]", Value = artistGenresDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -290,6 +334,7 @@ public class SqlServerArtistRepository : IArtistRepository
                 @{nameof(ArtistDto.SystemEntity)},
                 @{nameof(ArtistDto.Enabled)},
                 @{nameof(ArtistDto.ArtistRelationships)},
+                @{nameof(ArtistDto.ArtistGenres)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -328,12 +373,28 @@ public class SqlServerArtistRepository : IArtistRepository
             .ToList();
     }
 
+    private static void OrderArtistGenres(ArtistDto artist)
+    {
+        artist.ArtistGenres = artist.ArtistGenres
+            .OrderBy(artistGenre => artistGenre.Order)
+            .ToList();
+    }
+
     private static void SetArtistRelationshipOrders(ICollection<ArtistRelationshipDto> artistRelationships)
     {
         var i = 0;
         foreach (ArtistRelationshipDto artistRelationship in artistRelationships)
         {
             artistRelationship.Order = i++;
+        }
+    }
+
+    private static void SetArtistGenreOrders(ICollection<ArtistGenreDto> artistGenres)
+    {
+        var i = 0;
+        foreach (ArtistGenreDto artistGenre in artistGenres)
+        {
+            artistGenre.Order = i++;
         }
     }
 }
