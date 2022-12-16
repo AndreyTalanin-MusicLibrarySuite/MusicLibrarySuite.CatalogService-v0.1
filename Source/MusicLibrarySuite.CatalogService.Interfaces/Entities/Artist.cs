@@ -59,4 +59,10 @@ public class Artist
     /// </summary>
     [Required]
     public ICollection<ArtistRelationship> ArtistRelationships { get; set; } = Enumerable.Empty<ArtistRelationship>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of artist-to-genre relationships associated to the current artist.
+    /// </summary>
+    [Required]
+    public ICollection<ArtistGenre> ArtistGenres { get; set; } = Enumerable.Empty<ArtistGenre>().ToList();
 }
