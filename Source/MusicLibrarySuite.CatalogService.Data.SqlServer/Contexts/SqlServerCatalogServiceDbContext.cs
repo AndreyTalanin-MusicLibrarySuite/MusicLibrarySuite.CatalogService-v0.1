@@ -64,12 +64,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ArtistGenreDto>().ToTable("ArtistGenre", "dbo");
         modelBuilder.Entity<ArtistGenreDto>().HasKey(entity => new { entity.ArtistId, entity.GenreId });
         modelBuilder.Entity<ArtistGenreDto>()
-            .HasOne<ArtistDto>()
+            .HasOne(entity => entity.Artist)
             .WithMany(entity => entity.ArtistGenres)
             .HasForeignKey(entity => entity.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ArtistGenreDto>()
-            .HasOne<GenreDto>()
+            .HasOne(entity => entity.Genre)
             .WithMany()
             .HasForeignKey(entity => entity.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
