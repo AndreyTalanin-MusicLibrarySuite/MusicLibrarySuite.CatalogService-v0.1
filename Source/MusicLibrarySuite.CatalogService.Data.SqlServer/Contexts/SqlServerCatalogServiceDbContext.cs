@@ -65,7 +65,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ArtistGenreDto>().HasKey(entity => new { entity.ArtistId, entity.GenreId });
         modelBuilder.Entity<ArtistGenreDto>()
             .HasOne<ArtistDto>()
-            .WithMany()
+            .WithMany(entity => entity.ArtistGenres)
             .HasForeignKey(entity => entity.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ArtistGenreDto>()
