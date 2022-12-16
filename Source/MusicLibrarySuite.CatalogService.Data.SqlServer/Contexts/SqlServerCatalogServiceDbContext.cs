@@ -61,6 +61,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ArtistRelationshipDto>().HasCheckConstraint("CK_ArtistRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ArtistRelationshipDto>().HasCheckConstraint("CK_ArtistRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<ArtistGenreDto>().ToTable("ArtistGenre", "dbo");
+        modelBuilder.Entity<ArtistGenreDto>().HasKey(entity => new { entity.ArtistId, entity.GenreId });
+        modelBuilder.Entity<ArtistGenreDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ArtistGenreDto>()
+            .HasOne<GenreDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ArtistGenreDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ArtistGenre_ArtistId");
+        modelBuilder.Entity<ArtistGenreDto>()
+            .HasIndex(entity => entity.GenreId)
+            .HasDatabaseName("IX_ArtistGenre_GenreId");
+        modelBuilder.Entity<ArtistGenreDto>()
+            .HasIndex(entity => new { entity.ArtistId, entity.Order })
+            .HasDatabaseName("UIX_ArtistGenre_ArtistId_Order")
+            .IsUnique();
+
         modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
         modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
