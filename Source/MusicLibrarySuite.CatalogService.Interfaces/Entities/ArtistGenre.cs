@@ -25,4 +25,16 @@ public class ArtistGenre
     /// </summary>
     [Required]
     public int Order { get; set; }
+
+    /// <summary>
+    /// Gets or sets the artist.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public Artist? Artist { get; set; }
+
+    /// <summary>
+    /// Gets or sets the genre.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public Genre? Genre { get; set; }
 }
