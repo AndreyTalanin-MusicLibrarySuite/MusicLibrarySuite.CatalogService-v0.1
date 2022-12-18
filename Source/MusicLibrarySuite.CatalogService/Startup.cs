@@ -47,6 +47,7 @@ public class Startup
         services.AddAutoMapper(options =>
         {
             options.AddProfile<CommonDatabaseProfile>();
+            options.AddProfile<ArtistDatabaseProfile>();
             options.AddProfile<GenreDatabaseProfile>();
         });
 
@@ -94,16 +95,18 @@ public class Startup
 
             options.SwaggerDoc("MusicLibrarySuite.CatalogService", new OpenApiInfo()
             {
-                Title = "Music Library Suite - Catalog Service API v0.3.0",
+                Title = "Music Library Suite - Catalog Service API v0.4.0-rc1",
                 Description = "Initial pre-release (unstable) API version.",
-                Version = "v0.3.0",
+                Version = "v0.4.0-rc1",
                 Contact = contact,
                 License = license,
             });
         });
 
+        services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
         services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
 
+        services.AddScoped<IArtistService, ArtistService>();
         services.AddScoped<IGenreService, GenreService>();
     }
 

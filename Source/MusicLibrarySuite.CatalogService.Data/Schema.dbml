@@ -29,3 +29,15 @@ Ref "FK_GenreRelationship_Genre_GenreId" {
 Ref "FK_GenreRelationship_Genre_DependentGenreId" {
     "dbo"."GenreRelationship"."DependentGenreId" > "dbo"."Genre"."Id"
 }
+
+
+Table "dbo"."Artist" {
+    "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "DisambiguationText" nvarchar(2048) [null]
+    "SystemEntity" bit [not null]
+    "Enabled" bit [not null]
+    "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+    "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+}

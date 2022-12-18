@@ -10,6 +10,11 @@ namespace MusicLibrarySuite.CatalogService.Data.Contexts;
 public abstract class CatalogServiceDbContext : DbContext
 {
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ArtistDto" /> type.
+    /// </summary>
+    public DbSet<ArtistDto> Artists { get; }
+
+    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreDto" /> type.
     /// </summary>
     public DbSet<GenreDto> Genres { get; }
@@ -25,6 +30,7 @@ public abstract class CatalogServiceDbContext : DbContext
     protected CatalogServiceDbContext()
         : base()
     {
+        Artists = Set<ArtistDto>();
         Genres = Set<GenreDto>();
         GenreRelationships = Set<GenreRelationshipDto>();
     }
@@ -36,6 +42,7 @@ public abstract class CatalogServiceDbContext : DbContext
     protected CatalogServiceDbContext(DbContextOptions contextOptions)
         : base(contextOptions)
     {
+        Artists = Set<ArtistDto>();
         Genres = Set<GenreDto>();
         GenreRelationships = Set<GenreRelationshipDto>();
     }
