@@ -8,7 +8,7 @@
     <Authors>Andrey Talanin</Authors>
     <Description>Interfaces for the MusicLibrarySuite.CatalogService service.</Description>
     <RepositoryUrl>https://github.com/AndreyTalanin-MusicLibrarySuite/MusicLibrarySuite.CatalogService.git</RepositoryUrl>
-    <Version>0.4.0-rc3</Version>
+    <Version>0.4.0</Version>
   </PropertyGroup>
 
 </Project>
