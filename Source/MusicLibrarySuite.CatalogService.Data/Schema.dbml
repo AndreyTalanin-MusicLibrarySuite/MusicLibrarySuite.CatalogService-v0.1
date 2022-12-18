@@ -63,3 +63,23 @@ Ref "FK_ArtistRelationship_Artist_ArtistId" {
 Ref "FK_ArtistRelationship_Artist_DependentArtistId" {
     "dbo"."ArtistRelationship"."DependentArtistId" > "dbo"."Artist"."Id"
 }
+
+Table "dbo"."ArtistGenre" {
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "GenreId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "ArtistId" [name: "IX_ArtistGenre_ArtistId"]
+        "GenreId" [name: "IX_ArtistGenre_GenreId"]
+        ("ArtistId", "Order") [name: "UIX_ArtistGenre_ArtistId_Order", unique]
+    }
+}
+
+Ref "FK_ArtistGenre_Artist_ArtistId" {
+    "dbo"."ArtistGenre"."ArtistId" > "dbo"."Artist"."Id"
+}
+
+Ref "FK_ArtistGenre_Genre_GenreId" {
+    "dbo"."ArtistGenre"."GenreId" > "dbo"."Genre"."Id"
+}

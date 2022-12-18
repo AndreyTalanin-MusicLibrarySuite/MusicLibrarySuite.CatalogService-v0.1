@@ -22,6 +22,7 @@ public class ArtistDatabaseProfile : Profile
 
         CreateMap<Artist, ArtistDto>().ReverseMap();
         CreateMap<ArtistRelationship, ArtistRelationshipDto>().ReverseMap();
+        CreateMap<ArtistGenre, ArtistGenreDto>().ReverseMap();
         CreateMap<ArtistRequest, ArtistRequestDto>().ReverseMap();
         CreateMap<ArtistPageResponse, PageResponseDto<ArtistDto>>().ReverseMap();
         CreateMap<PageResponse<Artist>, PageResponseDto<ArtistDto>>().ReverseMap();

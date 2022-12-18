@@ -62,4 +62,9 @@ public class ArtistDto
     /// Gets or sets a collection of artist-to-artist relationships where the current artist is the principal entity.
     /// </summary>
     public ICollection<ArtistRelationshipDto> ArtistRelationships { get; set; } = Enumerable.Empty<ArtistRelationshipDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of artist-to-genre relationships associated to the current artist.
+    /// </summary>
+    public ICollection<ArtistGenreDto> ArtistGenres { get; set; } = Enumerable.Empty<ArtistGenreDto>().ToList();
 }
