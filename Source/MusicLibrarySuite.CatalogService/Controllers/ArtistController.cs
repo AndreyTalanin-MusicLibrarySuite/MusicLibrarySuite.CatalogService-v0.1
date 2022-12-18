@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+using MusicLibrarySuite.CatalogService.Core.Services;
 using MusicLibrarySuite.CatalogService.Core.Services.Abstractions;
 using MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -107,6 +108,24 @@ public class ArtistController : ControllerBase
 
         ArtistPageResponse pageResponse = await m_artistService.GetArtistsAsync(artistRequest);
         return Ok(pageResponse);
+    }
+
+    /// <summary>
+    /// Asynchronously gets all artist relationships by an artist's unique identifier.
+    /// </summary>
+    /// <param name="artistId">The artist's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all artist relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ArtistRelationship[]>> GetArtistRelationshipsAsync([Required][FromQuery] Guid artistId, [FromQuery] bool includeReverseRelationships)
+    {
+        ArtistRelationship[] artistRelationships = await m_artistService.GetArtistRelationshipsAsync(artistId, includeReverseRelationships);
+        return Ok(artistRelationships);
     }
 
     /// <summary>

@@ -62,6 +62,17 @@ public interface IArtistRepository
     public Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistRequestDto artistRequest);
 
     /// <summary>
+    /// Asynchronously gets all artist relationships by an artist's unique identifier.
+    /// </summary>
+    /// <param name="artistId">The artist's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all artist relationships.
+    /// </returns>
+    public Task<ArtistRelationshipDto[]> GetArtistRelationshipsAsync(Guid artistId, bool includeReverseRelationships = false);
+
+    /// <summary>
     /// Asynchronously creates a new artist.
     /// </summary>
     /// <param name="artist">The artist to create in the database.</param>
