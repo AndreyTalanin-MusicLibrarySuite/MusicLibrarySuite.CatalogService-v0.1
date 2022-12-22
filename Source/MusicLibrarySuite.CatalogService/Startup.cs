@@ -49,6 +49,7 @@ public class Startup
             options.AddProfile<CommonDatabaseProfile>();
             options.AddProfile<ArtistDatabaseProfile>();
             options.AddProfile<GenreDatabaseProfile>();
+            options.AddProfile<ProductDatabaseProfile>();
         });
 
         services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
@@ -105,9 +106,11 @@ public class Startup
 
         services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
         services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
+        services.AddScoped<IProductRepository, SqlServerProductRepository>();
 
         services.AddScoped<IArtistService, ArtistService>();
         services.AddScoped<IGenreService, GenreService>();
+        services.AddScoped<IProductService, ProductService>();
     }
 
     /// <summary>
