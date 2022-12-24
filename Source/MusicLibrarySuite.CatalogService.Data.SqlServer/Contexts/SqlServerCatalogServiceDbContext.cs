@@ -123,6 +123,31 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .Property(entity => entity.ReleasedOn)
             .HasColumnType("date");
 
+        modelBuilder.Entity<ProductRelationshipDto>().ToTable("ProductRelationship", "dbo");
+        modelBuilder.Entity<ProductRelationshipDto>().HasKey(entity => new { entity.ProductId, entity.DependentProductId });
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany(entity => entity.ProductRelationships)
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasOne(entity => entity.DependentProduct)
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ProductRelationship_ProductId");
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasIndex(entity => entity.DependentProductId)
+            .HasDatabaseName("IX_ProductRelationship_DependentProductId");
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.Order })
+            .HasDatabaseName("UIX_ProductRelationship_ProductId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         base.OnModelCreating(modelBuilder);
     }
 }

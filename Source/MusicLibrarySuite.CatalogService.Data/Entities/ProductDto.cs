@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -65,4 +67,9 @@ public class ProductDto
     /// </summary>
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of product-to-product relationships where the current product is the principal entity.
+    /// </summary>
+    public ICollection<ProductRelationshipDto> ProductRelationships { get; set; } = Enumerable.Empty<ProductRelationshipDto>().ToList();
 }

@@ -68,6 +68,14 @@ public class ProductService : IProductService
     }
 
     /// <inheritdoc />
+    public async Task<ProductRelationship[]> GetProductRelationshipsAsync(Guid productId, bool includeReverseRelationships = false)
+    {
+        ProductRelationshipDto[] productRelationshipDtoArray = await m_productRepository.GetProductRelationshipsAsync(productId, includeReverseRelationships);
+        ProductRelationship[] productRelationshipArray = m_mapper.Map<ProductRelationship[]>(productRelationshipDtoArray);
+        return productRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Product> CreateProductAsync(Product product)
     {
         ProductDto productDto = m_mapper.Map<ProductDto>(product);

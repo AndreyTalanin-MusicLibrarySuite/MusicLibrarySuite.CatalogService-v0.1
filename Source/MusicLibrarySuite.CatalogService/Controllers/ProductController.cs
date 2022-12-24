@@ -110,6 +110,24 @@ public class ProductController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ProductRelationship[]>> GetProductRelationshipsAsync([Required][FromQuery] Guid productId, [FromQuery] bool includeReverseRelationships)
+    {
+        ProductRelationship[] productRelationships = await m_productService.GetProductRelationshipsAsync(productId, includeReverseRelationships);
+        return Ok(productRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new product.
     /// </summary>
     /// <param name="product">The product to create.</param>
