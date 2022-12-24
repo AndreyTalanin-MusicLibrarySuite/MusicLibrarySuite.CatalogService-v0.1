@@ -127,7 +127,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ProductRelationshipDto>().HasKey(entity => new { entity.ProductId, entity.DependentProductId });
         modelBuilder.Entity<ProductRelationshipDto>()
             .HasOne<ProductDto>()
-            .WithMany()
+            .WithMany(entity => entity.ProductRelationships)
             .HasForeignKey(entity => entity.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ProductRelationshipDto>()
