@@ -155,6 +155,35 @@ public class SqlServerProductRepository : IProductRepository
     }
 
     /// <inheritdoc />
+    public async Task<ProductRelationshipDto[]> GetProductRelationshipsAsync(Guid productId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<ProductRelationshipDto> baseCollection = context.ProductRelationships.AsNoTracking()
+            .Include(productRelationship => productRelationship.Product)
+            .Include(productRelationship => productRelationship.DependentProduct);
+
+        ProductRelationshipDto[] productRelationships = await baseCollection
+            .Where(productRelationship => productRelationship.ProductId == productId)
+            .OrderBy(productRelationship => productRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            ProductRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(productRelationship => productRelationship.DependentProductId == productId)
+                .OrderBy(productRelationship => productRelationship.Product.Title)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            productRelationships = productRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return productRelationships;
+    }
+
+    /// <inheritdoc />
     public async Task<ProductDto> CreateProductAsync(ProductDto product)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
