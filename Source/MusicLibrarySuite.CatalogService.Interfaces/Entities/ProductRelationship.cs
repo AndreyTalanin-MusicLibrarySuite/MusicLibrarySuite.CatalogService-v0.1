@@ -30,4 +30,16 @@ public class ProductRelationship
     /// Gets or sets the relationship's description.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the principal product.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Product? Product { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dependent product.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Product? DependentProduct { get; set; }
 }
