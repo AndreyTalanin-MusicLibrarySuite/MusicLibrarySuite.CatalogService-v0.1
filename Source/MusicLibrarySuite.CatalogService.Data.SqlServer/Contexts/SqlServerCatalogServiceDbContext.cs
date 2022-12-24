@@ -126,12 +126,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ProductRelationshipDto>().ToTable("ProductRelationship", "dbo");
         modelBuilder.Entity<ProductRelationshipDto>().HasKey(entity => new { entity.ProductId, entity.DependentProductId });
         modelBuilder.Entity<ProductRelationshipDto>()
-            .HasOne<ProductDto>()
+            .HasOne(entity => entity.Product)
             .WithMany(entity => entity.ProductRelationships)
             .HasForeignKey(entity => entity.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ProductRelationshipDto>()
-            .HasOne<ProductDto>()
+            .HasOne(entity => entity.DependentProduct)
             .WithMany()
             .HasForeignKey(entity => entity.DependentProductId)
             .OnDelete(DeleteBehavior.Restrict);
