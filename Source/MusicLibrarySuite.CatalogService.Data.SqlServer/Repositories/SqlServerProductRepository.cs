@@ -42,7 +42,14 @@ public class SqlServerProductRepository : IProductRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetProduct] (@{productIdParameter.ParameterName})";
 
         ProductDto? product = await context.Products.FromSqlRaw(query, productIdParameter).AsNoTracking()
+            .Include(product => product.ProductRelationships)
+            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .FirstOrDefaultAsync();
+
+        if (product is not null)
+        {
+            OrderProductRelationships(product);
+        }
 
         return product;
     }
@@ -53,7 +60,14 @@ public class SqlServerProductRepository : IProductRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ProductDto[] products = await context.Products.AsNoTracking()
+            .Include(product => product.ProductRelationships)
+            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .ToArrayAsync();
+
+        foreach (ProductDto product in products)
+        {
+            OrderProductRelationships(product);
+        }
 
         return products;
     }
@@ -73,7 +87,14 @@ public class SqlServerProductRepository : IProductRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetProducts] (@{productIdsParameter.ParameterName})";
 
         ProductDto[] products = await context.Products.FromSqlRaw(query, productIdsParameter).AsNoTracking()
+            .Include(product => product.ProductRelationships)
+            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .ToArrayAsync();
+
+        foreach (ProductDto product in products)
+        {
+            OrderProductRelationships(product);
+        }
 
         return products;
     }
@@ -84,7 +105,14 @@ public class SqlServerProductRepository : IProductRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ProductDto[] products = await collectionProcessor(context.Products.AsNoTracking())
+            .Include(product => product.ProductRelationships)
+            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .ToArrayAsync();
+
+        foreach (ProductDto product in products)
+        {
+            OrderProductRelationships(product);
+        }
 
         return products;
     }
@@ -104,11 +132,18 @@ public class SqlServerProductRepository : IProductRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<ProductDto> products = await baseCollection
+            .Include(product => product.ProductRelationships)
+            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .OrderByDescending(product => product.SystemEntity)
             .ThenBy(product => product.Title)
             .Skip(productRequest.PageSize * productRequest.PageIndex)
             .Take(productRequest.PageSize)
             .ToListAsync();
+
+        foreach (ProductDto product in products)
+        {
+            OrderProductRelationships(product);
+        }
 
         return new PageResponseDto<ProductDto>()
         {
@@ -124,6 +159,24 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetProductRelationshipOrders(product.ProductRelationships);
+
+        using var productRelationshipsDataTable = new DataTable();
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.ProductId), typeof(Guid));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.DependentProductId), typeof(Guid));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.Name), typeof(string));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.Description), typeof(string));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.Order), typeof(int));
+        foreach (ProductRelationshipDto productRelationship in product.ProductRelationships)
+        {
+            productRelationshipsDataTable.Rows.Add(
+                productRelationship.ProductId.AsDbValue(),
+                productRelationship.DependentProductId.AsDbValue(),
+                productRelationship.Name.AsDbValue(),
+                productRelationship.Description.AsDbValue(),
+                productRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -137,6 +190,7 @@ public class SqlServerProductRepository : IProductRepository
             new SqlParameter(nameof(ProductDto.ReleasedOnYearOnly), product.ReleasedOnYearOnly.AsDbValue()),
             new SqlParameter(nameof(ProductDto.SystemEntity), product.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(ProductDto.Enabled), product.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ProductDto.ProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ProductRelationship]", Value = productRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ProductDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ProductDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ProductDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -152,6 +206,7 @@ public class SqlServerProductRepository : IProductRepository
                 @{nameof(ProductDto.ReleasedOnYearOnly)},
                 @{nameof(ProductDto.SystemEntity)},
                 @{nameof(ProductDto.Enabled)},
+                @{nameof(ProductDto.ProductRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -170,6 +225,24 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetProductRelationshipOrders(product.ProductRelationships);
+
+        using var productRelationshipsDataTable = new DataTable();
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.ProductId), typeof(Guid));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.DependentProductId), typeof(Guid));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.Name), typeof(string));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.Description), typeof(string));
+        productRelationshipsDataTable.Columns.Add(nameof(ProductRelationshipDto.Order), typeof(int));
+        foreach (ProductRelationshipDto productRelationship in product.ProductRelationships)
+        {
+            productRelationshipsDataTable.Rows.Add(
+                productRelationship.ProductId.AsDbValue(),
+                productRelationship.DependentProductId.AsDbValue(),
+                productRelationship.Name.AsDbValue(),
+                productRelationship.Description.AsDbValue(),
+                productRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -181,6 +254,7 @@ public class SqlServerProductRepository : IProductRepository
             new SqlParameter(nameof(ProductDto.ReleasedOnYearOnly), product.ReleasedOnYearOnly.AsDbValue()),
             new SqlParameter(nameof(ProductDto.SystemEntity), product.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(ProductDto.Enabled), product.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ProductDto.ProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ProductRelationship]", Value = productRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -194,6 +268,7 @@ public class SqlServerProductRepository : IProductRepository
                 @{nameof(ProductDto.ReleasedOnYearOnly)},
                 @{nameof(ProductDto.SystemEntity)},
                 @{nameof(ProductDto.Enabled)},
+                @{nameof(ProductDto.ProductRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -223,5 +298,21 @@ public class SqlServerProductRepository : IProductRepository
 
         var rowsDeleted = (int)resultRowsDeletedParameter.Value;
         return rowsDeleted > 0;
+    }
+
+    private static void OrderProductRelationships(ProductDto product)
+    {
+        product.ProductRelationships = product.ProductRelationships
+            .OrderBy(productRelationship => productRelationship.Order)
+            .ToList();
+    }
+
+    private static void SetProductRelationshipOrders(ICollection<ProductRelationshipDto> productRelationships)
+    {
+        var i = 0;
+        foreach (ProductRelationshipDto productRelationship in productRelationships)
+        {
+            productRelationship.Order = i++;
+        }
     }
 }
