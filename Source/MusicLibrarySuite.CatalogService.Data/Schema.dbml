@@ -83,3 +83,17 @@ Ref "FK_ArtistGenre_Artist_ArtistId" {
 Ref "FK_ArtistGenre_Genre_GenreId" {
     "dbo"."ArtistGenre"."GenreId" > "dbo"."Genre"."Id"
 }
+
+
+Table "dbo"."Product" {
+    "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
+    "Title" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "DisambiguationText" nvarchar(2048) [null]
+    "ReleasedOn" date [not null]
+    "ReleasedOnYearOnly" bit [not null]
+    "SystemEntity" bit [not null]
+    "Enabled" bit [not null]
+    "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+    "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+}

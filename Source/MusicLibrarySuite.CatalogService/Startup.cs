@@ -49,6 +49,7 @@ public class Startup
             options.AddProfile<CommonDatabaseProfile>();
             options.AddProfile<ArtistDatabaseProfile>();
             options.AddProfile<GenreDatabaseProfile>();
+            options.AddProfile<ProductDatabaseProfile>();
         });
 
         services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
@@ -95,9 +96,9 @@ public class Startup
 
             options.SwaggerDoc("MusicLibrarySuite.CatalogService", new OpenApiInfo()
             {
-                Title = "Music Library Suite - Catalog Service API v0.4.0",
+                Title = "Music Library Suite - Catalog Service API v0.5.0-rc1",
                 Description = "Initial pre-release (unstable) API version.",
-                Version = "v0.4.0",
+                Version = "v0.5.0-rc1",
                 Contact = contact,
                 License = license,
             });
@@ -105,9 +106,11 @@ public class Startup
 
         services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
         services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
+        services.AddScoped<IProductRepository, SqlServerProductRepository>();
 
         services.AddScoped<IArtistService, ArtistService>();
         services.AddScoped<IGenreService, GenreService>();
+        services.AddScoped<IProductService, ProductService>();
     }
 
     /// <summary>

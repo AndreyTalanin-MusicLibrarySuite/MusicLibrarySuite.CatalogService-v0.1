@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using MusicLibrarySuite.CatalogService.Core.Services;
 using MusicLibrarySuite.CatalogService.Core.Services.Abstractions;
 using MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
