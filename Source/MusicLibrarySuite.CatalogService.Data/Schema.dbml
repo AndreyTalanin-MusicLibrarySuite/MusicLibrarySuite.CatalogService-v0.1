@@ -97,3 +97,25 @@ Table "dbo"."Product" {
     "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
     "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
 }
+
+Table "dbo"."ProductRelationship" {
+    "ProductId" uniqueidentifier [primary key, not null]
+    "DependentProductId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+
+    Indexes {
+        "ProductId" [name: "IX_ProductRelationship_ProductId"]
+        "DependentProductId" [name: "IX_ProductRelationship_DependentProductId"]
+        ("ProductId", "Order") [name: "UIX_ProductRelationship_ProductId_Order", unique]
+    }
+}
+
+Ref "FK_ProductRelationship_Product_ProductId" {
+    "dbo"."ProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
+
+Ref "FK_ProductRelationship_Product_DependentProductId" {
+    "dbo"."ProductRelationship"."DependentProductId" > "dbo"."Product"."Id"
+}
