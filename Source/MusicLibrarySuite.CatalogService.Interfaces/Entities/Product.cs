@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -63,4 +65,10 @@ public class Product
     /// Gets or sets a value representing the moment of time when the entity was updated the last time.
     /// </summary>
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of product-to-product relationships where the current product is the principal entity.
+    /// </summary>
+    [Required]
+    public ICollection<ProductRelationship> ProductRelationships { get; set; } = Enumerable.Empty<ProductRelationship>().ToList();
 }
