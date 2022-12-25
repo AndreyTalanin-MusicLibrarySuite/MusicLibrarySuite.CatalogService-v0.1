@@ -148,6 +148,19 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<WorkDto>().ToTable("Work", "dbo");
+        modelBuilder.Entity<WorkDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<WorkDto>()
+            .HasIndex(entity => entity.InternationalStandardMusicalWorkCode)
+            .HasDatabaseName("IX_Work_InternationalStandardMusicalWorkCode");
+        modelBuilder.Entity<WorkDto>().HasCheckConstraint("CK_Work_Title", "LEN(TRIM([Title])) > 0");
+        modelBuilder.Entity<WorkDto>().HasCheckConstraint("CK_Work_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<WorkDto>().HasCheckConstraint("CK_Work_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+        modelBuilder.Entity<WorkDto>().HasCheckConstraint("CK_Work_InternationalStandardMusicalWorkCode", "[InternationalStandardMusicalWorkCode] IS NULL OR LEN(TRIM([InternationalStandardMusicalWorkCode])) > 0");
+        modelBuilder.Entity<WorkDto>()
+            .Property(entity => entity.ReleasedOn)
+            .HasColumnType("date");
+
         base.OnModelCreating(modelBuilder);
     }
 }
