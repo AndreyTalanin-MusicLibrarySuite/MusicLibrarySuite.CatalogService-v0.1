@@ -2,7 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using AutoMapper;
+
 using MusicLibrarySuite.CatalogService.Core.Services.Abstractions;
+using MusicLibrarySuite.CatalogService.Data.Entities;
+using MusicLibrarySuite.CatalogService.Data.Entities.Base;
+using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 using MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
 namespace MusicLibrarySuite.CatalogService.Core.Services;
@@ -12,24 +17,77 @@ namespace MusicLibrarySuite.CatalogService.Core.Services;
 /// </summary>
 public class WorkService : IWorkService
 {
-    /// <inheritdoc />
-    public Task<Work?> GetWorkAsync(Guid workId) => throw new NotImplementedException();
+    private readonly IWorkRepository m_workRepository;
+    private readonly IMapper m_mapper;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WorkService" /> type using the specified services.
+    /// </summary>
+    /// <param name="workRepository">The work repository.</param>
+    /// <param name="mapper">The AutoMapper mapper.</param>
+    public WorkService(IWorkRepository workRepository, IMapper mapper)
+    {
+        m_workRepository = workRepository;
+        m_mapper = mapper;
+    }
 
     /// <inheritdoc />
-    public Task<Work[]> GetWorksAsync() => throw new NotImplementedException();
+    public async Task<Work?> GetWorkAsync(Guid workId)
+    {
+        WorkDto? workDto = await m_workRepository.GetWorkAsync(workId);
+        Work? work = m_mapper.Map<Work?>(workDto);
+        return work;
+    }
 
     /// <inheritdoc />
-    public Task<Work[]> GetWorksAsync(IEnumerable<Guid> workIds) => throw new NotImplementedException();
+    public async Task<Work[]> GetWorksAsync()
+    {
+        WorkDto[] workDtoArray = await m_workRepository.GetWorksAsync();
+        Work[] workArray = m_mapper.Map<Work[]>(workDtoArray);
+        return workArray;
+    }
 
     /// <inheritdoc />
-    public Task<WorkPageResponse> GetWorksAsync(WorkRequest workRequest) => throw new NotImplementedException();
+    public async Task<Work[]> GetWorksAsync(IEnumerable<Guid> workIds)
+    {
+        WorkDto[] workDtoArray = await m_workRepository.GetWorksAsync(workIds);
+        Work[] workArray = m_mapper.Map<Work[]>(workDtoArray);
+        return workArray;
+    }
 
     /// <inheritdoc />
-    public Task<Work> CreateWorkAsync(Work work) => throw new NotImplementedException();
+    public async Task<WorkPageResponse> GetWorksAsync(WorkRequest workRequest)
+    {
+        WorkRequestDto workRequestDto = m_mapper.Map<WorkRequestDto>(workRequest);
+        PageResponseDto<WorkDto> pageResponseDto = await m_workRepository.GetWorksAsync(workRequestDto);
+        WorkPageResponse pageResponse = m_mapper.Map<WorkPageResponse>(pageResponseDto);
+
+        pageResponse.CompletedOn = DateTimeOffset.Now;
+
+        return pageResponse;
+    }
 
     /// <inheritdoc />
-    public Task<bool> UpdateWorkAsync(Work work) => throw new NotImplementedException();
+    public async Task<Work> CreateWorkAsync(Work work)
+    {
+        WorkDto workDto = m_mapper.Map<WorkDto>(work);
+        WorkDto createdWorkDto = await m_workRepository.CreateWorkAsync(workDto);
+        Work createdWork = m_mapper.Map<Work>(createdWorkDto);
+        return createdWork;
+    }
 
     /// <inheritdoc />
-    public Task<bool> DeleteWorkAsync(Guid workId) => throw new NotImplementedException();
+    public async Task<bool> UpdateWorkAsync(Work work)
+    {
+        WorkDto workDto = m_mapper.Map<WorkDto>(work);
+        var updated = await m_workRepository.UpdateWorkAsync(workDto);
+        return updated;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteWorkAsync(Guid workId)
+    {
+        var deleted = await m_workRepository.DeleteWorkAsync(workId);
+        return deleted;
+    }
 }
