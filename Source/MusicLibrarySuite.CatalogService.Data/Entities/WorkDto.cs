@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -71,4 +73,9 @@ public class WorkDto
     /// </summary>
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-work relationships where the current work is the principal entity.
+    /// </summary>
+    public ICollection<WorkRelationshipDto> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationshipDto>().ToList();
 }
