@@ -138,3 +138,25 @@ Table "dbo"."Work" {
         "InternationalStandardMusicalWorkCode" [name: "IX_Work_InternationalStandardMusicalWorkCode"]
     }
 }
+
+Table "dbo"."WorkRelationship" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "DependentWorkId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkRelationship_WorkId"]
+        "DependentWorkId" [name: "IX_WorkRelationship_DependentWorkId"]
+        ("WorkId", "Order") [name: "UIX_WorkRelationship_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkRelationship_Work_WorkId" {
+    "dbo"."WorkRelationship"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkRelationship_Work_DependentWorkId" {
+    "dbo"."WorkRelationship"."DependentWorkId" > "dbo"."Work"."Id"
+}
