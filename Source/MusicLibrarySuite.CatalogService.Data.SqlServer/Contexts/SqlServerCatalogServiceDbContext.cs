@@ -164,12 +164,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkRelationshipDto>().ToTable("WorkRelationship", "dbo");
         modelBuilder.Entity<WorkRelationshipDto>().HasKey(entity => new { entity.WorkId, entity.DependentWorkId });
         modelBuilder.Entity<WorkRelationshipDto>()
-            .HasOne<WorkDto>()
+            .HasOne(entity => entity.Work)
             .WithMany(entity => entity.WorkRelationships)
             .HasForeignKey(entity => entity.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<WorkRelationshipDto>()
-            .HasOne<WorkDto>()
+            .HasOne(entity => entity.DependentWork)
             .WithMany()
             .HasForeignKey(entity => entity.DependentWorkId)
             .OnDelete(DeleteBehavior.Restrict);
