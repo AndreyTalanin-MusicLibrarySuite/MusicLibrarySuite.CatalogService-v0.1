@@ -30,4 +30,16 @@ public class WorkRelationship
     /// Gets or sets the relationship's description.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the principal work.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Work? Work { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dependent work.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public Work? DependentWork { get; set; }
 }
