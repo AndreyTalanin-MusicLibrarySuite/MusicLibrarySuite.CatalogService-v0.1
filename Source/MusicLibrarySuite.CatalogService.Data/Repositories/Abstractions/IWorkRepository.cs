@@ -62,6 +62,17 @@ public interface IWorkRepository
     public Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkRequestDto workRequest);
 
     /// <summary>
+    /// Asynchronously gets all work relationships by a work's unique identifier.
+    /// </summary>
+    /// <param name="workId">The work's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all work relationships.
+    /// </returns>
+    public Task<WorkRelationshipDto[]> GetWorkRelationshipsAsync(Guid workId, bool includeReverseRelationships = false);
+
+    /// <summary>
     /// Asynchronously creates a new work.
     /// </summary>
     /// <param name="work">The work to create in the database.</param>

@@ -154,6 +154,35 @@ public class SqlServerWorkRepository : IWorkRepository
         };
     }
 
+    /// <inheritdoc/>
+    public async Task<WorkRelationshipDto[]> GetWorkRelationshipsAsync(Guid workId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<WorkRelationshipDto> baseCollection = context.WorkRelationships.AsNoTracking()
+            .Include(workRelationship => workRelationship.Work)
+            .Include(workRelationship => workRelationship.DependentWork);
+
+        WorkRelationshipDto[] workRelationships = await baseCollection
+            .Where(workRelationship => workRelationship.WorkId == workId)
+            .OrderBy(workRelationship => workRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            WorkRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(workRelationship => workRelationship.DependentWorkId == workId)
+                .OrderBy(workRelationship => workRelationship.Work.Title)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            workRelationships = workRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return workRelationships;
+    }
+
     /// <inheritdoc />
     public async Task<WorkDto> CreateWorkAsync(WorkDto work)
     {
