@@ -68,6 +68,14 @@ public class WorkService : IWorkService
     }
 
     /// <inheritdoc />
+    public async Task<WorkRelationship[]> GetWorkRelationshipsAsync(Guid workId, bool includeReverseRelationships = false)
+    {
+        WorkRelationshipDto[] workRelationshipDtoArray = await m_workRepository.GetWorkRelationshipsAsync(workId, includeReverseRelationships);
+        WorkRelationship[] workRelationshipArray = m_mapper.Map<WorkRelationship[]>(workRelationshipDtoArray);
+        return workRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Work> CreateWorkAsync(Work work)
     {
         WorkDto workDto = m_mapper.Map<WorkDto>(work);

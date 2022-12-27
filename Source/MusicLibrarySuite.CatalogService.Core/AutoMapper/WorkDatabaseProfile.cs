@@ -21,6 +21,7 @@ public class WorkDatabaseProfile : Profile
         DestinationMemberNamingConvention = ExactMatchNamingConvention.Instance;
 
         CreateMap<Work, WorkDto>().ReverseMap();
+        CreateMap<WorkRelationship, WorkRelationshipDto>().ReverseMap();
         CreateMap<WorkRequest, WorkRequestDto>().ReverseMap();
         CreateMap<WorkPageResponse, PageResponseDto<WorkDto>>().ReverseMap();
         CreateMap<PageResponse<Work>, PageResponseDto<WorkDto>>().ReverseMap();

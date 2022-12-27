@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -68,4 +70,10 @@ public class Work
     /// Gets or sets a value representing the moment of time when the entity was updated the last time.
     /// </summary>
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-work relationships where the current work is the principal entity.
+    /// </summary>
+    [Required]
+    public ICollection<WorkRelationship> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationship>().ToList();
 }

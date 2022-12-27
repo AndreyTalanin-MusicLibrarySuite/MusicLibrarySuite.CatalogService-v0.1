@@ -161,6 +161,31 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .Property(entity => entity.ReleasedOn)
             .HasColumnType("date");
 
+        modelBuilder.Entity<WorkRelationshipDto>().ToTable("WorkRelationship", "dbo");
+        modelBuilder.Entity<WorkRelationshipDto>().HasKey(entity => new { entity.WorkId, entity.DependentWorkId });
+        modelBuilder.Entity<WorkRelationshipDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkRelationships)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkRelationshipDto>()
+            .HasOne(entity => entity.DependentWork)
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentWorkId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<WorkRelationshipDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkRelationship_WorkId");
+        modelBuilder.Entity<WorkRelationshipDto>()
+            .HasIndex(entity => entity.DependentWorkId)
+            .HasDatabaseName("IX_WorkRelationship_DependentWorkId");
+        modelBuilder.Entity<WorkRelationshipDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkRelationship_WorkId_Order")
+            .IsUnique();
+        modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         base.OnModelCreating(modelBuilder);
     }
 }
