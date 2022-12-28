@@ -232,6 +232,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_WorkFeaturedArtist_WorkId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<WorkPerformerDto>().ToTable("WorkPerformer", "dbo");
+        modelBuilder.Entity<WorkPerformerDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasOne<WorkDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkPerformer_WorkId");
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_WorkPerformer_ArtistId");
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkPerformer_WorkId_Order")
+            .IsUnique();
+
         base.OnModelCreating(modelBuilder);
     }
 }

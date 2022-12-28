@@ -65,6 +65,11 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<WorkFeaturedArtistDto> WorkFeaturedArtists { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="WorkPerformerDto" /> type.
+    /// </summary>
+    public DbSet<WorkPerformerDto> WorkPerformers { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CatalogServiceDbContext" /> type.
     /// </summary>
     protected CatalogServiceDbContext()
@@ -81,6 +86,7 @@ public abstract class CatalogServiceDbContext : DbContext
         WorkRelationships = Set<WorkRelationshipDto>();
         WorkArtists = Set<WorkArtistDto>();
         WorkFeaturedArtists = Set<WorkFeaturedArtistDto>();
+        WorkPerformers = Set<WorkPerformerDto>();
     }
 
     /// <summary>
@@ -101,5 +107,6 @@ public abstract class CatalogServiceDbContext : DbContext
         WorkRelationships = Set<WorkRelationshipDto>();
         WorkArtists = Set<WorkArtistDto>();
         WorkFeaturedArtists = Set<WorkFeaturedArtistDto>();
+        WorkPerformers = Set<WorkPerformerDto>();
     }
 }
