@@ -160,3 +160,23 @@ Ref "FK_WorkRelationship_Work_WorkId" {
 Ref "FK_WorkRelationship_Work_DependentWorkId" {
     "dbo"."WorkRelationship"."DependentWorkId" > "dbo"."Work"."Id"
 }
+
+Table "dbo"."WorkArtist" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkArtist_WorkId"]
+        "ArtistId" [name: "IX_WorkArtist_ArtistId"]
+        ("WorkId", "Order") [name: "UIX_WorkArtist_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkArtist_Work_WorkId" {
+    "dbo"."WorkArtist"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkArtist_Artist_ArtistId" {
+    "dbo"."WorkArtist"."ArtistId" > "dbo"."Artist"."Id"
+}
