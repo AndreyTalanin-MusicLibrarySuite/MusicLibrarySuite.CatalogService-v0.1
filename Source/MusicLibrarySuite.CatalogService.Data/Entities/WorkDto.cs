@@ -83,4 +83,9 @@ public class WorkDto
     /// Gets or sets a collection of work-to-artist relationships associated to the current work.
     /// </summary>
     public ICollection<WorkArtistDto> WorkArtists { get; set; } = Enumerable.Empty<WorkArtistDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "featured artist" role.
+    /// </summary>
+    public ICollection<WorkFeaturedArtistDto> WorkFeaturedArtists { get; set; } = Enumerable.Empty<WorkFeaturedArtistDto>().ToList();
 }
