@@ -78,4 +78,9 @@ public class WorkDto
     /// Gets or sets a collection of work-to-work relationships where the current work is the principal entity.
     /// </summary>
     public ICollection<WorkRelationshipDto> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationshipDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work.
+    /// </summary>
+    public ICollection<WorkArtistDto> WorkArtists { get; set; } = Enumerable.Empty<WorkArtistDto>().ToList();
 }

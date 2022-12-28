@@ -190,7 +190,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkArtistDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
         modelBuilder.Entity<WorkArtistDto>()
             .HasOne<WorkDto>()
-            .WithMany()
+            .WithMany(entity => entity.WorkArtists)
             .HasForeignKey(entity => entity.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<WorkArtistDto>()
