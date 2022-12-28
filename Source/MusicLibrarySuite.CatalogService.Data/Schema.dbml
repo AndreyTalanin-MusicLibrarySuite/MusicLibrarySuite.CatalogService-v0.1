@@ -200,3 +200,23 @@ Ref "FK_WorkFeaturedArtist_Work_WorkId" {
 Ref "FK_WorkFeaturedArtist_Artist_ArtistId" {
     "dbo"."WorkFeaturedArtist"."ArtistId" > "dbo"."Artist"."Id"
 }
+
+Table "dbo"."WorkPerformer" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkPerformer_WorkId"]
+        "ArtistId" [name: "IX_WorkPerformer_ArtistId"]
+        ("WorkId", "Order") [name: "UIX_WorkPerformer_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkPerformer_Work_WorkId" {
+    "dbo"."WorkPerformer"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkPerformer_Artist_ArtistId" {
+    "dbo"."WorkPerformer"."ArtistId" > "dbo"."Artist"."Id"
+}
