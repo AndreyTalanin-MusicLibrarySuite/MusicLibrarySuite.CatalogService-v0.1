@@ -186,6 +186,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<WorkArtistDto>().ToTable("WorkArtist", "dbo");
+        modelBuilder.Entity<WorkArtistDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasOne<WorkDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkArtist_WorkId");
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_WorkArtist_ArtistId");
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkArtist_WorkId_Order")
+            .IsUnique();
+
         base.OnModelCreating(modelBuilder);
     }
 }
