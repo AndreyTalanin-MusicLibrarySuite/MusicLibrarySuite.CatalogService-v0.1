@@ -259,7 +259,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkComposerDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
         modelBuilder.Entity<WorkComposerDto>()
             .HasOne<WorkDto>()
-            .WithMany()
+            .WithMany(entity => entity.WorkComposers)
             .HasForeignKey(entity => entity.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<WorkComposerDto>()
