@@ -94,4 +94,10 @@ public class Work
     /// </summary>
     [Required]
     public ICollection<WorkPerformer> WorkPerformers { get; set; } = Enumerable.Empty<WorkPerformer>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "composer" role.
+    /// </summary>
+    [Required]
+    public ICollection<WorkComposer> WorkComposers { get; set; } = Enumerable.Empty<WorkComposer>().ToList();
 }
