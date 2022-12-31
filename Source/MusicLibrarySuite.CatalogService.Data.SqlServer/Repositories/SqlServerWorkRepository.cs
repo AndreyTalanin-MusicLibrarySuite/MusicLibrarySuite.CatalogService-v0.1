@@ -44,11 +44,23 @@ public class SqlServerWorkRepository : IWorkRepository
         WorkDto? work = await context.Works.FromSqlRaw(query, workIdParameter).AsNoTracking()
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
+            .Include(work => work.WorkArtists)
+            .ThenInclude(workArtist => workArtist.Artist)
+            .Include(work => work.WorkFeaturedArtists)
+            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
+            .Include(work => work.WorkPerformers)
+            .ThenInclude(workPerformer => workPerformer.Artist)
+            .Include(work => work.WorkComposers)
+            .ThenInclude(workComposer => workComposer.Artist)
             .FirstOrDefaultAsync();
 
         if (work is not null)
         {
             OrderWorkRelationships(work);
+            OrderWorkArtists(work);
+            OrderWorkFeaturedArtists(work);
+            OrderWorkPerformers(work);
+            OrderWorkComposers(work);
         }
 
         return work;
@@ -62,11 +74,23 @@ public class SqlServerWorkRepository : IWorkRepository
         WorkDto[] works = await context.Works.AsNoTracking()
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
+            .Include(work => work.WorkArtists)
+            .ThenInclude(workArtist => workArtist.Artist)
+            .Include(work => work.WorkFeaturedArtists)
+            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
+            .Include(work => work.WorkPerformers)
+            .ThenInclude(workPerformer => workPerformer.Artist)
+            .Include(work => work.WorkComposers)
+            .ThenInclude(workComposer => workComposer.Artist)
             .ToArrayAsync();
 
         foreach (WorkDto work in works)
         {
             OrderWorkRelationships(work);
+            OrderWorkArtists(work);
+            OrderWorkFeaturedArtists(work);
+            OrderWorkPerformers(work);
+            OrderWorkComposers(work);
         }
 
         return works;
@@ -89,11 +113,23 @@ public class SqlServerWorkRepository : IWorkRepository
         WorkDto[] works = await context.Works.FromSqlRaw(query, workIdsParameter).AsNoTracking()
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
+            .Include(work => work.WorkArtists)
+            .ThenInclude(workArtist => workArtist.Artist)
+            .Include(work => work.WorkFeaturedArtists)
+            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
+            .Include(work => work.WorkPerformers)
+            .ThenInclude(workPerformer => workPerformer.Artist)
+            .Include(work => work.WorkComposers)
+            .ThenInclude(workComposer => workComposer.Artist)
             .ToArrayAsync();
 
         foreach (WorkDto work in works)
         {
             OrderWorkRelationships(work);
+            OrderWorkArtists(work);
+            OrderWorkFeaturedArtists(work);
+            OrderWorkPerformers(work);
+            OrderWorkComposers(work);
         }
 
         return works;
@@ -107,11 +143,23 @@ public class SqlServerWorkRepository : IWorkRepository
         WorkDto[] works = await collectionProcessor(context.Works.AsNoTracking())
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
+            .Include(work => work.WorkArtists)
+            .ThenInclude(workArtist => workArtist.Artist)
+            .Include(work => work.WorkFeaturedArtists)
+            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
+            .Include(work => work.WorkPerformers)
+            .ThenInclude(workPerformer => workPerformer.Artist)
+            .Include(work => work.WorkComposers)
+            .ThenInclude(workComposer => workComposer.Artist)
             .ToArrayAsync();
 
         foreach (WorkDto work in works)
         {
             OrderWorkRelationships(work);
+            OrderWorkArtists(work);
+            OrderWorkFeaturedArtists(work);
+            OrderWorkPerformers(work);
+            OrderWorkComposers(work);
         }
 
         return works;
@@ -134,6 +182,14 @@ public class SqlServerWorkRepository : IWorkRepository
         List<WorkDto> works = await baseCollection
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
+            .Include(work => work.WorkArtists)
+            .ThenInclude(workArtist => workArtist.Artist)
+            .Include(work => work.WorkFeaturedArtists)
+            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
+            .Include(work => work.WorkPerformers)
+            .ThenInclude(workPerformer => workPerformer.Artist)
+            .Include(work => work.WorkComposers)
+            .ThenInclude(workComposer => workComposer.Artist)
             .OrderByDescending(work => work.SystemEntity)
             .ThenBy(work => work.Title)
             .Skip(workRequest.PageSize * workRequest.PageIndex)
@@ -143,6 +199,10 @@ public class SqlServerWorkRepository : IWorkRepository
         foreach (WorkDto work in works)
         {
             OrderWorkRelationships(work);
+            OrderWorkArtists(work);
+            OrderWorkFeaturedArtists(work);
+            OrderWorkPerformers(work);
+            OrderWorkComposers(work);
         }
 
         return new PageResponseDto<WorkDto>()
@@ -189,6 +249,10 @@ public class SqlServerWorkRepository : IWorkRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         SetWorkRelationshipOrders(work.WorkRelationships);
+        SetWorkArtistOrders(work.WorkArtists);
+        SetWorkFeaturedArtistOrders(work.WorkFeaturedArtists);
+        SetWorkPerformerOrders(work.WorkPerformers);
+        SetWorkComposerOrders(work.WorkComposers);
 
         using var workRelationshipsDataTable = new DataTable();
         workRelationshipsDataTable.Columns.Add(nameof(WorkRelationshipDto.WorkId), typeof(Guid));
@@ -206,6 +270,54 @@ public class SqlServerWorkRepository : IWorkRepository
                 workRelationship.Order.AsDbValue());
         }
 
+        using var workArtistsDataTable = new DataTable();
+        workArtistsDataTable.Columns.Add(nameof(WorkArtistDto.WorkId), typeof(Guid));
+        workArtistsDataTable.Columns.Add(nameof(WorkArtistDto.ArtistId), typeof(Guid));
+        workArtistsDataTable.Columns.Add(nameof(WorkArtistDto.Order), typeof(int));
+        foreach (WorkArtistDto workArtist in work.WorkArtists)
+        {
+            workArtistsDataTable.Rows.Add(
+                workArtist.WorkId.AsDbValue(),
+                workArtist.ArtistId.AsDbValue(),
+                workArtist.Order.AsDbValue());
+        }
+
+        using var workFeaturedArtistsDataTable = new DataTable();
+        workFeaturedArtistsDataTable.Columns.Add(nameof(WorkFeaturedArtistDto.WorkId), typeof(Guid));
+        workFeaturedArtistsDataTable.Columns.Add(nameof(WorkFeaturedArtistDto.ArtistId), typeof(Guid));
+        workFeaturedArtistsDataTable.Columns.Add(nameof(WorkFeaturedArtistDto.Order), typeof(int));
+        foreach (WorkFeaturedArtistDto workFeaturedArtist in work.WorkFeaturedArtists)
+        {
+            workFeaturedArtistsDataTable.Rows.Add(
+                workFeaturedArtist.WorkId.AsDbValue(),
+                workFeaturedArtist.ArtistId.AsDbValue(),
+                workFeaturedArtist.Order.AsDbValue());
+        }
+
+        using var workPerformersDataTable = new DataTable();
+        workPerformersDataTable.Columns.Add(nameof(WorkPerformerDto.WorkId), typeof(Guid));
+        workPerformersDataTable.Columns.Add(nameof(WorkPerformerDto.ArtistId), typeof(Guid));
+        workPerformersDataTable.Columns.Add(nameof(WorkPerformerDto.Order), typeof(int));
+        foreach (WorkPerformerDto workPerformer in work.WorkPerformers)
+        {
+            workPerformersDataTable.Rows.Add(
+                workPerformer.WorkId.AsDbValue(),
+                workPerformer.ArtistId.AsDbValue(),
+                workPerformer.Order.AsDbValue());
+        }
+
+        using var workComposersDataTable = new DataTable();
+        workComposersDataTable.Columns.Add(nameof(WorkComposerDto.WorkId), typeof(Guid));
+        workComposersDataTable.Columns.Add(nameof(WorkComposerDto.ArtistId), typeof(Guid));
+        workComposersDataTable.Columns.Add(nameof(WorkComposerDto.Order), typeof(int));
+        foreach (WorkComposerDto workComposer in work.WorkComposers)
+        {
+            workComposersDataTable.Rows.Add(
+                workComposer.WorkId.AsDbValue(),
+                workComposer.ArtistId.AsDbValue(),
+                workComposer.Order.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -221,6 +333,10 @@ public class SqlServerWorkRepository : IWorkRepository
             new SqlParameter(nameof(WorkDto.SystemEntity), work.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(WorkDto.Enabled), work.Enabled.AsDbValue()),
             new SqlParameter(nameof(WorkDto.WorkRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkRelationship]", Value = workRelationshipsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkArtist]", Value = workArtistsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkFeaturedArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkFeaturedArtist]", Value = workFeaturedArtistsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkPerformers), SqlDbType.Structured) { TypeName = "[dbo].[WorkPerformer]", Value = workPerformersDataTable },
+            new SqlParameter(nameof(WorkDto.WorkComposers), SqlDbType.Structured) { TypeName = "[dbo].[WorkComposer]", Value = workComposersDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(WorkDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(WorkDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(WorkDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -238,6 +354,10 @@ public class SqlServerWorkRepository : IWorkRepository
                 @{nameof(WorkDto.SystemEntity)},
                 @{nameof(WorkDto.Enabled)},
                 @{nameof(WorkDto.WorkRelationships)},
+                @{nameof(WorkDto.WorkArtists)},
+                @{nameof(WorkDto.WorkFeaturedArtists)},
+                @{nameof(WorkDto.WorkPerformers)},
+                @{nameof(WorkDto.WorkComposers)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -257,6 +377,10 @@ public class SqlServerWorkRepository : IWorkRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         SetWorkRelationshipOrders(work.WorkRelationships);
+        SetWorkArtistOrders(work.WorkArtists);
+        SetWorkFeaturedArtistOrders(work.WorkFeaturedArtists);
+        SetWorkPerformerOrders(work.WorkPerformers);
+        SetWorkComposerOrders(work.WorkComposers);
 
         using var workRelationshipsDataTable = new DataTable();
         workRelationshipsDataTable.Columns.Add(nameof(WorkRelationshipDto.WorkId), typeof(Guid));
@@ -274,6 +398,54 @@ public class SqlServerWorkRepository : IWorkRepository
                 workRelationship.Order.AsDbValue());
         }
 
+        using var workArtistsDataTable = new DataTable();
+        workArtistsDataTable.Columns.Add(nameof(WorkArtistDto.WorkId), typeof(Guid));
+        workArtistsDataTable.Columns.Add(nameof(WorkArtistDto.ArtistId), typeof(Guid));
+        workArtistsDataTable.Columns.Add(nameof(WorkArtistDto.Order), typeof(int));
+        foreach (WorkArtistDto workArtist in work.WorkArtists)
+        {
+            workArtistsDataTable.Rows.Add(
+                workArtist.WorkId.AsDbValue(),
+                workArtist.ArtistId.AsDbValue(),
+                workArtist.Order.AsDbValue());
+        }
+
+        using var workFeaturedArtistsDataTable = new DataTable();
+        workFeaturedArtistsDataTable.Columns.Add(nameof(WorkFeaturedArtistDto.WorkId), typeof(Guid));
+        workFeaturedArtistsDataTable.Columns.Add(nameof(WorkFeaturedArtistDto.ArtistId), typeof(Guid));
+        workFeaturedArtistsDataTable.Columns.Add(nameof(WorkFeaturedArtistDto.Order), typeof(int));
+        foreach (WorkFeaturedArtistDto workFeaturedArtist in work.WorkFeaturedArtists)
+        {
+            workFeaturedArtistsDataTable.Rows.Add(
+                workFeaturedArtist.WorkId.AsDbValue(),
+                workFeaturedArtist.ArtistId.AsDbValue(),
+                workFeaturedArtist.Order.AsDbValue());
+        }
+
+        using var workPerformersDataTable = new DataTable();
+        workPerformersDataTable.Columns.Add(nameof(WorkPerformerDto.WorkId), typeof(Guid));
+        workPerformersDataTable.Columns.Add(nameof(WorkPerformerDto.ArtistId), typeof(Guid));
+        workPerformersDataTable.Columns.Add(nameof(WorkPerformerDto.Order), typeof(int));
+        foreach (WorkPerformerDto workPerformer in work.WorkPerformers)
+        {
+            workPerformersDataTable.Rows.Add(
+                workPerformer.WorkId.AsDbValue(),
+                workPerformer.ArtistId.AsDbValue(),
+                workPerformer.Order.AsDbValue());
+        }
+
+        using var workComposersDataTable = new DataTable();
+        workComposersDataTable.Columns.Add(nameof(WorkComposerDto.WorkId), typeof(Guid));
+        workComposersDataTable.Columns.Add(nameof(WorkComposerDto.ArtistId), typeof(Guid));
+        workComposersDataTable.Columns.Add(nameof(WorkComposerDto.Order), typeof(int));
+        foreach (WorkComposerDto workComposer in work.WorkComposers)
+        {
+            workComposersDataTable.Rows.Add(
+                workComposer.WorkId.AsDbValue(),
+                workComposer.ArtistId.AsDbValue(),
+                workComposer.Order.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -287,6 +459,10 @@ public class SqlServerWorkRepository : IWorkRepository
             new SqlParameter(nameof(WorkDto.SystemEntity), work.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(WorkDto.Enabled), work.Enabled.AsDbValue()),
             new SqlParameter(nameof(WorkDto.WorkRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkRelationship]", Value = workRelationshipsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkArtist]", Value = workArtistsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkFeaturedArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkFeaturedArtist]", Value = workFeaturedArtistsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkPerformers), SqlDbType.Structured) { TypeName = "[dbo].[WorkPerformer]", Value = workPerformersDataTable },
+            new SqlParameter(nameof(WorkDto.WorkComposers), SqlDbType.Structured) { TypeName = "[dbo].[WorkComposer]", Value = workComposersDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -302,6 +478,10 @@ public class SqlServerWorkRepository : IWorkRepository
                 @{nameof(WorkDto.SystemEntity)},
                 @{nameof(WorkDto.Enabled)},
                 @{nameof(WorkDto.WorkRelationships)},
+                @{nameof(WorkDto.WorkArtists)},
+                @{nameof(WorkDto.WorkFeaturedArtists)},
+                @{nameof(WorkDto.WorkPerformers)},
+                @{nameof(WorkDto.WorkComposers)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -340,12 +520,76 @@ public class SqlServerWorkRepository : IWorkRepository
             .ToList();
     }
 
+    private static void OrderWorkArtists(WorkDto work)
+    {
+        work.WorkArtists = work.WorkArtists
+            .OrderBy(workArtist => workArtist.Order)
+            .ToList();
+    }
+
+    private static void OrderWorkFeaturedArtists(WorkDto work)
+    {
+        work.WorkFeaturedArtists = work.WorkFeaturedArtists
+            .OrderBy(workFeaturedArtist => workFeaturedArtist.Order)
+            .ToList();
+    }
+
+    private static void OrderWorkPerformers(WorkDto work)
+    {
+        work.WorkPerformers = work.WorkPerformers
+            .OrderBy(workPerformer => workPerformer.Order)
+            .ToList();
+    }
+
+    private static void OrderWorkComposers(WorkDto work)
+    {
+        work.WorkComposers = work.WorkComposers
+            .OrderBy(workComposer => workComposer.Order)
+            .ToList();
+    }
+
     private static void SetWorkRelationshipOrders(ICollection<WorkRelationshipDto> workRelationships)
     {
         var i = 0;
         foreach (WorkRelationshipDto workRelationship in workRelationships)
         {
             workRelationship.Order = i++;
+        }
+    }
+
+    private static void SetWorkArtistOrders(ICollection<WorkArtistDto> workArtists)
+    {
+        var i = 0;
+        foreach (WorkArtistDto workArtist in workArtists)
+        {
+            workArtist.Order = i++;
+        }
+    }
+
+    private static void SetWorkFeaturedArtistOrders(ICollection<WorkFeaturedArtistDto> workFeaturedArtists)
+    {
+        var i = 0;
+        foreach (WorkFeaturedArtistDto workFeaturedArtist in workFeaturedArtists)
+        {
+            workFeaturedArtist.Order = i++;
+        }
+    }
+
+    private static void SetWorkPerformerOrders(ICollection<WorkPerformerDto> workPerformers)
+    {
+        var i = 0;
+        foreach (WorkPerformerDto workPerformer in workPerformers)
+        {
+            workPerformer.Order = i++;
+        }
+    }
+
+    private static void SetWorkComposerOrders(ICollection<WorkComposerDto> workComposers)
+    {
+        var i = 0;
+        foreach (WorkComposerDto workComposer in workComposers)
+        {
+            workComposer.Order = i++;
         }
     }
 }
