@@ -88,4 +88,10 @@ public class Work
     /// </summary>
     [Required]
     public ICollection<WorkFeaturedArtist> WorkFeaturedArtists { get; set; } = Enumerable.Empty<WorkFeaturedArtist>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "performer" role.
+    /// </summary>
+    [Required]
+    public ICollection<WorkPerformer> WorkPerformers { get; set; } = Enumerable.Empty<WorkPerformer>().ToList();
 }
