@@ -76,4 +76,10 @@ public class Work
     /// </summary>
     [Required]
     public ICollection<WorkRelationship> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationship>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work.
+    /// </summary>
+    [Required]
+    public ICollection<WorkArtist> WorkArtists { get; set; } = Enumerable.Empty<WorkArtist>().ToList();
 }
