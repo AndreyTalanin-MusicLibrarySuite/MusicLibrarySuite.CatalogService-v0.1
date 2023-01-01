@@ -240,3 +240,23 @@ Ref "FK_WorkComposer_Work_WorkId" {
 Ref "FK_WorkComposer_Artist_ArtistId" {
     "dbo"."WorkComposer"."ArtistId" > "dbo"."Artist"."Id"
 }
+
+Table "dbo"."WorkGenre" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "GenreId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkGenre_WorkId"]
+        "GenreId" [name: "IX_WorkGenre_GenreId"]
+        ("WorkId", "Order") [name: "UIX_WorkGenre_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkGenre_Work_WorkId" {
+    "dbo"."WorkGenre"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkGenre_Genre_GenreId" {
+    "dbo"."WorkGenre"."GenreId" > "dbo"."Genre"."Id"
+}
