@@ -98,4 +98,9 @@ public class WorkDto
     /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "composer" role.
     /// </summary>
     public ICollection<WorkComposerDto> WorkComposers { get; set; } = Enumerable.Empty<WorkComposerDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-genre relationships associated to the current work.
+    /// </summary>
+    public ICollection<WorkGenreDto> WorkGenres { get; set; } = Enumerable.Empty<WorkGenreDto>().ToList();
 }

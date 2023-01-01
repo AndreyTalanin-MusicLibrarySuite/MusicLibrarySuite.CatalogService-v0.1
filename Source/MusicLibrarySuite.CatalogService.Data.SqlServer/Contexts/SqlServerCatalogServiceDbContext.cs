@@ -282,7 +282,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkGenreDto>().HasKey(entity => new { entity.WorkId, entity.GenreId });
         modelBuilder.Entity<WorkGenreDto>()
             .HasOne<WorkDto>()
-            .WithMany()
+            .WithMany(entity => entity.WorkGenres)
             .HasForeignKey(entity => entity.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<WorkGenreDto>()
