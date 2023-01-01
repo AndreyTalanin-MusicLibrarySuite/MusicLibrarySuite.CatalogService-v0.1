@@ -100,4 +100,10 @@ public class Work
     /// </summary>
     [Required]
     public ICollection<WorkComposer> WorkComposers { get; set; } = Enumerable.Empty<WorkComposer>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-genre relationships associated to the current work.
+    /// </summary>
+    [Required]
+    public ICollection<WorkGenre> WorkGenres { get; set; } = Enumerable.Empty<WorkGenre>().ToList();
 }
