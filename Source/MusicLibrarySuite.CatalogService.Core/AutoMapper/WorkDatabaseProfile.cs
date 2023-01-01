@@ -26,6 +26,7 @@ public class WorkDatabaseProfile : Profile
         CreateMap<WorkFeaturedArtist, WorkFeaturedArtistDto>().ReverseMap();
         CreateMap<WorkPerformer, WorkPerformerDto>().ReverseMap();
         CreateMap<WorkComposer, WorkComposerDto>().ReverseMap();
+        CreateMap<WorkGenre, WorkGenreDto>().ReverseMap();
         CreateMap<WorkRequest, WorkRequestDto>().ReverseMap();
         CreateMap<WorkPageResponse, PageResponseDto<WorkDto>>().ReverseMap();
         CreateMap<PageResponse<Work>, PageResponseDto<WorkDto>>().ReverseMap();
