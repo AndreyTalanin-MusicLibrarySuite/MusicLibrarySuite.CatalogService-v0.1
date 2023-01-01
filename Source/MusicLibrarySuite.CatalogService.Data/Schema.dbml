@@ -160,3 +160,83 @@ Ref "FK_WorkRelationship_Work_WorkId" {
 Ref "FK_WorkRelationship_Work_DependentWorkId" {
     "dbo"."WorkRelationship"."DependentWorkId" > "dbo"."Work"."Id"
 }
+
+Table "dbo"."WorkArtist" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkArtist_WorkId"]
+        "ArtistId" [name: "IX_WorkArtist_ArtistId"]
+        ("WorkId", "Order") [name: "UIX_WorkArtist_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkArtist_Work_WorkId" {
+    "dbo"."WorkArtist"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkArtist_Artist_ArtistId" {
+    "dbo"."WorkArtist"."ArtistId" > "dbo"."Artist"."Id"
+}
+
+Table "dbo"."WorkFeaturedArtist" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkFeaturedArtist_WorkId"]
+        "ArtistId" [name: "IX_WorkFeaturedArtist_ArtistId"]
+        ("WorkId", "Order") [name: "UIX_WorkFeaturedArtist_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkFeaturedArtist_Work_WorkId" {
+    "dbo"."WorkFeaturedArtist"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkFeaturedArtist_Artist_ArtistId" {
+    "dbo"."WorkFeaturedArtist"."ArtistId" > "dbo"."Artist"."Id"
+}
+
+Table "dbo"."WorkPerformer" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkPerformer_WorkId"]
+        "ArtistId" [name: "IX_WorkPerformer_ArtistId"]
+        ("WorkId", "Order") [name: "UIX_WorkPerformer_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkPerformer_Work_WorkId" {
+    "dbo"."WorkPerformer"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkPerformer_Artist_ArtistId" {
+    "dbo"."WorkPerformer"."ArtistId" > "dbo"."Artist"."Id"
+}
+
+Table "dbo"."WorkComposer" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkComposer_WorkId"]
+        "ArtistId" [name: "IX_WorkComposer_ArtistId"]
+        ("WorkId", "Order") [name: "UIX_WorkComposer_WorkId_Order", unique]
+    }
+}
+
+Ref "FK_WorkComposer_Work_WorkId" {
+    "dbo"."WorkComposer"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkComposer_Artist_ArtistId" {
+    "dbo"."WorkComposer"."ArtistId" > "dbo"."Artist"."Id"
+}

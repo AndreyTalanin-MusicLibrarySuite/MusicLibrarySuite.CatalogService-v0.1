@@ -186,6 +186,98 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<WorkArtistDto>().ToTable("WorkArtist", "dbo");
+        modelBuilder.Entity<WorkArtistDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkArtists)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkArtist_WorkId");
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_WorkArtist_ArtistId");
+        modelBuilder.Entity<WorkArtistDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkArtist_WorkId_Order")
+            .IsUnique();
+
+        modelBuilder.Entity<WorkFeaturedArtistDto>().ToTable("WorkFeaturedArtist", "dbo");
+        modelBuilder.Entity<WorkFeaturedArtistDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
+        modelBuilder.Entity<WorkFeaturedArtistDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkFeaturedArtists)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkFeaturedArtistDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkFeaturedArtistDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkFeaturedArtist_WorkId");
+        modelBuilder.Entity<WorkFeaturedArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_WorkFeaturedArtist_ArtistId");
+        modelBuilder.Entity<WorkFeaturedArtistDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkFeaturedArtist_WorkId_Order")
+            .IsUnique();
+
+        modelBuilder.Entity<WorkPerformerDto>().ToTable("WorkPerformer", "dbo");
+        modelBuilder.Entity<WorkPerformerDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkPerformers)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkPerformer_WorkId");
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_WorkPerformer_ArtistId");
+        modelBuilder.Entity<WorkPerformerDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkPerformer_WorkId_Order")
+            .IsUnique();
+
+        modelBuilder.Entity<WorkComposerDto>().ToTable("WorkComposer", "dbo");
+        modelBuilder.Entity<WorkComposerDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
+        modelBuilder.Entity<WorkComposerDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkComposers)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkComposerDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkComposerDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkComposer_WorkId");
+        modelBuilder.Entity<WorkComposerDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_WorkComposer_ArtistId");
+        modelBuilder.Entity<WorkComposerDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkComposer_WorkId_Order")
+            .IsUnique();
+
         base.OnModelCreating(modelBuilder);
     }
 }

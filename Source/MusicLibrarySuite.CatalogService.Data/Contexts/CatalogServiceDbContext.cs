@@ -55,6 +55,26 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<WorkRelationshipDto> WorkRelationships { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="WorkArtistDto" /> type.
+    /// </summary>
+    public DbSet<WorkArtistDto> WorkArtists { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="WorkFeaturedArtistDto" /> type.
+    /// </summary>
+    public DbSet<WorkFeaturedArtistDto> WorkFeaturedArtists { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="WorkPerformerDto" /> type.
+    /// </summary>
+    public DbSet<WorkPerformerDto> WorkPerformers { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="WorkComposerDto" /> type.
+    /// </summary>
+    public DbSet<WorkComposerDto> WorkComposers { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CatalogServiceDbContext" /> type.
     /// </summary>
     protected CatalogServiceDbContext()
@@ -69,6 +89,10 @@ public abstract class CatalogServiceDbContext : DbContext
         ProductRelationships = Set<ProductRelationshipDto>();
         Works = Set<WorkDto>();
         WorkRelationships = Set<WorkRelationshipDto>();
+        WorkArtists = Set<WorkArtistDto>();
+        WorkFeaturedArtists = Set<WorkFeaturedArtistDto>();
+        WorkPerformers = Set<WorkPerformerDto>();
+        WorkComposers = Set<WorkComposerDto>();
     }
 
     /// <summary>
@@ -87,5 +111,9 @@ public abstract class CatalogServiceDbContext : DbContext
         ProductRelationships = Set<ProductRelationshipDto>();
         Works = Set<WorkDto>();
         WorkRelationships = Set<WorkRelationshipDto>();
+        WorkArtists = Set<WorkArtistDto>();
+        WorkFeaturedArtists = Set<WorkFeaturedArtistDto>();
+        WorkPerformers = Set<WorkPerformerDto>();
+        WorkComposers = Set<WorkComposerDto>();
     }
 }
