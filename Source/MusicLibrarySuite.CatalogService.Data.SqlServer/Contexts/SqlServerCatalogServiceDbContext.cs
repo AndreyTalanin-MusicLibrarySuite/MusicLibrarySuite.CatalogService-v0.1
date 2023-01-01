@@ -281,12 +281,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkGenreDto>().ToTable("WorkGenre", "dbo");
         modelBuilder.Entity<WorkGenreDto>().HasKey(entity => new { entity.WorkId, entity.GenreId });
         modelBuilder.Entity<WorkGenreDto>()
-            .HasOne<WorkDto>()
+            .HasOne(entity => entity.Work)
             .WithMany(entity => entity.WorkGenres)
             .HasForeignKey(entity => entity.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<WorkGenreDto>()
-            .HasOne<GenreDto>()
+            .HasOne(entity => entity.Genre)
             .WithMany()
             .HasForeignKey(entity => entity.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
