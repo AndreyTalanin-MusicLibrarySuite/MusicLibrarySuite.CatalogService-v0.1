@@ -289,6 +289,21 @@ public class SqlServerWorkRepository : IWorkRepository
     }
 
     /// <inheritdoc/>
+    public async Task<WorkToProductRelationshipDto[]> GetWorkToProductRelationshipsByProductAsync(Guid productId)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        WorkToProductRelationshipDto[] workToProductRelationships = await context.WorkToProductRelationships.AsNoTracking()
+            .Include(workToProductRelationship => workToProductRelationship.Work)
+            .Include(workToProductRelationship => workToProductRelationship.Product)
+            .Where(workToProductRelationship => workToProductRelationship.ProductId == productId)
+            .OrderBy(workToProductRelationship => workToProductRelationship.ReferenceOrder)
+            .ToArrayAsync();
+
+        return workToProductRelationships;
+    }
+
+    /// <inheritdoc />
     public async Task<WorkDto> CreateWorkAsync(WorkDto work)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();

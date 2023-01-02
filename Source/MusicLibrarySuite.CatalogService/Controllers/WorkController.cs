@@ -145,6 +145,23 @@ public class WorkController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all work-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all work-to-product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<WorkToProductRelationship[]>> GetWorkToProductRelationshipsByProductAsync([Required][FromQuery] Guid productId)
+    {
+        WorkToProductRelationship[] workToProductRelationships = await m_workService.GetWorkToProductRelationshipsByProductAsync(productId);
+        return Ok(workToProductRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new work.
     /// </summary>
     /// <param name="work">The work to create.</param>
