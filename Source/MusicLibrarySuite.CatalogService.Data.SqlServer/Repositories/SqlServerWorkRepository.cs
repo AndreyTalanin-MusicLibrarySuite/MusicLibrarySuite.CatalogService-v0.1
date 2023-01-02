@@ -54,6 +54,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
+            .Include(work => work.WorkToProductRelationships)
+            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .FirstOrDefaultAsync();
 
         if (work is not null)
@@ -64,6 +66,7 @@ public class SqlServerWorkRepository : IWorkRepository
             OrderWorkPerformers(work);
             OrderWorkComposers(work);
             OrderWorkGenres(work);
+            OrderWorkToProductRelationships(work);
         }
 
         return work;
@@ -87,6 +90,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
+            .Include(work => work.WorkToProductRelationships)
+            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .ToArrayAsync();
 
         foreach (WorkDto work in works)
@@ -97,6 +102,7 @@ public class SqlServerWorkRepository : IWorkRepository
             OrderWorkPerformers(work);
             OrderWorkComposers(work);
             OrderWorkGenres(work);
+            OrderWorkToProductRelationships(work);
         }
 
         return works;
@@ -129,6 +135,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
+            .Include(work => work.WorkToProductRelationships)
+            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .ToArrayAsync();
 
         foreach (WorkDto work in works)
@@ -139,6 +147,7 @@ public class SqlServerWorkRepository : IWorkRepository
             OrderWorkPerformers(work);
             OrderWorkComposers(work);
             OrderWorkGenres(work);
+            OrderWorkToProductRelationships(work);
         }
 
         return works;
@@ -162,6 +171,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
+            .Include(work => work.WorkToProductRelationships)
+            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .ToArrayAsync();
 
         foreach (WorkDto work in works)
@@ -172,6 +183,7 @@ public class SqlServerWorkRepository : IWorkRepository
             OrderWorkPerformers(work);
             OrderWorkComposers(work);
             OrderWorkGenres(work);
+            OrderWorkToProductRelationships(work);
         }
 
         return works;
@@ -204,6 +216,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
+            .Include(work => work.WorkToProductRelationships)
+            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .OrderByDescending(work => work.SystemEntity)
             .ThenBy(work => work.Title)
             .Skip(workRequest.PageSize * workRequest.PageIndex)
@@ -218,6 +232,7 @@ public class SqlServerWorkRepository : IWorkRepository
             OrderWorkPerformers(work);
             OrderWorkComposers(work);
             OrderWorkGenres(work);
+            OrderWorkToProductRelationships(work);
         }
 
         return new PageResponseDto<WorkDto>()
@@ -269,6 +284,7 @@ public class SqlServerWorkRepository : IWorkRepository
         SetWorkPerformerOrders(work.WorkPerformers);
         SetWorkComposerOrders(work.WorkComposers);
         SetWorkGenreOrders(work.WorkGenres);
+        SetWorkToProductRelationshipOrders(work.WorkToProductRelationships);
 
         using var workRelationshipsDataTable = new DataTable();
         workRelationshipsDataTable.Columns.Add(nameof(WorkRelationshipDto.WorkId), typeof(Guid));
@@ -346,6 +362,24 @@ public class SqlServerWorkRepository : IWorkRepository
                 workGenre.Order.AsDbValue());
         }
 
+        using var workToProductRelationshipsDataTable = new DataTable();
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (WorkToProductRelationshipDto workToProductRelationship in work.WorkToProductRelationships)
+        {
+            workToProductRelationshipsDataTable.Rows.Add(
+                workToProductRelationship.WorkId.AsDbValue(),
+                workToProductRelationship.ProductId.AsDbValue(),
+                workToProductRelationship.Name.AsDbValue(),
+                workToProductRelationship.Description.AsDbValue(),
+                workToProductRelationship.Order.AsDbValue(),
+                workToProductRelationship.ReferenceOrder.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -366,6 +400,7 @@ public class SqlServerWorkRepository : IWorkRepository
             new SqlParameter(nameof(WorkDto.WorkPerformers), SqlDbType.Structured) { TypeName = "[dbo].[WorkPerformer]", Value = workPerformersDataTable },
             new SqlParameter(nameof(WorkDto.WorkComposers), SqlDbType.Structured) { TypeName = "[dbo].[WorkComposer]", Value = workComposersDataTable },
             new SqlParameter(nameof(WorkDto.WorkGenres), SqlDbType.Structured) { TypeName = "[dbo].[WorkGenre]", Value = workGenresDataTable },
+            new SqlParameter(nameof(WorkDto.WorkToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(WorkDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(WorkDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(WorkDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -388,6 +423,7 @@ public class SqlServerWorkRepository : IWorkRepository
                 @{nameof(WorkDto.WorkPerformers)},
                 @{nameof(WorkDto.WorkComposers)},
                 @{nameof(WorkDto.WorkGenres)},
+                @{nameof(WorkDto.WorkToProductRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -412,6 +448,7 @@ public class SqlServerWorkRepository : IWorkRepository
         SetWorkPerformerOrders(work.WorkPerformers);
         SetWorkComposerOrders(work.WorkComposers);
         SetWorkGenreOrders(work.WorkGenres);
+        SetWorkToProductRelationshipOrders(work.WorkToProductRelationships);
 
         using var workRelationshipsDataTable = new DataTable();
         workRelationshipsDataTable.Columns.Add(nameof(WorkRelationshipDto.WorkId), typeof(Guid));
@@ -489,6 +526,24 @@ public class SqlServerWorkRepository : IWorkRepository
                 workGenre.Order.AsDbValue());
         }
 
+        using var workToProductRelationshipsDataTable = new DataTable();
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (WorkToProductRelationshipDto workToProductRelationship in work.WorkToProductRelationships)
+        {
+            workToProductRelationshipsDataTable.Rows.Add(
+                workToProductRelationship.WorkId.AsDbValue(),
+                workToProductRelationship.ProductId.AsDbValue(),
+                workToProductRelationship.Name.AsDbValue(),
+                workToProductRelationship.Description.AsDbValue(),
+                workToProductRelationship.Order.AsDbValue(),
+                workToProductRelationship.ReferenceOrder.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -507,6 +562,7 @@ public class SqlServerWorkRepository : IWorkRepository
             new SqlParameter(nameof(WorkDto.WorkPerformers), SqlDbType.Structured) { TypeName = "[dbo].[WorkPerformer]", Value = workPerformersDataTable },
             new SqlParameter(nameof(WorkDto.WorkComposers), SqlDbType.Structured) { TypeName = "[dbo].[WorkComposer]", Value = workComposersDataTable },
             new SqlParameter(nameof(WorkDto.WorkGenres), SqlDbType.Structured) { TypeName = "[dbo].[WorkGenre]", Value = workGenresDataTable },
+            new SqlParameter(nameof(WorkDto.WorkToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -527,6 +583,7 @@ public class SqlServerWorkRepository : IWorkRepository
                 @{nameof(WorkDto.WorkPerformers)},
                 @{nameof(WorkDto.WorkComposers)},
                 @{nameof(WorkDto.WorkGenres)},
+                @{nameof(WorkDto.WorkToProductRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -600,6 +657,13 @@ public class SqlServerWorkRepository : IWorkRepository
             .ToList();
     }
 
+    private static void OrderWorkToProductRelationships(WorkDto work)
+    {
+        work.WorkToProductRelationships = work.WorkToProductRelationships
+            .OrderBy(workToProductRelationship => workToProductRelationship.Order)
+            .ToList();
+    }
+
     private static void SetWorkRelationshipOrders(ICollection<WorkRelationshipDto> workRelationships)
     {
         var i = 0;
@@ -651,6 +715,15 @@ public class SqlServerWorkRepository : IWorkRepository
         foreach (WorkGenreDto workGenre in workGenres)
         {
             workGenre.Order = i++;
+        }
+    }
+
+    private static void SetWorkToProductRelationshipOrders(ICollection<WorkToProductRelationshipDto> workToProductRelationships)
+    {
+        var i = 0;
+        foreach (WorkToProductRelationshipDto workToProductRelationship in workToProductRelationships)
+        {
+            workToProductRelationship.Order = i++;
         }
     }
 }
