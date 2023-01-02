@@ -39,4 +39,16 @@ public class WorkToProductRelationshipDto
     /// Gets or sets the relationship's display order used when requesting relationships for a product.
     /// </summary>
     public int ReferenceOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the work.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public WorkDto? Work { get; set; }
+
+    /// <summary>
+    /// Gets or sets the product.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ProductDto? Product { get; set; }
 }

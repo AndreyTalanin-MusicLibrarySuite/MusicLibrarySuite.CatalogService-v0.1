@@ -304,12 +304,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkToProductRelationshipDto>().ToTable("WorkToProductRelationship", "dbo");
         modelBuilder.Entity<WorkToProductRelationshipDto>().HasKey(entity => new { entity.WorkId, entity.ProductId });
         modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasOne<WorkDto>()
+            .HasOne(entity => entity.Work)
             .WithMany(entity => entity.WorkToProductRelationships)
             .HasForeignKey(entity => entity.WorkId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasOne<ProductDto>()
+            .HasOne(entity => entity.Product)
             .WithMany()
             .HasForeignKey(entity => entity.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
