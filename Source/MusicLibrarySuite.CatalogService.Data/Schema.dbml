@@ -260,3 +260,27 @@ Ref "FK_WorkGenre_Work_WorkId" {
 Ref "FK_WorkGenre_Genre_GenreId" {
     "dbo"."WorkGenre"."GenreId" > "dbo"."Genre"."Id"
 }
+
+Table "dbo"."WorkToProductRelationship" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkToProductRelationship_WorkId"]
+        "ProductId" [name: "IX_WorkToProductRelationship_ProductId"]
+        ("WorkId", "Order") [name: "UIX_WorkToProductRelationship_WorkId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_WorkToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_WorkToProductRelationship_Work_WorkId" {
+    "dbo"."WorkToProductRelationship"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkToProductRelationship_Product_ProductId" {
+    "dbo"."WorkToProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
