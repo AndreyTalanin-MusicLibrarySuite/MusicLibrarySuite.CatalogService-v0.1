@@ -109,6 +109,14 @@ public class WorkService : IWorkService
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateWorkToProductRelationshipsOrderAsync(WorkToProductRelationship[] workToProductRelationships, bool useReferenceOrder)
+    {
+        WorkToProductRelationshipDto[] workToProductRelationshipDtoArray = m_mapper.Map<WorkToProductRelationshipDto[]>(workToProductRelationships);
+        var updated = await m_workRepository.UpdateWorkToProductRelationshipsOrderAsync(workToProductRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteWorkAsync(Guid workId)
     {
         var deleted = await m_workRepository.DeleteWorkAsync(workId);

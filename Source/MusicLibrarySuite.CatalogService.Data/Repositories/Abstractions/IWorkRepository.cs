@@ -113,6 +113,17 @@ public interface IWorkRepository
     public Task<bool> UpdateWorkAsync(WorkDto work);
 
     /// <summary>
+    /// Asynchronously updates order of existing work-to-product relationships.
+    /// </summary>
+    /// <param name="workToProductRelationships">A collection of work-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the <see cref="WorkToProductRelationshipDto.ReferenceOrder" /> property should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any work-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateWorkToProductRelationshipsOrderAsync(WorkToProductRelationshipDto[] workToProductRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
     /// Asynchronously deletes an existing work.
     /// </summary>
     /// <param name="workId">The unique identifier of the work to delete from the database.</param>

@@ -616,6 +616,30 @@ public partial class WorkToProductRelationshipsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateWorkToProductRelationshipsOrder]
+            (
+                @UseReferenceOrder BIT,
+                @WorkToProductRelationships [dbo].[WorkToProductRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceWorkToProductRelationship] AS
+                (
+                    SELECT * FROM @WorkToProductRelationships
+                )
+                MERGE INTO [dbo].[WorkToProductRelationship] AS [target]
+                USING [SourceWorkToProductRelationship] AS [source]
+                ON [target].[WorkId] = [source].[WorkId] AND [target].[ProductId] = [source].[ProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Order] = CASE WHEN @UseReferenceOrder = 0 THEN [source].[Order] ELSE [target].[Order] END,
+                    [target].[ReferenceOrder] = CASE WHEN @UseReferenceOrder = 1 THEN [source].[ReferenceOrder] ELSE [target].[ReferenceOrder] END;
+
+                SET @ResultRowsUpdated = @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_DeleteWork]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -635,6 +659,8 @@ public partial class WorkToProductRelationshipsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateWork];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWork];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWorkToProductRelationshipsOrder];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteWork];");
 

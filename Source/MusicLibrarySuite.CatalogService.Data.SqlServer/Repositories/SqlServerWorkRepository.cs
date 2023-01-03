@@ -623,6 +623,58 @@ public class SqlServerWorkRepository : IWorkRepository
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateWorkToProductRelationshipsOrderAsync(WorkToProductRelationshipDto[] workToProductRelationships, bool useReferenceOrder)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        var i = 0;
+        foreach (WorkToProductRelationshipDto workToProductRelationship in workToProductRelationships)
+        {
+            if (!useReferenceOrder)
+                workToProductRelationship.Order = i++;
+            else
+                workToProductRelationship.ReferenceOrder = i++;
+        }
+
+        using var workToProductRelationshipsDataTable = new DataTable();
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (WorkToProductRelationshipDto workToProductRelationship in workToProductRelationships)
+        {
+            workToProductRelationshipsDataTable.Rows.Add(
+                workToProductRelationship.WorkId.AsDbValue(),
+                workToProductRelationship.ProductId.AsDbValue(),
+                workToProductRelationship.Name.AsDbValue(),
+                workToProductRelationship.Description.AsDbValue(),
+                workToProductRelationship.Order.AsDbValue(),
+                workToProductRelationship.ReferenceOrder.AsDbValue());
+        }
+
+        SqlParameter resultRowsUpdatedParameter;
+        var parameters = new SqlParameter[]
+        {
+            new SqlParameter("UseReferenceOrder", useReferenceOrder.AsDbValue()),
+            new SqlParameter("WorkToProductRelationships", SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
+            resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
+        };
+
+        var query = @$"
+            EXEC [dbo].[sp_UpdateWorkToProductRelationshipsOrder]
+                @UseReferenceOrder,
+                @WorkToProductRelationships,
+                @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
+
+        await context.Database.ExecuteSqlRawAsync(query, parameters);
+
+        var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
+        return rowsUpdated > 0;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteWorkAsync(Guid workId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();

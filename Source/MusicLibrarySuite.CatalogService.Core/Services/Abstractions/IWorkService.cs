@@ -102,6 +102,17 @@ public interface IWorkService
     public Task<bool> UpdateWorkAsync(Work work);
 
     /// <summary>
+    /// Asynchronously updates order of existing work-to-product relationships.
+    /// </summary>
+    /// <param name="workToProductRelationships">A collection of work-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any work-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateWorkToProductRelationshipsOrderAsync(WorkToProductRelationship[] workToProductRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
     /// Asynchronously deletes an existing work.
     /// </summary>
     /// <param name="workId">The unique identifier of the work to delete.</param>
