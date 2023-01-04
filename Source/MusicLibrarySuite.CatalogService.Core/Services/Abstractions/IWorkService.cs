@@ -62,6 +62,26 @@ public interface IWorkService
     public Task<WorkRelationship[]> GetWorkRelationshipsAsync(Guid workId, bool includeReverseRelationships = false);
 
     /// <summary>
+    /// Asynchronously gets all work-to-product relationships by a work's unique identifier.
+    /// </summary>
+    /// <param name="workId">The work's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all work-to-product relationships.
+    /// </returns>
+    public Task<WorkToProductRelationship[]> GetWorkToProductRelationshipsAsync(Guid workId);
+
+    /// <summary>
+    /// Asynchronously gets all work-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all work-to-product relationships.
+    /// </returns>
+    public Task<WorkToProductRelationship[]> GetWorkToProductRelationshipsByProductAsync(Guid productId);
+
+    /// <summary>
     /// Asynchronously creates a new work.
     /// </summary>
     /// <param name="work">The work to create.</param>
@@ -80,6 +100,17 @@ public interface IWorkService
     /// The task's result will be a value indicating whether the work was found and updated.
     /// </returns>
     public Task<bool> UpdateWorkAsync(Work work);
+
+    /// <summary>
+    /// Asynchronously updates order of existing work-to-product relationships.
+    /// </summary>
+    /// <param name="workToProductRelationships">A collection of work-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any work-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateWorkToProductRelationshipsOrderAsync(WorkToProductRelationship[] workToProductRelationships, bool useReferenceOrder = false);
 
     /// <summary>
     /// Asynchronously deletes an existing work.

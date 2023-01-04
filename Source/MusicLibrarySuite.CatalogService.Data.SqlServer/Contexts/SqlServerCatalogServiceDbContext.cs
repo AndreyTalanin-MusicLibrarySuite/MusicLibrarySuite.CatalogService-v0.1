@@ -301,6 +301,35 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_WorkGenre_WorkId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<WorkToProductRelationshipDto>().ToTable("WorkToProductRelationship", "dbo");
+        modelBuilder.Entity<WorkToProductRelationshipDto>().HasKey(entity => new { entity.WorkId, entity.ProductId });
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkToProductRelationships)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkToProductRelationship_WorkId");
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_WorkToProductRelationship_ProductId");
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkToProductRelationship_WorkId_Order")
+            .IsUnique();
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_WorkToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<WorkToProductRelationshipDto>().HasCheckConstraint("CK_WorkToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<WorkToProductRelationshipDto>().HasCheckConstraint("CK_WorkToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         base.OnModelCreating(modelBuilder);
     }
 }

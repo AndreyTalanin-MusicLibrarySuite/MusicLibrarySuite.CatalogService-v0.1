@@ -76,6 +76,22 @@ public class WorkService : IWorkService
     }
 
     /// <inheritdoc />
+    public async Task<WorkToProductRelationship[]> GetWorkToProductRelationshipsAsync(Guid workId)
+    {
+        WorkToProductRelationshipDto[] workToProductRelationshipDtoArray = await m_workRepository.GetWorkToProductRelationshipsAsync(workId);
+        WorkToProductRelationship[] workToProductRelationshipArray = m_mapper.Map<WorkToProductRelationship[]>(workToProductRelationshipDtoArray);
+        return workToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
+    public async Task<WorkToProductRelationship[]> GetWorkToProductRelationshipsByProductAsync(Guid productId)
+    {
+        WorkToProductRelationshipDto[] workToProductRelationshipDtoArray = await m_workRepository.GetWorkToProductRelationshipsByProductAsync(productId);
+        WorkToProductRelationship[] workToProductRelationshipArray = m_mapper.Map<WorkToProductRelationship[]>(workToProductRelationshipDtoArray);
+        return workToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Work> CreateWorkAsync(Work work)
     {
         WorkDto workDto = m_mapper.Map<WorkDto>(work);
@@ -89,6 +105,14 @@ public class WorkService : IWorkService
     {
         WorkDto workDto = m_mapper.Map<WorkDto>(work);
         var updated = await m_workRepository.UpdateWorkAsync(workDto);
+        return updated;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> UpdateWorkToProductRelationshipsOrderAsync(WorkToProductRelationship[] workToProductRelationships, bool useReferenceOrder)
+    {
+        WorkToProductRelationshipDto[] workToProductRelationshipDtoArray = m_mapper.Map<WorkToProductRelationshipDto[]>(workToProductRelationships);
+        var updated = await m_workRepository.UpdateWorkToProductRelationshipsOrderAsync(workToProductRelationshipDtoArray, useReferenceOrder);
         return updated;
     }
 

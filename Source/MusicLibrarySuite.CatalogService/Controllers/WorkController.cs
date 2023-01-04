@@ -128,6 +128,40 @@ public class WorkController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all work-to-product relationships by a work's unique identifier.
+    /// </summary>
+    /// <param name="workId">The work's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all work-to-product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<WorkToProductRelationship[]>> GetWorkToProductRelationshipsAsync([Required][FromQuery] Guid workId)
+    {
+        WorkToProductRelationship[] workToProductRelationships = await m_workService.GetWorkToProductRelationshipsAsync(workId);
+        return Ok(workToProductRelationships);
+    }
+
+    /// <summary>
+    /// Asynchronously gets all work-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all work-to-product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<WorkToProductRelationship[]>> GetWorkToProductRelationshipsByProductAsync([Required][FromQuery] Guid productId)
+    {
+        WorkToProductRelationship[] workToProductRelationships = await m_workService.GetWorkToProductRelationshipsByProductAsync(productId);
+        return Ok(workToProductRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new work.
     /// </summary>
     /// <param name="work">The work to create.</param>
@@ -155,6 +189,21 @@ public class WorkController : ControllerBase
     public async Task<ActionResult> UpdateWorkAsync([Required][FromBody] Work work)
     {
         var result = await m_workService.UpdateWorkAsync(work);
+        return result ? Ok() : NotFound();
+    }
+
+    /// <summary>
+    /// Asynchronously updates order of existing work-to-product relationships.
+    /// </summary>
+    /// <param name="workToProductRelationships">A collection of work-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateWorkToProductRelationshipsOrderAsync([Required][FromBody] WorkToProductRelationship[] workToProductRelationships, [FromQuery] bool? useReferenceOrder)
+    {
+        var result = await m_workService.UpdateWorkToProductRelationshipsOrderAsync(workToProductRelationships, useReferenceOrder == true);
         return result ? Ok() : NotFound();
     }
 
