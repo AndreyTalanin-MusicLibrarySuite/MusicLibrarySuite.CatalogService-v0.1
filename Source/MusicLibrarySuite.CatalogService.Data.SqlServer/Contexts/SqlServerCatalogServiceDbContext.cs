@@ -84,6 +84,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ArtistGenre_ArtistId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
+        modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
+        modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+
         modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
         modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");

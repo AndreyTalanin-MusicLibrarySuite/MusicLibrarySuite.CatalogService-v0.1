@@ -25,6 +25,11 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<ArtistGenreDto> ArtistGenres { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseGroupDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseGroupDto> ReleaseGroups { get; }
+
+    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreDto" /> type.
     /// </summary>
     public DbSet<GenreDto> Genres { get; }
@@ -93,6 +98,7 @@ public abstract class CatalogServiceDbContext : DbContext
         Artists = Set<ArtistDto>();
         ArtistRelationships = Set<ArtistRelationshipDto>();
         ArtistGenres = Set<ArtistGenreDto>();
+        ReleaseGroups = Set<ReleaseGroupDto>();
         Genres = Set<GenreDto>();
         GenreRelationships = Set<GenreRelationshipDto>();
         Products = Set<ProductDto>();
@@ -117,6 +123,7 @@ public abstract class CatalogServiceDbContext : DbContext
         Artists = Set<ArtistDto>();
         ArtistRelationships = Set<ArtistRelationshipDto>();
         ArtistGenres = Set<ArtistGenreDto>();
+        ReleaseGroups = Set<ReleaseGroupDto>();
         Genres = Set<GenreDto>();
         GenreRelationships = Set<GenreRelationshipDto>();
         Products = Set<ProductDto>();
