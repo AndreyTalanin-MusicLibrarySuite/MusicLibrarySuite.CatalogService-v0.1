@@ -21,6 +21,7 @@ public class ReleaseGroupDatabaseProfile : Profile
         DestinationMemberNamingConvention = ExactMatchNamingConvention.Instance;
 
         CreateMap<ReleaseGroup, ReleaseGroupDto>().ReverseMap();
+        CreateMap<ReleaseGroupRelationship, ReleaseGroupRelationshipDto>().ReverseMap();
         CreateMap<ReleaseGroupRequest, ReleaseGroupRequestDto>().ReverseMap();
         CreateMap<ReleaseGroupPageResponse, PageResponseDto<ReleaseGroupDto>>().ReverseMap();
         CreateMap<PageResponse<ReleaseGroup>, PageResponseDto<ReleaseGroupDto>>().ReverseMap();
