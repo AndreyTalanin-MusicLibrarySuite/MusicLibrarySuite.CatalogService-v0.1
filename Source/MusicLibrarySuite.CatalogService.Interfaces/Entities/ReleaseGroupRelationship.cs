@@ -30,4 +30,16 @@ public class ReleaseGroupRelationship
     /// Gets or sets the relationship's description.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the principal release group.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public ReleaseGroup? ReleaseGroup { get; set; }
+
+    /// <summary>
+    /// Gets or sets the dependent release group.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned by the application.</remarks>
+    public ReleaseGroup? DependentReleaseGroup { get; set; }
 }
