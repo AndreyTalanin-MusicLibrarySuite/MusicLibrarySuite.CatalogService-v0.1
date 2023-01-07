@@ -153,6 +153,35 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
         };
     }
 
+    /// <inheritdoc/>
+    public async Task<ReleaseGroupRelationshipDto[]> GetReleaseGroupRelationshipsAsync(Guid releaseGroupId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<ReleaseGroupRelationshipDto> baseCollection = context.ReleaseGroupRelationships.AsNoTracking()
+            .Include(releaseGroupRelationship => releaseGroupRelationship.ReleaseGroup)
+            .Include(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup);
+
+        ReleaseGroupRelationshipDto[] releaseGroupRelationships = await baseCollection
+            .Where(releaseGroupRelationship => releaseGroupRelationship.ReleaseGroupId == releaseGroupId)
+            .OrderBy(releaseGroupRelationship => releaseGroupRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            ReleaseGroupRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroupId == releaseGroupId)
+                .OrderBy(releaseGroupRelationship => releaseGroupRelationship.ReleaseGroup.Title)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            releaseGroupRelationships = releaseGroupRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return releaseGroupRelationships;
+    }
+
     /// <inheritdoc />
     public async Task<ReleaseGroupDto> CreateReleaseGroupAsync(ReleaseGroupDto releaseGroup)
     {
