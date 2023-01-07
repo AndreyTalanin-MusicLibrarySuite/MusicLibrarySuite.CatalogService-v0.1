@@ -284,3 +284,14 @@ Ref "FK_WorkToProductRelationship_Work_WorkId" {
 Ref "FK_WorkToProductRelationship_Product_ProductId" {
     "dbo"."WorkToProductRelationship"."ProductId" > "dbo"."Product"."Id"
 }
+
+
+Table "dbo"."ReleaseGroup" {
+    "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
+    "Title" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "DisambiguationText" nvarchar(2048) [null]
+    "Enabled" bit [not null]
+    "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+    "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+}

@@ -48,6 +48,7 @@ public class Startup
         {
             options.AddProfile<CommonDatabaseProfile>();
             options.AddProfile<ArtistDatabaseProfile>();
+            options.AddProfile<ReleaseGroupDatabaseProfile>();
             options.AddProfile<GenreDatabaseProfile>();
             options.AddProfile<ProductDatabaseProfile>();
             options.AddProfile<WorkDatabaseProfile>();
@@ -97,20 +98,22 @@ public class Startup
 
             options.SwaggerDoc("MusicLibrarySuite.CatalogService", new OpenApiInfo()
             {
-                Title = "Music Library Suite - Catalog Service API v0.6.0",
+                Title = "Music Library Suite - Catalog Service API v0.7.0-rc1",
                 Description = "Initial pre-release (unstable) API version.",
-                Version = "v0.6.0",
+                Version = "v0.7.0-rc1",
                 Contact = contact,
                 License = license,
             });
         });
 
         services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
+        services.AddScoped<IReleaseGroupRepository, SqlServerReleaseGroupRepository>();
         services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
         services.AddScoped<IProductRepository, SqlServerProductRepository>();
         services.AddScoped<IWorkRepository, SqlServerWorkRepository>();
 
         services.AddScoped<IArtistService, ArtistService>();
+        services.AddScoped<IReleaseGroupService, ReleaseGroupService>();
         services.AddScoped<IGenreService, GenreService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IWorkService, WorkService>();
