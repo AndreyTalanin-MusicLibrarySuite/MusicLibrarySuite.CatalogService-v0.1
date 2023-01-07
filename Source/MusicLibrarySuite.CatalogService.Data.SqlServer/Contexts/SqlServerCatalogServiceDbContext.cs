@@ -94,7 +94,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseGroupId, entity.DependentReleaseGroupId });
         modelBuilder.Entity<ReleaseGroupRelationshipDto>()
             .HasOne<ReleaseGroupDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleaseGroupRelationships)
             .HasForeignKey(entity => entity.ReleaseGroupId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseGroupRelationshipDto>()
