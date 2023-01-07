@@ -90,6 +90,31 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
 
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>().ToTable("ReleaseGroupRelationship", "dbo");
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseGroupId, entity.DependentReleaseGroupId });
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>()
+            .HasOne<ReleaseGroupDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseGroupId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>()
+            .HasOne<ReleaseGroupDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentReleaseGroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseGroupId)
+            .HasDatabaseName("IX_ReleaseGroupRelationship_ReleaseGroupId");
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>()
+            .HasIndex(entity => entity.DependentReleaseGroupId)
+            .HasDatabaseName("IX_ReleaseGroupRelationship_DependentReleaseGroupId");
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseGroupId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseGroupRelationship_ReleaseGroupId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseGroupRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
         modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
