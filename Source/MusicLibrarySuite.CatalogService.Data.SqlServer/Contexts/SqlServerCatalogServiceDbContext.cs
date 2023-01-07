@@ -93,12 +93,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseGroupRelationshipDto>().ToTable("ReleaseGroupRelationship", "dbo");
         modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseGroupId, entity.DependentReleaseGroupId });
         modelBuilder.Entity<ReleaseGroupRelationshipDto>()
-            .HasOne<ReleaseGroupDto>()
+            .HasOne(entity => entity.ReleaseGroup)
             .WithMany(entity => entity.ReleaseGroupRelationships)
             .HasForeignKey(entity => entity.ReleaseGroupId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseGroupRelationshipDto>()
-            .HasOne<ReleaseGroupDto>()
+            .HasOne(entity => entity.DependentReleaseGroup)
             .WithMany()
             .HasForeignKey(entity => entity.DependentReleaseGroupId)
             .OnDelete(DeleteBehavior.Restrict);
