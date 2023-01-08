@@ -62,6 +62,17 @@ public interface IReleaseGroupRepository
     public Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupRequestDto releaseGroupRequest);
 
     /// <summary>
+    /// Asynchronously gets all release group relationships by a release group's unique identifier.
+    /// </summary>
+    /// <param name="releaseGroupId">The release group's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release group relationships.
+    /// </returns>
+    public Task<ReleaseGroupRelationshipDto[]> GetReleaseGroupRelationshipsAsync(Guid releaseGroupId, bool includeReverseRelationships = false);
+
+    /// <summary>
     /// Asynchronously creates a new release group.
     /// </summary>
     /// <param name="releaseGroup">The release group to create in the database.</param>

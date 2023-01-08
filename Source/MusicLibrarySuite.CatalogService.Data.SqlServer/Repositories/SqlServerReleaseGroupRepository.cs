@@ -42,7 +42,14 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetReleaseGroup] (@{releaseGroupIdParameter.ParameterName})";
 
         ReleaseGroupDto? releaseGroup = await context.ReleaseGroups.FromSqlRaw(query, releaseGroupIdParameter).AsNoTracking()
+            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
+            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .FirstOrDefaultAsync();
+
+        if (releaseGroup is not null)
+        {
+            OrderReleaseGroupRelationships(releaseGroup);
+        }
 
         return releaseGroup;
     }
@@ -53,7 +60,14 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ReleaseGroupDto[] releaseGroups = await context.ReleaseGroups.AsNoTracking()
+            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
+            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .ToArrayAsync();
+
+        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
+        {
+            OrderReleaseGroupRelationships(releaseGroup);
+        }
 
         return releaseGroups;
     }
@@ -73,7 +87,14 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetReleaseGroups] (@{releaseGroupIdsParameter.ParameterName})";
 
         ReleaseGroupDto[] releaseGroups = await context.ReleaseGroups.FromSqlRaw(query, releaseGroupIdsParameter).AsNoTracking()
+            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
+            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .ToArrayAsync();
+
+        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
+        {
+            OrderReleaseGroupRelationships(releaseGroup);
+        }
 
         return releaseGroups;
     }
@@ -84,7 +105,14 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ReleaseGroupDto[] releaseGroups = await collectionProcessor(context.ReleaseGroups.AsNoTracking())
+            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
+            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .ToArrayAsync();
+
+        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
+        {
+            OrderReleaseGroupRelationships(releaseGroup);
+        }
 
         return releaseGroups;
     }
@@ -104,10 +132,17 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<ReleaseGroupDto> releaseGroups = await baseCollection
+            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
+            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .OrderBy(releaseGroup => releaseGroup.Title)
             .Skip(releaseGroupRequest.PageSize * releaseGroupRequest.PageIndex)
             .Take(releaseGroupRequest.PageSize)
             .ToListAsync();
+
+        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
+        {
+            OrderReleaseGroupRelationships(releaseGroup);
+        }
 
         return new PageResponseDto<ReleaseGroupDto>()
         {
@@ -118,10 +153,57 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
         };
     }
 
+    /// <inheritdoc/>
+    public async Task<ReleaseGroupRelationshipDto[]> GetReleaseGroupRelationshipsAsync(Guid releaseGroupId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<ReleaseGroupRelationshipDto> baseCollection = context.ReleaseGroupRelationships.AsNoTracking()
+            .Include(releaseGroupRelationship => releaseGroupRelationship.ReleaseGroup)
+            .Include(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup);
+
+        ReleaseGroupRelationshipDto[] releaseGroupRelationships = await baseCollection
+            .Where(releaseGroupRelationship => releaseGroupRelationship.ReleaseGroupId == releaseGroupId)
+            .OrderBy(releaseGroupRelationship => releaseGroupRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            ReleaseGroupRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroupId == releaseGroupId)
+                .OrderBy(releaseGroupRelationship => releaseGroupRelationship.ReleaseGroup.Title)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            releaseGroupRelationships = releaseGroupRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return releaseGroupRelationships;
+    }
+
     /// <inheritdoc />
     public async Task<ReleaseGroupDto> CreateReleaseGroupAsync(ReleaseGroupDto releaseGroup)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        SetReleaseGroupRelationshipOrders(releaseGroup.ReleaseGroupRelationships);
+
+        using var releaseGroupRelationshipsDataTable = new DataTable();
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.ReleaseGroupId), typeof(Guid));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.DependentReleaseGroupId), typeof(Guid));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.Name), typeof(string));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.Description), typeof(string));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.Order), typeof(int));
+        foreach (ReleaseGroupRelationshipDto releaseGroupRelationship in releaseGroup.ReleaseGroupRelationships)
+        {
+            releaseGroupRelationshipsDataTable.Rows.Add(
+                releaseGroupRelationship.ReleaseGroupId.AsDbValue(),
+                releaseGroupRelationship.DependentReleaseGroupId.AsDbValue(),
+                releaseGroupRelationship.Name.AsDbValue(),
+                releaseGroupRelationship.Description.AsDbValue(),
+                releaseGroupRelationship.Order.AsDbValue());
+        }
 
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
@@ -133,6 +215,7 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
             new SqlParameter(nameof(ReleaseGroupDto.Description), releaseGroup.Description.AsDbValue()),
             new SqlParameter(nameof(ReleaseGroupDto.DisambiguationText), releaseGroup.DisambiguationText.AsDbValue()),
             new SqlParameter(nameof(ReleaseGroupDto.Enabled), releaseGroup.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ReleaseGroupDto.ReleaseGroupRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseGroupRelationship]", Value = releaseGroupRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ReleaseGroupDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ReleaseGroupDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ReleaseGroupDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -145,6 +228,7 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
                 @{nameof(ReleaseGroupDto.Description)},
                 @{nameof(ReleaseGroupDto.DisambiguationText)},
                 @{nameof(ReleaseGroupDto.Enabled)},
+                @{nameof(ReleaseGroupDto.ReleaseGroupRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -163,6 +247,24 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetReleaseGroupRelationshipOrders(releaseGroup.ReleaseGroupRelationships);
+
+        using var releaseGroupRelationshipsDataTable = new DataTable();
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.ReleaseGroupId), typeof(Guid));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.DependentReleaseGroupId), typeof(Guid));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.Name), typeof(string));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.Description), typeof(string));
+        releaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseGroupRelationshipDto.Order), typeof(int));
+        foreach (ReleaseGroupRelationshipDto releaseGroupRelationship in releaseGroup.ReleaseGroupRelationships)
+        {
+            releaseGroupRelationshipsDataTable.Rows.Add(
+                releaseGroupRelationship.ReleaseGroupId.AsDbValue(),
+                releaseGroupRelationship.DependentReleaseGroupId.AsDbValue(),
+                releaseGroupRelationship.Name.AsDbValue(),
+                releaseGroupRelationship.Description.AsDbValue(),
+                releaseGroupRelationship.Order.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -171,6 +273,7 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
             new SqlParameter(nameof(ReleaseGroupDto.Description), releaseGroup.Description.AsDbValue()),
             new SqlParameter(nameof(ReleaseGroupDto.DisambiguationText), releaseGroup.DisambiguationText.AsDbValue()),
             new SqlParameter(nameof(ReleaseGroupDto.Enabled), releaseGroup.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ReleaseGroupDto.ReleaseGroupRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseGroupRelationship]", Value = releaseGroupRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -181,6 +284,7 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
                 @{nameof(ReleaseGroupDto.Description)},
                 @{nameof(ReleaseGroupDto.DisambiguationText)},
                 @{nameof(ReleaseGroupDto.Enabled)},
+                @{nameof(ReleaseGroupDto.ReleaseGroupRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -210,5 +314,21 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 
         var rowsDeleted = (int)resultRowsDeletedParameter.Value;
         return rowsDeleted > 0;
+    }
+
+    private static void OrderReleaseGroupRelationships(ReleaseGroupDto releaseGroup)
+    {
+        releaseGroup.ReleaseGroupRelationships = releaseGroup.ReleaseGroupRelationships
+            .OrderBy(releaseGroupRelationship => releaseGroupRelationship.Order)
+            .ToList();
+    }
+
+    private static void SetReleaseGroupRelationshipOrders(ICollection<ReleaseGroupRelationshipDto> releaseGroupRelationships)
+    {
+        var i = 0;
+        foreach (ReleaseGroupRelationshipDto releaseGroupRelationship in releaseGroupRelationships)
+        {
+            releaseGroupRelationship.Order = i++;
+        }
     }
 }

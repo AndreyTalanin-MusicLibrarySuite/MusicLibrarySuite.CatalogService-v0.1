@@ -295,3 +295,25 @@ Table "dbo"."ReleaseGroup" {
     "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
     "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
 }
+
+Table "dbo"."ReleaseGroupRelationship" {
+    "ReleaseGroupId" uniqueidentifier [primary key, not null]
+    "DependentReleaseGroupId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+
+    Indexes {
+        "ReleaseGroupId" [name: "IX_ReleaseGroupRelationship_ReleaseGroupId"]
+        "DependentReleaseGroupId" [name: "IX_ReleaseGroupRelationship_DependentReleaseGroupId"]
+        ("ReleaseGroupId", "Order") [name: "UIX_ReleaseGroupRelationship_ReleaseGroupId_Order", unique]
+    }
+}
+
+Ref "FK_ReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId" {
+    "dbo"."ReleaseGroupRelationship"."ReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
+}
+
+Ref "FK_ReleaseGroupRelationship_ReleaseGroup_DependentReleaseGroupId" {
+    "dbo"."ReleaseGroupRelationship"."DependentReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
+}

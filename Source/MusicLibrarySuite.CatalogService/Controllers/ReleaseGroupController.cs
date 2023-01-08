@@ -110,6 +110,24 @@ public class ReleaseGroupController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all release group relationships by a release group's unique identifier.
+    /// </summary>
+    /// <param name="releaseGroupId">The release group's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release group relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseGroupRelationship[]>> GetReleaseGroupRelationshipsAsync([Required][FromQuery] Guid releaseGroupId, [FromQuery] bool includeReverseRelationships)
+    {
+        ReleaseGroupRelationship[] releaseGroupRelationships = await m_releaseGroupService.GetReleaseGroupRelationshipsAsync(releaseGroupId, includeReverseRelationships);
+        return Ok(releaseGroupRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new release group.
     /// </summary>
     /// <param name="releaseGroup">The release group to create.</param>

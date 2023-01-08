@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -45,4 +47,10 @@ public class ReleaseGroup
     /// Gets or sets a value representing the moment of time when the entity was updated the last time.
     /// </summary>
     public DateTimeOffset UpdatedOn { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of release-group-to-release-group relationships where the current release group is the principal entity.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseGroupRelationship> ReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseGroupRelationship>().ToList();
 }
