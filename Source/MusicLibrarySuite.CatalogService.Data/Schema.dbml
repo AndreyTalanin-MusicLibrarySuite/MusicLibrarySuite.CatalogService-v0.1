@@ -317,3 +317,25 @@ Ref "FK_ReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId" {
 Ref "FK_ReleaseGroupRelationship_ReleaseGroup_DependentReleaseGroupId" {
     "dbo"."ReleaseGroupRelationship"."DependentReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
 }
+
+
+Table "dbo"."Release" {
+    "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
+    "Title" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "DisambiguationText" nvarchar(2048) [null]
+    "Barcode" nvarchar(32) [null]
+    "CatalogNumber" nvarchar(32) [null]
+    "MediaFormat" nvarchar(256) [null]
+    "PublishFormat" nvarchar(256) [null]
+    "ReleasedOn" date [not null]
+    "ReleasedOnYearOnly" bit [not null]
+    "Enabled" bit [not null]
+    "CreatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+    "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
+
+    Indexes {
+        "Barcode" [name: "IX_Release_Barcode"]
+        "CatalogNumber" [name: "IX_Release_CatalogNumber"]
+    }
+}
