@@ -84,6 +84,25 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ArtistGenre_ArtistId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseDto>().ToTable("Release", "dbo");
+        modelBuilder.Entity<ReleaseDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<ReleaseDto>()
+            .HasIndex(entity => entity.Barcode)
+            .HasDatabaseName("IX_Release_Barcode");
+        modelBuilder.Entity<ReleaseDto>()
+            .HasIndex(entity => entity.CatalogNumber)
+            .HasDatabaseName("IX_Release_CatalogNumber");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_Title", "LEN(TRIM([Title])) > 0");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_Barcode", "[Barcode] IS NULL OR LEN(TRIM([Barcode])) > 0");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_CatalogNumber", "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_MediaFormat", "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
+        modelBuilder.Entity<ReleaseDto>().HasCheckConstraint("CK_Release_PublishFormat", "[PublishFormat] IS NULL OR LEN(TRIM([PublishFormat])) > 0");
+        modelBuilder.Entity<ReleaseDto>()
+            .Property(entity => entity.ReleasedOn)
+            .HasColumnType("date");
+
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
