@@ -339,3 +339,27 @@ Table "dbo"."Release" {
         "CatalogNumber" [name: "IX_Release_CatalogNumber"]
     }
 }
+
+
+Table "dbo"."ReleaseMedia" {
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "Title" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "DisambiguationText" nvarchar(2048) [null]
+    "CatalogNumber" nvarchar(32) [null]
+    "MediaFormat" nvarchar(256) [null]
+    "TableOfContentsChecksum" nvarchar(64) [null]
+    "TableOfContentsChecksumLong" nvarchar(64) [null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseMedia_ReleaseId"]
+        "CatalogNumber" [name: "IX_ReleaseMedia_CatalogNumber"]
+        "TableOfContentsChecksum" [name: "IX_ReleaseMedia_TableOfContentsChecksum"]
+        "TableOfContentsChecksumLong" [name: "IX_ReleaseMedia_TableOfContentsChecksumLong"]
+    }
+}
+
+Ref "FK_ReleaseMedia_Release_ReleaseId" {
+    "dbo"."ReleaseMedia"."ReleaseId" > "dbo"."Release"."Id"
+}
