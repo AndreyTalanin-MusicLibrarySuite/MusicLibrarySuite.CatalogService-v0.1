@@ -103,6 +103,33 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .Property(entity => entity.ReleasedOn)
             .HasColumnType("date");
 
+        modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
+        modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
+        modelBuilder.Entity<ReleaseMediaDto>()
+            .HasOne<ReleaseDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseMediaDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseMedia_ReleaseId");
+        modelBuilder.Entity<ReleaseMediaDto>()
+            .HasIndex(entity => entity.CatalogNumber)
+            .HasDatabaseName("IX_ReleaseMedia_CatalogNumber");
+        modelBuilder.Entity<ReleaseMediaDto>()
+            .HasIndex(entity => entity.TableOfContentsChecksum)
+            .HasDatabaseName("IX_ReleaseMedia_TableOfContentsChecksum");
+        modelBuilder.Entity<ReleaseMediaDto>()
+            .HasIndex(entity => entity.TableOfContentsChecksumLong)
+            .HasDatabaseName("IX_ReleaseMedia_TableOfContentsChecksumLong");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_Title", "LEN(TRIM([Title])) > 0");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_CatalogNumber", "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_MediaFormat", "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksum", "[TableOfContentsChecksum] IS NULL OR LEN(TRIM([TableOfContentsChecksum])) > 0");
+        modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksumLong", "[TableOfContentsChecksumLong] IS NULL OR LEN(TRIM([TableOfContentsChecksumLong])) > 0");
+
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
