@@ -22,6 +22,7 @@ public class ReleaseDatabaseProfile : Profile
 
         CreateMap<Release, ReleaseDto>().ReverseMap();
         CreateMap<ReleaseMedia, ReleaseMediaDto>().ReverseMap();
+        CreateMap<ReleaseTrack, ReleaseTrackDto>().ReverseMap();
         CreateMap<ReleaseRequest, ReleaseRequestDto>().ReverseMap();
         CreateMap<ReleasePageResponse, PageResponseDto<ReleaseDto>>().ReverseMap();
         CreateMap<PageResponse<Release>, PageResponseDto<ReleaseDto>>().ReverseMap();
