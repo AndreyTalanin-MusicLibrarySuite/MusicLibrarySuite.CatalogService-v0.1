@@ -36,6 +36,12 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto? releaseDto = await m_releaseRepository.GetReleaseAsync(releaseId);
         Release? release = m_mapper.Map<Release?>(releaseDto);
+
+        if (release is not null)
+        {
+            SetReleaseMediaDisplayProperties(release);
+        }
+
         return release;
     }
 
@@ -44,6 +50,12 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto[] releaseDtoArray = await m_releaseRepository.GetReleasesAsync();
         Release[] releaseArray = m_mapper.Map<Release[]>(releaseDtoArray);
+
+        foreach (Release release in releaseArray)
+        {
+            SetReleaseMediaDisplayProperties(release);
+        }
+
         return releaseArray;
     }
 
@@ -52,6 +64,12 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto[] releaseDtoArray = await m_releaseRepository.GetReleasesAsync(releaseIds);
         Release[] releaseArray = m_mapper.Map<Release[]>(releaseDtoArray);
+
+        foreach (Release release in releaseArray)
+        {
+            SetReleaseMediaDisplayProperties(release);
+        }
+
         return releaseArray;
     }
 
@@ -61,6 +79,11 @@ public class ReleaseService : IReleaseService
         ReleaseRequestDto releaseRequestDto = m_mapper.Map<ReleaseRequestDto>(releaseRequest);
         PageResponseDto<ReleaseDto> pageResponseDto = await m_releaseRepository.GetReleasesAsync(releaseRequestDto);
         ReleasePageResponse pageResponse = m_mapper.Map<ReleasePageResponse>(pageResponseDto);
+
+        foreach (Release release in pageResponse.Items)
+        {
+            SetReleaseMediaDisplayProperties(release);
+        }
 
         pageResponse.CompletedOn = DateTimeOffset.Now;
 
@@ -89,5 +112,13 @@ public class ReleaseService : IReleaseService
     {
         var deleted = await m_releaseRepository.DeleteReleaseAsync(releaseId);
         return deleted;
+    }
+
+    private static void SetReleaseMediaDisplayProperties(Release release)
+    {
+        foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
+        {
+            releaseMedia.TotalMediaCount = (short)release.ReleaseMediaCollection.Count;
+        }
     }
 }
