@@ -40,6 +40,10 @@ public class ReleaseService : IReleaseService
         if (release is not null)
         {
             SetReleaseMediaDisplayProperties(release);
+            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
+            {
+                SetReleaseTrackDisplayProperties(releaseMedia);
+            }
         }
 
         return release;
@@ -54,6 +58,10 @@ public class ReleaseService : IReleaseService
         foreach (Release release in releaseArray)
         {
             SetReleaseMediaDisplayProperties(release);
+            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
+            {
+                SetReleaseTrackDisplayProperties(releaseMedia);
+            }
         }
 
         return releaseArray;
@@ -68,6 +76,10 @@ public class ReleaseService : IReleaseService
         foreach (Release release in releaseArray)
         {
             SetReleaseMediaDisplayProperties(release);
+            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
+            {
+                SetReleaseTrackDisplayProperties(releaseMedia);
+            }
         }
 
         return releaseArray;
@@ -83,6 +95,10 @@ public class ReleaseService : IReleaseService
         foreach (Release release in pageResponse.Items)
         {
             SetReleaseMediaDisplayProperties(release);
+            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
+            {
+                SetReleaseTrackDisplayProperties(releaseMedia);
+            }
         }
 
         pageResponse.CompletedOn = DateTimeOffset.Now;
@@ -119,6 +135,15 @@ public class ReleaseService : IReleaseService
         foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
         {
             releaseMedia.TotalMediaCount = (short)release.ReleaseMediaCollection.Count;
+        }
+    }
+
+    private static void SetReleaseTrackDisplayProperties(ReleaseMedia releaseMedia)
+    {
+        foreach (ReleaseTrack releaseTrack in releaseMedia.ReleaseTrackCollection)
+        {
+            releaseTrack.TotalTrackCount = (short)releaseMedia.ReleaseTrackCollection.Count;
+            releaseTrack.TotalMediaCount = releaseMedia.TotalMediaCount;
         }
     }
 }

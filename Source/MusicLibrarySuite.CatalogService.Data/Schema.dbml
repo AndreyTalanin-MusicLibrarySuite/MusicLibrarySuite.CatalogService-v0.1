@@ -363,3 +363,24 @@ Table "dbo"."ReleaseMedia" {
 Ref "FK_ReleaseMedia_Release_ReleaseId" {
     "dbo"."ReleaseMedia"."ReleaseId" > "dbo"."Release"."Id"
 }
+
+
+Table "dbo"."ReleaseTrack" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "Title" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "DisambiguationText" nvarchar(2048) [null]
+    "InternationalStandardRecordingCode" nvarchar(32) [null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseTrack_ReleaseId"]
+        ("MediaNumber", "ReleaseId") [name: "IX_ReleaseTrack_MediaNumber_ReleaseId"]
+        "InternationalStandardRecordingCode" [name: "IX_ReleaseTrack_InternationalStandardRecordingCode"]
+    }
+}
+
+Ref "FK_ReleaseTrack_ReleaseMedia_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrack".("MediaNumber", "ReleaseId") > "dbo"."ReleaseMedia".("MediaNumber", "ReleaseId")
+}

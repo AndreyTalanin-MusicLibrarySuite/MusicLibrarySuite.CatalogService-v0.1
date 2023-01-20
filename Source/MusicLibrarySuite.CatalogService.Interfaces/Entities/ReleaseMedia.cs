@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -61,4 +63,10 @@ public class ReleaseMedia
     /// Gets or sets the release media's ToC checksum (a 28-character Base64 string used by MusicBrainz).
     /// </summary>
     public string? TableOfContentsChecksumLong { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of release tracks associated to the current release media.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseTrack> ReleaseTrackCollection { get; set; } = Enumerable.Empty<ReleaseTrack>().ToList();
 }

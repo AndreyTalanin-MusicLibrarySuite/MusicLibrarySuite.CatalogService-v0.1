@@ -130,6 +130,27 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksum", "[TableOfContentsChecksum] IS NULL OR LEN(TRIM([TableOfContentsChecksum])) > 0");
         modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksumLong", "[TableOfContentsChecksumLong] IS NULL OR LEN(TRIM([TableOfContentsChecksumLong])) > 0");
 
+        modelBuilder.Entity<ReleaseTrackDto>().ToTable("ReleaseTrack", "dbo");
+        modelBuilder.Entity<ReleaseTrackDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId });
+        modelBuilder.Entity<ReleaseTrackDto>()
+            .HasOne<ReleaseMediaDto>()
+            .WithMany(entity => entity.ReleaseTrackCollection)
+            .HasForeignKey(entity => new { entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseTrack_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackDto>()
+            .HasIndex(entity => new { entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseTrack_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackDto>()
+            .HasIndex(entity => entity.InternationalStandardRecordingCode)
+            .HasDatabaseName("IX_ReleaseTrack_InternationalStandardRecordingCode");
+        modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_Title", "LEN(TRIM([Title])) > 0");
+        modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+        modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_InternationalStandardRecordingCode", "[InternationalStandardRecordingCode] IS NULL OR LEN(TRIM([InternationalStandardRecordingCode])) > 0");
+
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
