@@ -42,7 +42,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetRelease] (@{releaseIdParameter.ParameterName})";
 
         ReleaseDto? release = await context.Releases.FromSqlRaw(query, releaseIdParameter).AsNoTracking()
+            .Include(release => release.ReleaseMediaCollection)
             .FirstOrDefaultAsync();
+
+        if (release is not null)
+        {
+            OrderReleaseMediaCollection(release);
+        }
 
         return release;
     }
@@ -53,7 +59,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ReleaseDto[] releases = await context.Releases.AsNoTracking()
+            .Include(release => release.ReleaseMediaCollection)
             .ToArrayAsync();
+
+        foreach (ReleaseDto release in releases)
+        {
+            OrderReleaseMediaCollection(release);
+        }
 
         return releases;
     }
@@ -73,7 +85,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
         var query = $"SELECT * FROM [dbo].[ufn_GetReleases] (@{releaseIdsParameter.ParameterName})";
 
         ReleaseDto[] releases = await context.Releases.FromSqlRaw(query, releaseIdsParameter).AsNoTracking()
+            .Include(release => release.ReleaseMediaCollection)
             .ToArrayAsync();
+
+        foreach (ReleaseDto release in releases)
+        {
+            OrderReleaseMediaCollection(release);
+        }
 
         return releases;
     }
@@ -84,7 +102,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         ReleaseDto[] releases = await collectionProcessor(context.Releases.AsNoTracking())
+            .Include(release => release.ReleaseMediaCollection)
             .ToArrayAsync();
+
+        foreach (ReleaseDto release in releases)
+        {
+            OrderReleaseMediaCollection(release);
+        }
 
         return releases;
     }
@@ -104,10 +128,16 @@ public class SqlServerReleaseRepository : IReleaseRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<ReleaseDto> releases = await baseCollection
+            .Include(release => release.ReleaseMediaCollection)
             .OrderBy(release => release.Title)
             .Skip(releaseRequest.PageSize * releaseRequest.PageIndex)
             .Take(releaseRequest.PageSize)
             .ToListAsync();
+
+        foreach (ReleaseDto release in releases)
+        {
+            OrderReleaseMediaCollection(release);
+        }
 
         return new PageResponseDto<ReleaseDto>()
         {
@@ -122,6 +152,32 @@ public class SqlServerReleaseRepository : IReleaseRepository
     public async Task<ReleaseDto> CreateReleaseAsync(ReleaseDto release)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        SetReleaseMediaForeignKeys(release.Id, release.ReleaseMediaCollection);
+
+        using var releaseMediaCollectionDataTable = new DataTable();
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MediaNumber), typeof(byte));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.ReleaseId), typeof(Guid));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Title), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Description), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.DisambiguationText), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.CatalogNumber), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MediaFormat), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksum), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksumLong), typeof(string));
+        foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
+        {
+            releaseMediaCollectionDataTable.Rows.Add(
+                releaseMedia.MediaNumber.AsDbValue(),
+                releaseMedia.ReleaseId.AsDbValue(),
+                releaseMedia.Title.AsDbValue(),
+                releaseMedia.Description.AsDbValue(),
+                releaseMedia.DisambiguationText.AsDbValue(),
+                releaseMedia.CatalogNumber.AsDbValue(),
+                releaseMedia.MediaFormat.AsDbValue(),
+                releaseMedia.TableOfContentsChecksum.AsDbValue(),
+                releaseMedia.TableOfContentsChecksumLong.AsDbValue());
+        }
 
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
@@ -139,6 +195,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseDto.ReleasedOn), release.ReleasedOn.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.ReleasedOnYearOnly), release.ReleasedOnYearOnly.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.Enabled), release.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ReleaseDto.ReleaseMediaCollection), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseMedia]", Value = releaseMediaCollectionDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ReleaseDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ReleaseDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ReleaseDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -157,6 +214,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseDto.ReleasedOn)},
                 @{nameof(ReleaseDto.ReleasedOnYearOnly)},
                 @{nameof(ReleaseDto.Enabled)},
+                @{nameof(ReleaseDto.ReleaseMediaCollection)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -175,6 +233,32 @@ public class SqlServerReleaseRepository : IReleaseRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
+        SetReleaseMediaForeignKeys(release.Id, release.ReleaseMediaCollection);
+
+        using var releaseMediaCollectionDataTable = new DataTable();
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MediaNumber), typeof(byte));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.ReleaseId), typeof(Guid));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Title), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Description), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.DisambiguationText), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.CatalogNumber), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MediaFormat), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksum), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksumLong), typeof(string));
+        foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
+        {
+            releaseMediaCollectionDataTable.Rows.Add(
+                releaseMedia.MediaNumber.AsDbValue(),
+                releaseMedia.ReleaseId.AsDbValue(),
+                releaseMedia.Title.AsDbValue(),
+                releaseMedia.Description.AsDbValue(),
+                releaseMedia.DisambiguationText.AsDbValue(),
+                releaseMedia.CatalogNumber.AsDbValue(),
+                releaseMedia.MediaFormat.AsDbValue(),
+                releaseMedia.TableOfContentsChecksum.AsDbValue(),
+                releaseMedia.TableOfContentsChecksumLong.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -189,6 +273,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseDto.ReleasedOn), release.ReleasedOn.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.ReleasedOnYearOnly), release.ReleasedOnYearOnly.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.Enabled), release.Enabled.AsDbValue()),
+            new SqlParameter(nameof(ReleaseDto.ReleaseMediaCollection), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseMedia]", Value = releaseMediaCollectionDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -205,6 +290,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseDto.ReleasedOn)},
                 @{nameof(ReleaseDto.ReleasedOnYearOnly)},
                 @{nameof(ReleaseDto.Enabled)},
+                @{nameof(ReleaseDto.ReleaseMediaCollection)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -234,5 +320,20 @@ public class SqlServerReleaseRepository : IReleaseRepository
 
         var rowsDeleted = (int)resultRowsDeletedParameter.Value;
         return rowsDeleted > 0;
+    }
+
+    private static void OrderReleaseMediaCollection(ReleaseDto release)
+    {
+        release.ReleaseMediaCollection = release.ReleaseMediaCollection
+            .OrderBy(releaseMedia => releaseMedia.MediaNumber)
+            .ToList();
+    }
+
+    private static void SetReleaseMediaForeignKeys(Guid releaseId, IEnumerable<ReleaseMediaDto> releaseMediaCollection)
+    {
+        foreach (ReleaseMediaDto releaseMedia in releaseMediaCollection)
+        {
+            releaseMedia.ReleaseId = releaseId;
+        }
     }
 }
