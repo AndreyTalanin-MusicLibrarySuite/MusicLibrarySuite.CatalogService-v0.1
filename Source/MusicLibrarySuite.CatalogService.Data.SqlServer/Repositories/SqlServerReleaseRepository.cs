@@ -189,6 +189,35 @@ public class SqlServerReleaseRepository : IReleaseRepository
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseRelationshipDto[]> GetReleaseRelationshipsAsync(Guid releaseId, bool includeReverseRelationships = false)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        IQueryable<ReleaseRelationshipDto> baseCollection = context.ReleaseRelationships.AsNoTracking()
+            .Include(releaseRelationship => releaseRelationship.Release)
+            .Include(releaseRelationship => releaseRelationship.DependentRelease);
+
+        ReleaseRelationshipDto[] releaseRelationships = await baseCollection
+            .Where(releaseRelationship => releaseRelationship.ReleaseId == releaseId)
+            .OrderBy(releaseRelationship => releaseRelationship.Order)
+            .ToArrayAsync();
+
+        if (includeReverseRelationships)
+        {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            ReleaseRelationshipDto[] reverseRelationships = await baseCollection
+                .Where(releaseRelationship => releaseRelationship.DependentReleaseId == releaseId)
+                .OrderBy(releaseRelationship => releaseRelationship.Release.Title)
+                .ToArrayAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+            releaseRelationships = releaseRelationships.Concat(reverseRelationships).ToArray();
+        }
+
+        return releaseRelationships;
+    }
+
+    /// <inheritdoc />
     public async Task<ReleaseDto> CreateReleaseAsync(ReleaseDto release)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
