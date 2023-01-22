@@ -88,6 +88,11 @@ public class ReleaseDto
     public DateTimeOffset UpdatedOn { get; set; }
 
     /// <summary>
+    /// Gets or sets a collection of release-to-release relationships where the current release is the principal entity.
+    /// </summary>
+    public ICollection<ReleaseRelationshipDto> ReleaseRelationships { get; set; } = Enumerable.Empty<ReleaseRelationshipDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();
