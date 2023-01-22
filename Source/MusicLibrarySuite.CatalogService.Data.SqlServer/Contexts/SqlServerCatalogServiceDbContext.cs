@@ -103,6 +103,31 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .Property(entity => entity.ReleasedOn)
             .HasColumnType("date");
 
+        modelBuilder.Entity<ReleaseRelationshipDto>().ToTable("ReleaseRelationship", "dbo");
+        modelBuilder.Entity<ReleaseRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.DependentReleaseId });
+        modelBuilder.Entity<ReleaseRelationshipDto>()
+            .HasOne<ReleaseDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseRelationshipDto>()
+            .HasOne<ReleaseDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentReleaseId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ReleaseRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseRelationship_ReleaseId");
+        modelBuilder.Entity<ReleaseRelationshipDto>()
+            .HasIndex(entity => entity.DependentReleaseId)
+            .HasDatabaseName("IX_ReleaseRelationship_DependentReleaseId");
+        modelBuilder.Entity<ReleaseRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseRelationship_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()
