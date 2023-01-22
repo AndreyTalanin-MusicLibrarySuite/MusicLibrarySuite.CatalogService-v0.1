@@ -51,6 +51,17 @@ public interface IReleaseService
     public Task<ReleasePageResponse> GetReleasesAsync(ReleaseRequest releaseRequest);
 
     /// <summary>
+    /// Asynchronously gets all release relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release relationships.
+    /// </returns>
+    public Task<ReleaseRelationship[]> GetReleaseRelationshipsAsync(Guid releaseId, bool includeReverseRelationships = false);
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>

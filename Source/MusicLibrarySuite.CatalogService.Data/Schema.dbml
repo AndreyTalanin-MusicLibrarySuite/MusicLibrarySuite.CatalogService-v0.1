@@ -340,6 +340,28 @@ Table "dbo"."Release" {
     }
 }
 
+Table "dbo"."ReleaseRelationship" {
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "DependentReleaseId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseRelationship_ReleaseId"]
+        "DependentReleaseId" [name: "IX_ReleaseRelationship_DependentReleaseId"]
+        ("ReleaseId", "Order") [name: "UIX_ReleaseRelationship_ReleaseId_Order", unique]
+    }
+}
+
+Ref "FK_ReleaseRelationship_Release_ReleaseId" {
+    "dbo"."ReleaseRelationship"."ReleaseId" > "dbo"."Release"."Id"
+}
+
+Ref "FK_ReleaseRelationship_Release_DependentReleaseId" {
+    "dbo"."ReleaseRelationship"."DependentReleaseId" > "dbo"."Release"."Id"
+}
+
 
 Table "dbo"."ReleaseMedia" {
     "MediaNumber" tinyint [primary key, not null]

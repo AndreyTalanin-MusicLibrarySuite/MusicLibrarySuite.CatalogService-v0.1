@@ -110,6 +110,24 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all release relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <param name="includeReverseRelationships">A boolean value specifying whether reverse relationships should be included.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseRelationship[]>> GetReleaseRelationshipsAsync([Required][FromQuery] Guid releaseId, [FromQuery] bool includeReverseRelationships)
+    {
+        ReleaseRelationship[] releaseRelationships = await m_releaseService.GetReleaseRelationshipsAsync(releaseId, includeReverseRelationships);
+        return Ok(releaseRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>

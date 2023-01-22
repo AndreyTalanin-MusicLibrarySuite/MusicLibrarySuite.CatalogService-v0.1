@@ -81,6 +81,12 @@ public class Release
     public DateTimeOffset UpdatedOn { get; set; }
 
     /// <summary>
+    /// Gets or sets a collection of release-to-release relationships where the current release is the principal entity.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseRelationship> ReleaseRelationships { get; set; } = Enumerable.Empty<ReleaseRelationship>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     [Required]
