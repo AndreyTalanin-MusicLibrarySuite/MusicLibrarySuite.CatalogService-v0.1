@@ -19,4 +19,16 @@ public class ReleaseArtist
     /// </summary>
     [Required]
     public Guid ArtistId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public Release? Release { get; set; }
+
+    /// <summary>
+    /// Gets or sets the artist.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public Artist? Artist { get; set; }
 }
