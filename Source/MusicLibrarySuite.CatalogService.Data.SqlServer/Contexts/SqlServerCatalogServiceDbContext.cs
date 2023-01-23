@@ -131,12 +131,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseArtistDto>().ToTable("ReleaseArtist", "dbo");
         modelBuilder.Entity<ReleaseArtistDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
         modelBuilder.Entity<ReleaseArtistDto>()
-            .HasOne<ReleaseDto>()
+            .HasOne(entity => entity.Release)
             .WithMany(entity => entity.ReleaseArtists)
             .HasForeignKey(entity => entity.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseArtistDto>()
-            .HasOne<ArtistDto>()
+            .HasOne(entity => entity.Artist)
             .WithMany()
             .HasForeignKey(entity => entity.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
