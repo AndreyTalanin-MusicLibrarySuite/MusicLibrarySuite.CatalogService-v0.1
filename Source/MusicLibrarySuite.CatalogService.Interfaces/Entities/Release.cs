@@ -93,6 +93,12 @@ public class Release
     public ICollection<ReleaseArtist> ReleaseArtists { get; set; } = Enumerable.Empty<ReleaseArtist>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "featured artist" role.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseFeaturedArtist> ReleaseFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseFeaturedArtist>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     [Required]
