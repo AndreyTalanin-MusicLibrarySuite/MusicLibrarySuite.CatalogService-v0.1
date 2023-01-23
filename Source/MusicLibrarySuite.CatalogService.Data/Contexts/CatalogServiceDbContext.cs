@@ -50,6 +50,11 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<ReleasePerformerDto> ReleasePerformers { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseComposerDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseComposerDto> ReleaseComposers { get; }
+
+    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseMediaDto" /> type.
     /// </summary>
     public DbSet<ReleaseMediaDto> ReleaseMediaCollection { get; }
@@ -143,6 +148,7 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseArtists = Set<ReleaseArtistDto>();
         ReleaseFeaturedArtists = Set<ReleaseFeaturedArtistDto>();
         ReleasePerformers = Set<ReleasePerformerDto>();
+        ReleaseComposers = Set<ReleaseComposerDto>();
         ReleaseMediaCollection = Set<ReleaseMediaDto>();
         ReleaseTrackCollection = Set<ReleaseTrackDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
@@ -176,6 +182,7 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseArtists = Set<ReleaseArtistDto>();
         ReleaseFeaturedArtists = Set<ReleaseFeaturedArtistDto>();
         ReleasePerformers = Set<ReleasePerformerDto>();
+        ReleaseComposers = Set<ReleaseComposerDto>();
         ReleaseMediaCollection = Set<ReleaseMediaDto>();
         ReleaseTrackCollection = Set<ReleaseTrackDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
