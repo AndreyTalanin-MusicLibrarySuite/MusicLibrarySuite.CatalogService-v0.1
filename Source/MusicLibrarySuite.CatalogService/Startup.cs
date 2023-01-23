@@ -99,9 +99,9 @@ public class Startup
 
             options.SwaggerDoc("MusicLibrarySuite.CatalogService", new OpenApiInfo()
             {
-                Title = "Music Library Suite - Catalog Service API v0.8.0-rc4",
+                Title = "Music Library Suite - Catalog Service API v0.8.0-rc5",
                 Description = "Initial pre-release (unstable) API version.",
-                Version = "v0.8.0-rc4",
+                Version = "v0.8.0-rc5",
                 Contact = contact,
                 License = license,
             });
