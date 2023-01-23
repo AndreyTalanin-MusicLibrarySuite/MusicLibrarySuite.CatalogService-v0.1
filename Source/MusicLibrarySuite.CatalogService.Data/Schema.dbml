@@ -362,6 +362,26 @@ Ref "FK_ReleaseRelationship_Release_DependentReleaseId" {
     "dbo"."ReleaseRelationship"."DependentReleaseId" > "dbo"."Release"."Id"
 }
 
+Table "dbo"."ReleaseArtist" {
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseArtist_ReleaseId"]
+        "ArtistId" [name: "IX_ReleaseArtist_ArtistId"]
+        ("ReleaseId", "Order") [name: "UIX_ReleaseArtist_ReleaseId_Order", unique]
+    }
+}
+
+Ref "FK_ReleaseArtist_Release_ReleaseId" {
+    "dbo"."ReleaseArtist"."ReleaseId" > "dbo"."Release"."Id"
+}
+
+Ref "FK_ReleaseArtist_Artist_ArtistId" {
+    "dbo"."ReleaseArtist"."ArtistId" > "dbo"."Artist"."Id"
+}
+
 
 Table "dbo"."ReleaseMedia" {
     "MediaNumber" tinyint [primary key, not null]
