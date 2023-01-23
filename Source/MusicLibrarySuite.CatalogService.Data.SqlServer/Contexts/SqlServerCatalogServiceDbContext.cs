@@ -178,7 +178,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleasePerformerDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
         modelBuilder.Entity<ReleasePerformerDto>()
             .HasOne<ReleaseDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleasePerformers)
             .HasForeignKey(entity => entity.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleasePerformerDto>()
