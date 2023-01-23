@@ -128,6 +128,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<ReleaseArtistDto>().ToTable("ReleaseArtist", "dbo");
+        modelBuilder.Entity<ReleaseArtistDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasOne<ReleaseDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseArtist_ReleaseId");
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ReleaseArtist_ArtistId");
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseArtist_ReleaseId_Order")
+            .IsUnique();
+
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()
