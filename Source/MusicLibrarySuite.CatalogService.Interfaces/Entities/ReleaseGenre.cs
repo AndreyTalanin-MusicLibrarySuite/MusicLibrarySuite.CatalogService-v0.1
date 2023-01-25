@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations;
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
 /// <summary>
-/// Represents a work-to-genre relationship.
+/// Represents a release-to-genre relationship.
 /// </summary>
-public class WorkGenre
+public class ReleaseGenre
 {
     /// <summary>
-    /// Gets or sets the work's unique identifier.
+    /// Gets or sets the release's unique identifier.
     /// </summary>
     [Required]
-    public Guid WorkId { get; set; }
+    public Guid ReleaseId { get; set; }
 
     /// <summary>
     /// Gets or sets the genre's unique identifier.
@@ -21,10 +21,10 @@ public class WorkGenre
     public Guid GenreId { get; set; }
 
     /// <summary>
-    /// Gets or sets the work.
+    /// Gets or sets the release.
     /// </summary>
     /// <remarks>This property is only used to store data returned from the database.</remarks>
-    public Work? Work { get; set; }
+    public Release? Release { get; set; }
 
     /// <summary>
     /// Gets or sets the genre.

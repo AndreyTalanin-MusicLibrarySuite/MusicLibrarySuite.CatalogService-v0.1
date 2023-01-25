@@ -113,6 +113,11 @@ public class ReleaseDto
     public ICollection<ReleaseComposerDto> ReleaseComposers { get; set; } = Enumerable.Empty<ReleaseComposerDto>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-genre relationships associated to the current release.
+    /// </summary>
+    public ICollection<ReleaseGenreDto> ReleaseGenres { get; set; } = Enumerable.Empty<ReleaseGenreDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();

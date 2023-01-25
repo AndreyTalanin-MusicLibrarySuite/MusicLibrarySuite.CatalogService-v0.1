@@ -111,6 +111,12 @@ public class Release
     public ICollection<ReleaseComposer> ReleaseComposers { get; set; } = Enumerable.Empty<ReleaseComposer>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-genre relationships associated to the current release.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseGenre> ReleaseGenres { get; set; } = Enumerable.Empty<ReleaseGenre>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     [Required]
