@@ -223,12 +223,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseGenreDto>().ToTable("ReleaseGenre", "dbo");
         modelBuilder.Entity<ReleaseGenreDto>().HasKey(entity => new { entity.ReleaseId, entity.GenreId });
         modelBuilder.Entity<ReleaseGenreDto>()
-            .HasOne<ReleaseDto>()
+            .HasOne(entity => entity.Release)
             .WithMany(entity => entity.ReleaseGenres)
             .HasForeignKey(entity => entity.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseGenreDto>()
-            .HasOne<GenreDto>()
+            .HasOne(entity => entity.Genre)
             .WithMany()
             .HasForeignKey(entity => entity.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
