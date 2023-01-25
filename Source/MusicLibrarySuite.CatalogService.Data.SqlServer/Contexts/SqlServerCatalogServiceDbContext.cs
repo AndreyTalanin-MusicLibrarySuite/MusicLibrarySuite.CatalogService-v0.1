@@ -220,6 +220,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ReleaseComposer_ReleaseId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseGenreDto>().ToTable("ReleaseGenre", "dbo");
+        modelBuilder.Entity<ReleaseGenreDto>().HasKey(entity => new { entity.ReleaseId, entity.GenreId });
+        modelBuilder.Entity<ReleaseGenreDto>()
+            .HasOne<ReleaseDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseGenreDto>()
+            .HasOne<GenreDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseGenreDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseGenre_ReleaseId");
+        modelBuilder.Entity<ReleaseGenreDto>()
+            .HasIndex(entity => entity.GenreId)
+            .HasDatabaseName("IX_ReleaseGenre_GenreId");
+        modelBuilder.Entity<ReleaseGenreDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseGenre_ReleaseId_Order")
+            .IsUnique();
+
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()
