@@ -224,7 +224,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseGenreDto>().HasKey(entity => new { entity.ReleaseId, entity.GenreId });
         modelBuilder.Entity<ReleaseGenreDto>()
             .HasOne<ReleaseDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleaseGenres)
             .HasForeignKey(entity => entity.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseGenreDto>()
