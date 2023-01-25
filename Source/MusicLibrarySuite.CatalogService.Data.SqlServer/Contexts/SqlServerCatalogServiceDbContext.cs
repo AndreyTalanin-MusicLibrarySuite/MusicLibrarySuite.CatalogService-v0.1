@@ -128,6 +128,98 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<ReleaseArtistDto>().ToTable("ReleaseArtist", "dbo");
+        modelBuilder.Entity<ReleaseArtistDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleaseArtists)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseArtist_ReleaseId");
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ReleaseArtist_ArtistId");
+        modelBuilder.Entity<ReleaseArtistDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseArtist_ReleaseId_Order")
+            .IsUnique();
+
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>().ToTable("ReleaseFeaturedArtist", "dbo");
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleaseFeaturedArtists)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseFeaturedArtist_ReleaseId");
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ReleaseFeaturedArtist_ArtistId");
+        modelBuilder.Entity<ReleaseFeaturedArtistDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseFeaturedArtist_ReleaseId_Order")
+            .IsUnique();
+
+        modelBuilder.Entity<ReleasePerformerDto>().ToTable("ReleasePerformer", "dbo");
+        modelBuilder.Entity<ReleasePerformerDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
+        modelBuilder.Entity<ReleasePerformerDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleasePerformers)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleasePerformerDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleasePerformerDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleasePerformer_ReleaseId");
+        modelBuilder.Entity<ReleasePerformerDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ReleasePerformer_ArtistId");
+        modelBuilder.Entity<ReleasePerformerDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleasePerformer_ReleaseId_Order")
+            .IsUnique();
+
+        modelBuilder.Entity<ReleaseComposerDto>().ToTable("ReleaseComposer", "dbo");
+        modelBuilder.Entity<ReleaseComposerDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
+        modelBuilder.Entity<ReleaseComposerDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleaseComposers)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseComposerDto>()
+            .HasOne(entity => entity.Artist)
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseComposerDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseComposer_ReleaseId");
+        modelBuilder.Entity<ReleaseComposerDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ReleaseComposer_ArtistId");
+        modelBuilder.Entity<ReleaseComposerDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseComposer_ReleaseId_Order")
+            .IsUnique();
+
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()

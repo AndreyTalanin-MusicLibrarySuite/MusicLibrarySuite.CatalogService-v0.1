@@ -93,6 +93,26 @@ public class ReleaseDto
     public ICollection<ReleaseRelationshipDto> ReleaseRelationships { get; set; } = Enumerable.Empty<ReleaseRelationshipDto>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-artist relationships associated to the current release.
+    /// </summary>
+    public ICollection<ReleaseArtistDto> ReleaseArtists { get; set; } = Enumerable.Empty<ReleaseArtistDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "featured artist" role.
+    /// </summary>
+    public ICollection<ReleaseFeaturedArtistDto> ReleaseFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseFeaturedArtistDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "performer" role.
+    /// </summary>
+    public ICollection<ReleasePerformerDto> ReleasePerformers { get; set; } = Enumerable.Empty<ReleasePerformerDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "composer" role.
+    /// </summary>
+    public ICollection<ReleaseComposerDto> ReleaseComposers { get; set; } = Enumerable.Empty<ReleaseComposerDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();

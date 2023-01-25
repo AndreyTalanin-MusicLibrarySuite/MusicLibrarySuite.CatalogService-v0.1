@@ -35,6 +35,26 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<ReleaseRelationshipDto> ReleaseRelationships { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseArtistDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseArtistDto> ReleaseArtists { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseFeaturedArtistDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseFeaturedArtistDto> ReleaseFeaturedArtists { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleasePerformerDto" /> type.
+    /// </summary>
+    public DbSet<ReleasePerformerDto> ReleasePerformers { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseComposerDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseComposerDto> ReleaseComposers { get; }
+
+    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseMediaDto" /> type.
     /// </summary>
     public DbSet<ReleaseMediaDto> ReleaseMediaCollection { get; }
@@ -125,6 +145,10 @@ public abstract class CatalogServiceDbContext : DbContext
         ArtistGenres = Set<ArtistGenreDto>();
         Releases = Set<ReleaseDto>();
         ReleaseRelationships = Set<ReleaseRelationshipDto>();
+        ReleaseArtists = Set<ReleaseArtistDto>();
+        ReleaseFeaturedArtists = Set<ReleaseFeaturedArtistDto>();
+        ReleasePerformers = Set<ReleasePerformerDto>();
+        ReleaseComposers = Set<ReleaseComposerDto>();
         ReleaseMediaCollection = Set<ReleaseMediaDto>();
         ReleaseTrackCollection = Set<ReleaseTrackDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
@@ -155,6 +179,10 @@ public abstract class CatalogServiceDbContext : DbContext
         ArtistGenres = Set<ArtistGenreDto>();
         Releases = Set<ReleaseDto>();
         ReleaseRelationships = Set<ReleaseRelationshipDto>();
+        ReleaseArtists = Set<ReleaseArtistDto>();
+        ReleaseFeaturedArtists = Set<ReleaseFeaturedArtistDto>();
+        ReleasePerformers = Set<ReleasePerformerDto>();
+        ReleaseComposers = Set<ReleaseComposerDto>();
         ReleaseMediaCollection = Set<ReleaseMediaDto>();
         ReleaseTrackCollection = Set<ReleaseTrackDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
