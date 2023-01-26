@@ -243,6 +243,35 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ReleaseGenre_ReleaseId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().ToTable("ReleaseToProductRelationship", "dbo");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ProductId });
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasOne<ReleaseDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasOne<ProductDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseToProductRelationship_ReleaseId");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ReleaseToProductRelationship_ProductId");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseToProductRelationship_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()
