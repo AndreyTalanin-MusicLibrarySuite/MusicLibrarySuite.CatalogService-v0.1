@@ -462,6 +462,28 @@ Ref "FK_ReleaseGenre_Genre_GenreId" {
     "dbo"."ReleaseGenre"."GenreId" > "dbo"."Genre"."Id"
 }
 
+Table "dbo"."ReleaseToProductRelationship" {
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseToProductRelationship_ReleaseId"]
+        "ProductId" [name: "IX_ReleaseToProductRelationship_ProductId"]
+        ("ReleaseId", "Order") [name: "UIX_ReleaseToProductRelationship_ReleaseId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseToProductRelationship_Release_ReleaseId" {
+    "dbo"."ReleaseToProductRelationship"."ReleaseId" > "dbo"."Release"."Id"
+}
+
+Ref "FK_ReleaseToProductRelationship_Product_ProductId" {
+    "dbo"."ReleaseToProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
+
 
 Table "dbo"."ReleaseMedia" {
     "MediaNumber" tinyint [primary key, not null]
