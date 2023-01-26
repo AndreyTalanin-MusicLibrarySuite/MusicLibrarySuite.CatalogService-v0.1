@@ -118,6 +118,12 @@ public class ReleaseDto
     public ICollection<ReleaseGenreDto> ReleaseGenres { get; set; } = Enumerable.Empty<ReleaseGenreDto>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-product relationships associated to the current release.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseToProductRelationshipDto> ReleaseToProductRelationships { get; set; } = Enumerable.Empty<ReleaseToProductRelationshipDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();
