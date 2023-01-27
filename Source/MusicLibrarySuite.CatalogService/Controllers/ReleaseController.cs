@@ -145,6 +145,23 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all release-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseToProductRelationship[]>> GetReleaseToProductRelationshipsByProductAsync([Required][FromQuery] Guid productId)
+    {
+        ReleaseToProductRelationship[] releaseToProductRelationships = await m_releaseService.GetReleaseToProductRelationshipsByProductAsync(productId);
+        return Ok(releaseToProductRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>
