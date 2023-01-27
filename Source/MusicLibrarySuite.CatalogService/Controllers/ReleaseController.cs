@@ -193,6 +193,21 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously updates order of existing release-to-product relationships.
+    /// </summary>
+    /// <param name="releaseToProductRelationships">A collection of release-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateReleaseToProductRelationshipsOrderAsync([Required][FromBody] ReleaseToProductRelationship[] releaseToProductRelationships, [FromQuery] bool? useReferenceOrder)
+    {
+        var result = await m_releaseService.UpdateReleaseToProductRelationshipsOrderAsync(releaseToProductRelationships, useReferenceOrder == true);
+        return result ? Ok() : NotFound();
+    }
+
+    /// <summary>
     /// Asynchronously deletes an existing release.
     /// </summary>
     /// <param name="releaseId">The unique identifier of the release to delete.</param>

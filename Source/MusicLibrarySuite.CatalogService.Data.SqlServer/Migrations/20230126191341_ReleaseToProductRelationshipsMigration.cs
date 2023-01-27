@@ -776,6 +776,30 @@ public partial class ReleaseToProductRelationshipsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateReleaseToProductRelationshipsOrder]
+            (
+                @UseReferenceOrder BIT,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceReleaseToProductRelationship] AS
+                (
+                    SELECT * FROM @ReleaseToProductRelationships
+                )
+                MERGE INTO [dbo].[ReleaseToProductRelationship] AS [target]
+                USING [SourceReleaseToProductRelationship] AS [source]
+                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ProductId] = [source].[ProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Order] = CASE WHEN @UseReferenceOrder = 0 THEN [source].[Order] ELSE [target].[Order] END,
+                    [target].[ReferenceOrder] = CASE WHEN @UseReferenceOrder = 1 THEN [source].[ReferenceOrder] ELSE [target].[ReferenceOrder] END;
+
+                SET @ResultRowsUpdated = @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_DeleteRelease]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -795,6 +819,8 @@ public partial class ReleaseToProductRelationshipsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseToProductRelationshipsOrder];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
 
