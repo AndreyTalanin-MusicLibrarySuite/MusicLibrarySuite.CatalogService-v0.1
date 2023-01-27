@@ -308,6 +308,21 @@ public class SqlServerReleaseRepository : IReleaseRepository
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseToProductRelationshipDto[]> GetReleaseToProductRelationshipsAsync(Guid releaseId)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        ReleaseToProductRelationshipDto[] releaseToProductRelationships = await context.ReleaseToProductRelationships.AsNoTracking()
+            .Include(releaseToProductRelationship => releaseToProductRelationship.Release)
+            .Include(releaseToProductRelationship => releaseToProductRelationship.Product)
+            .Where(releaseToProductRelationship => releaseToProductRelationship.ReleaseId == releaseId)
+            .OrderBy(releaseToProductRelationship => releaseToProductRelationship.Order)
+            .ToArrayAsync();
+
+        return releaseToProductRelationships;
+    }
+
+    /// <inheritdoc />
     public async Task<ReleaseDto> CreateReleaseAsync(ReleaseDto release)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
