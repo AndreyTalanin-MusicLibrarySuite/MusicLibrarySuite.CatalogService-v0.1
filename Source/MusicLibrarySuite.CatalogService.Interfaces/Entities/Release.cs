@@ -117,6 +117,13 @@ public class Release
     public ICollection<ReleaseGenre> ReleaseGenres { get; set; } = Enumerable.Empty<ReleaseGenre>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-product relationships associated to the current release.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
+    [Required]
+    public ICollection<ReleaseToProductRelationship> ReleaseToProductRelationships { get; set; } = Enumerable.Empty<ReleaseToProductRelationship>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     [Required]
