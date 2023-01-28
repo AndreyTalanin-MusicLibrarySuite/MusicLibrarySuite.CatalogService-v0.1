@@ -172,6 +172,14 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships, bool useReferenceOrder)
+    {
+        ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationshipDtoArray = m_mapper.Map<ReleaseToReleaseGroupRelationshipDto[]>(releaseToReleaseGroupRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseToReleaseGroupRelationshipsOrderAsync(releaseToReleaseGroupRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteReleaseAsync(Guid releaseId)
     {
         var deleted = await m_releaseRepository.DeleteReleaseAsync(releaseId);

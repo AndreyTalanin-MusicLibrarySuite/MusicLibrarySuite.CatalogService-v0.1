@@ -910,6 +910,58 @@ public class SqlServerReleaseRepository : IReleaseRepository
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationships, bool useReferenceOrder)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        var i = 0;
+        foreach (ReleaseToReleaseGroupRelationshipDto releaseToReleaseGroupRelationship in releaseToReleaseGroupRelationships)
+        {
+            if (!useReferenceOrder)
+                releaseToReleaseGroupRelationship.Order = i++;
+            else
+                releaseToReleaseGroupRelationship.ReferenceOrder = i++;
+        }
+
+        using var releaseToReleaseGroupRelationshipsDataTable = new DataTable();
+        releaseToReleaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseToReleaseGroupRelationshipDto.ReleaseId), typeof(Guid));
+        releaseToReleaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseToReleaseGroupRelationshipDto.ReleaseGroupId), typeof(Guid));
+        releaseToReleaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseToReleaseGroupRelationshipDto.Name), typeof(string));
+        releaseToReleaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseToReleaseGroupRelationshipDto.Description), typeof(string));
+        releaseToReleaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseToReleaseGroupRelationshipDto.Order), typeof(int));
+        releaseToReleaseGroupRelationshipsDataTable.Columns.Add(nameof(ReleaseToReleaseGroupRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (ReleaseToReleaseGroupRelationshipDto releaseToReleaseGroupRelationship in releaseToReleaseGroupRelationships)
+        {
+            releaseToReleaseGroupRelationshipsDataTable.Rows.Add(
+                releaseToReleaseGroupRelationship.ReleaseId.AsDbValue(),
+                releaseToReleaseGroupRelationship.ReleaseGroupId.AsDbValue(),
+                releaseToReleaseGroupRelationship.Name.AsDbValue(),
+                releaseToReleaseGroupRelationship.Description.AsDbValue(),
+                releaseToReleaseGroupRelationship.Order.AsDbValue(),
+                releaseToReleaseGroupRelationship.ReferenceOrder.AsDbValue());
+        }
+
+        SqlParameter resultRowsUpdatedParameter;
+        var parameters = new SqlParameter[]
+        {
+            new SqlParameter("UseReferenceOrder", useReferenceOrder.AsDbValue()),
+            new SqlParameter("ReleaseToReleaseGroupRelationships", SqlDbType.Structured) { TypeName = "[dbo].[ReleaseToReleaseGroupRelationship]", Value = releaseToReleaseGroupRelationshipsDataTable },
+            resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
+        };
+
+        var query = @$"
+            EXEC [dbo].[sp_UpdateReleaseToReleaseGroupRelationshipsOrder]
+                @UseReferenceOrder,
+                @ReleaseToReleaseGroupRelationships,
+                @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
+
+        await context.Database.ExecuteSqlRawAsync(query, parameters);
+
+        var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
+        return rowsUpdated > 0;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteReleaseAsync(Guid releaseId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
