@@ -275,12 +275,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().ToTable("ReleaseToReleaseGroupRelationship", "dbo");
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ReleaseGroupId });
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasOne<ReleaseDto>()
+            .HasOne(entity => entity.Release)
             .WithMany(entity => entity.ReleaseToReleaseGroupRelationships)
             .HasForeignKey(entity => entity.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasOne<ReleaseGroupDto>()
+            .HasOne(entity => entity.ReleaseGroup)
             .WithMany()
             .HasForeignKey(entity => entity.ReleaseGroupId)
             .OnDelete(DeleteBehavior.Cascade);

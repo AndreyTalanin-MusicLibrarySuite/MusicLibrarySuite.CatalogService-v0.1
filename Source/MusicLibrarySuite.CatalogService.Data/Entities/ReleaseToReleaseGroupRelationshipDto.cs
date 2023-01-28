@@ -39,4 +39,16 @@ public class ReleaseToReleaseGroupRelationshipDto
     /// Gets or sets the relationship's display order used when requesting relationships for a release group.
     /// </summary>
     public int ReferenceOrder { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ReleaseDto? Release { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release group.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ReleaseGroupDto? ReleaseGroup { get; set; }
 }
