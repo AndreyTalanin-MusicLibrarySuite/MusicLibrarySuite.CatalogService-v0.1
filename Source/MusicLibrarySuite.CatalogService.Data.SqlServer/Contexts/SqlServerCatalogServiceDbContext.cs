@@ -272,6 +272,35 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().ToTable("ReleaseToReleaseGroupRelationship", "dbo");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ReleaseGroupId });
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleaseToReleaseGroupRelationships)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasOne(entity => entity.ReleaseGroup)
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseGroupId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseToReleaseGroupRelationship_ReleaseId");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseGroupId)
+            .HasDatabaseName("IX_ReleaseToReleaseGroupRelationship_ReleaseGroupId");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseToReleaseGroupRelationship_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseGroupId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseToReleaseGroupRelationship_ReleaseGroupId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()

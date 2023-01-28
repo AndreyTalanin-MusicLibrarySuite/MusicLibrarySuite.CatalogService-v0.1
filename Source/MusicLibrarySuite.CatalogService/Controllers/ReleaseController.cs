@@ -162,6 +162,40 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all release-to-release-group relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-release-group relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseToReleaseGroupRelationship[]>> GetReleaseToReleaseGroupRelationshipsAsync([Required][FromQuery] Guid releaseId)
+    {
+        ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships = await m_releaseService.GetReleaseToReleaseGroupRelationshipsAsync(releaseId);
+        return Ok(releaseToReleaseGroupRelationships);
+    }
+
+    /// <summary>
+    /// Asynchronously gets all release-to-release-group relationships by a release group's unique identifier.
+    /// </summary>
+    /// <param name="releaseGroupId">The release group's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-release-group relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseToReleaseGroupRelationship[]>> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync([Required][FromQuery] Guid releaseGroupId)
+    {
+        ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships = await m_releaseService.GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(releaseGroupId);
+        return Ok(releaseToReleaseGroupRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>
@@ -204,6 +238,21 @@ public class ReleaseController : ControllerBase
     public async Task<ActionResult> UpdateReleaseToProductRelationshipsOrderAsync([Required][FromBody] ReleaseToProductRelationship[] releaseToProductRelationships, [FromQuery] bool? useReferenceOrder)
     {
         var result = await m_releaseService.UpdateReleaseToProductRelationshipsOrderAsync(releaseToProductRelationships, useReferenceOrder == true);
+        return result ? Ok() : NotFound();
+    }
+
+    /// <summary>
+    /// Asynchronously updates order of existing release-to-release-group relationships.
+    /// </summary>
+    /// <param name="releaseToReleaseGroupRelationships">A collection of release-to-release-group relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateReleaseToReleaseGroupRelationshipsOrderAsync([Required][FromBody] ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships, [FromQuery] bool? useReferenceOrder)
+    {
+        var result = await m_releaseService.UpdateReleaseToReleaseGroupRelationshipsOrderAsync(releaseToReleaseGroupRelationships, useReferenceOrder == true);
         return result ? Ok() : NotFound();
     }
 

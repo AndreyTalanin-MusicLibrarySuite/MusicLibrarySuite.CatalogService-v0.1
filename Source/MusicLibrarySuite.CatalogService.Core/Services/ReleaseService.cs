@@ -131,6 +131,22 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseToReleaseGroupRelationship[]> GetReleaseToReleaseGroupRelationshipsAsync(Guid releaseId)
+    {
+        ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationshipDtoArray = await m_releaseRepository.GetReleaseToReleaseGroupRelationshipsAsync(releaseId);
+        ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationshipArray = m_mapper.Map<ReleaseToReleaseGroupRelationship[]>(releaseToReleaseGroupRelationshipDtoArray);
+        return releaseToReleaseGroupRelationshipArray;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseToReleaseGroupRelationship[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId)
+    {
+        ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationshipDtoArray = await m_releaseRepository.GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(releaseGroupId);
+        ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationshipArray = m_mapper.Map<ReleaseToReleaseGroupRelationship[]>(releaseToReleaseGroupRelationshipDtoArray);
+        return releaseToReleaseGroupRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Release> CreateReleaseAsync(Release release)
     {
         ReleaseDto releaseDto = m_mapper.Map<ReleaseDto>(release);
@@ -152,6 +168,14 @@ public class ReleaseService : IReleaseService
     {
         ReleaseToProductRelationshipDto[] releaseToProductRelationshipDtoArray = m_mapper.Map<ReleaseToProductRelationshipDto[]>(releaseToProductRelationships);
         var updated = await m_releaseRepository.UpdateReleaseToProductRelationshipsOrderAsync(releaseToProductRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships, bool useReferenceOrder)
+    {
+        ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationshipDtoArray = m_mapper.Map<ReleaseToReleaseGroupRelationshipDto[]>(releaseToReleaseGroupRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseToReleaseGroupRelationshipsOrderAsync(releaseToReleaseGroupRelationshipDtoArray, useReferenceOrder);
         return updated;
     }
 
