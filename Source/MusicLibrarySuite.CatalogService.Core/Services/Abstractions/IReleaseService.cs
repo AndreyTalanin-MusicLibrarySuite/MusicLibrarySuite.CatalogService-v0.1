@@ -82,6 +82,16 @@ public interface IReleaseService
     public Task<ReleaseToProductRelationship[]> GetReleaseToProductRelationshipsByProductAsync(Guid productId);
 
     /// <summary>
+    /// Asynchronously gets all release-to-release-group relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-release-group relationships.
+    /// </returns>
+    public Task<ReleaseToReleaseGroupRelationship[]> GetReleaseToReleaseGroupRelationshipsAsync(Guid releaseId);
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>
