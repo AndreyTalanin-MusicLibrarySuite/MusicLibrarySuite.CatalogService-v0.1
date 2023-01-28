@@ -73,6 +73,26 @@ public interface IReleaseRepository
     public Task<ReleaseRelationshipDto[]> GetReleaseRelationshipsAsync(Guid releaseId, bool includeReverseRelationships = false);
 
     /// <summary>
+    /// Asynchronously gets all release-to-product relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-product relationships.
+    /// </returns>
+    public Task<ReleaseToProductRelationshipDto[]> GetReleaseToProductRelationshipsAsync(Guid releaseId);
+
+    /// <summary>
+    /// Asynchronously gets all release-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-product relationships.
+    /// </returns>
+    public Task<ReleaseToProductRelationshipDto[]> GetReleaseToProductRelationshipsByProductAsync(Guid productId);
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create in the database.</param>
@@ -91,6 +111,17 @@ public interface IReleaseRepository
     /// The task's result will be a value indicating whether the release was found and updated.
     /// </returns>
     public Task<bool> UpdateReleaseAsync(ReleaseDto release);
+
+    /// <summary>
+    /// Asynchronously updates order of existing release-to-product relationships.
+    /// </summary>
+    /// <param name="releaseToProductRelationships">A collection of release-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the <see cref="ReleaseToProductRelationshipDto.ReferenceOrder" /> property should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any release-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateReleaseToProductRelationshipsOrderAsync(ReleaseToProductRelationshipDto[] releaseToProductRelationships, bool useReferenceOrder = false);
 
     /// <summary>
     /// Asynchronously deletes an existing release.

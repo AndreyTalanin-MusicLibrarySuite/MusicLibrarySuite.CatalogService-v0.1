@@ -115,6 +115,22 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseToProductRelationship[]> GetReleaseToProductRelationshipsAsync(Guid releaseId)
+    {
+        ReleaseToProductRelationshipDto[] releaseToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseToProductRelationshipsAsync(releaseId);
+        ReleaseToProductRelationship[] releaseToProductRelationshipArray = m_mapper.Map<ReleaseToProductRelationship[]>(releaseToProductRelationshipDtoArray);
+        return releaseToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseToProductRelationship[]> GetReleaseToProductRelationshipsByProductAsync(Guid productId)
+    {
+        ReleaseToProductRelationshipDto[] releaseToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseToProductRelationshipsByProductAsync(productId);
+        ReleaseToProductRelationship[] releaseToProductRelationshipArray = m_mapper.Map<ReleaseToProductRelationship[]>(releaseToProductRelationshipDtoArray);
+        return releaseToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Release> CreateReleaseAsync(Release release)
     {
         ReleaseDto releaseDto = m_mapper.Map<ReleaseDto>(release);
@@ -128,6 +144,14 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto releaseDto = m_mapper.Map<ReleaseDto>(release);
         var updated = await m_releaseRepository.UpdateReleaseAsync(releaseDto);
+        return updated;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> UpdateReleaseToProductRelationshipsOrderAsync(ReleaseToProductRelationship[] releaseToProductRelationships, bool useReferenceOrder)
+    {
+        ReleaseToProductRelationshipDto[] releaseToProductRelationshipDtoArray = m_mapper.Map<ReleaseToProductRelationshipDto[]>(releaseToProductRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseToProductRelationshipsOrderAsync(releaseToProductRelationshipDtoArray, useReferenceOrder);
         return updated;
     }
 

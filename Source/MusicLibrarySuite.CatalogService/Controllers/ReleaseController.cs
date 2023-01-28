@@ -128,6 +128,40 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all release-to-product relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseToProductRelationship[]>> GetReleaseToProductRelationshipsAsync([Required][FromQuery] Guid releaseId)
+    {
+        ReleaseToProductRelationship[] releaseToProductRelationships = await m_releaseService.GetReleaseToProductRelationshipsAsync(releaseId);
+        return Ok(releaseToProductRelationships);
+    }
+
+    /// <summary>
+    /// Asynchronously gets all release-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-product relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseToProductRelationship[]>> GetReleaseToProductRelationshipsByProductAsync([Required][FromQuery] Guid productId)
+    {
+        ReleaseToProductRelationship[] releaseToProductRelationships = await m_releaseService.GetReleaseToProductRelationshipsByProductAsync(productId);
+        return Ok(releaseToProductRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>
@@ -155,6 +189,21 @@ public class ReleaseController : ControllerBase
     public async Task<ActionResult> UpdateReleaseAsync([Required][FromBody] Release release)
     {
         var result = await m_releaseService.UpdateReleaseAsync(release);
+        return result ? Ok() : NotFound();
+    }
+
+    /// <summary>
+    /// Asynchronously updates order of existing release-to-product relationships.
+    /// </summary>
+    /// <param name="releaseToProductRelationships">A collection of release-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateReleaseToProductRelationshipsOrderAsync([Required][FromBody] ReleaseToProductRelationship[] releaseToProductRelationships, [FromQuery] bool? useReferenceOrder)
+    {
+        var result = await m_releaseService.UpdateReleaseToProductRelationshipsOrderAsync(releaseToProductRelationships, useReferenceOrder == true);
         return result ? Ok() : NotFound();
     }
 
