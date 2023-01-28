@@ -484,6 +484,28 @@ Ref "FK_ReleaseToProductRelationship_Product_ProductId" {
     "dbo"."ReleaseToProductRelationship"."ProductId" > "dbo"."Product"."Id"
 }
 
+Table "dbo"."ReleaseToReleaseGroupRelationship" {
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ReleaseGroupId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseToReleaseGroupRelationship_ReleaseId"]
+        "ReleaseGroupId" [name: "IX_ReleaseToReleaseGroupRelationship_ReleaseGroupId"]
+        ("ReleaseId", "Order") [name: "UIX_ReleaseToReleaseGroupRelationship_ReleaseId_Order", unique]
+        ("ReleaseGroupId", "ReferenceOrder") [name: "UIX_ReleaseToReleaseGroupRelationship_ReleaseGroupId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseToReleaseGroupRelationship_Release_ReleaseId" {
+    "dbo"."ReleaseToReleaseGroupRelationship"."ReleaseId" > "dbo"."Release"."Id"
+}
+
+Ref "FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId" {
+    "dbo"."ReleaseToReleaseGroupRelationship"."ReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
+}
+
 
 Table "dbo"."ReleaseMedia" {
     "MediaNumber" tinyint [primary key, not null]
