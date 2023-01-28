@@ -124,6 +124,12 @@ public class ReleaseDto
     public ICollection<ReleaseToProductRelationshipDto> ReleaseToProductRelationships { get; set; } = Enumerable.Empty<ReleaseToProductRelationshipDto>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of release-to-release-group relationships associated to the current release.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseToReleaseGroupRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseToReleaseGroupRelationshipDto> ReleaseToReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseToReleaseGroupRelationshipDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
     public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();

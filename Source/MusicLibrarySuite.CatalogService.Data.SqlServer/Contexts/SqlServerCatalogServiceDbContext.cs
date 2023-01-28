@@ -276,7 +276,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ReleaseGroupId });
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
             .HasOne<ReleaseDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleaseToReleaseGroupRelationships)
             .HasForeignKey(entity => entity.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
