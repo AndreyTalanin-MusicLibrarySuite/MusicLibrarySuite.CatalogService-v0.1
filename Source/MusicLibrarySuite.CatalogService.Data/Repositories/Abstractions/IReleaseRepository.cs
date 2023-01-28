@@ -103,6 +103,16 @@ public interface IReleaseRepository
     public Task<ReleaseToReleaseGroupRelationshipDto[]> GetReleaseToReleaseGroupRelationshipsAsync(Guid releaseId);
 
     /// <summary>
+    /// Asynchronously gets all release-to-release-group relationships by a release group's unique identifier.
+    /// </summary>
+    /// <param name="releaseGroupId">The release group's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-release-group relationships.
+    /// </returns>
+    public Task<ReleaseToReleaseGroupRelationshipDto[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId);
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create in the database.</param>

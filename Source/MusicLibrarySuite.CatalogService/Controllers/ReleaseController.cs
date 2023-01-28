@@ -179,6 +179,23 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously gets all release-to-release-group relationships by a release group's unique identifier.
+    /// </summary>
+    /// <param name="releaseGroupId">The release group's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-to-release-group relationships.
+    /// </returns>
+    [HttpGet]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ReleaseToReleaseGroupRelationship[]>> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync([Required][FromQuery] Guid releaseGroupId)
+    {
+        ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships = await m_releaseService.GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(releaseGroupId);
+        return Ok(releaseToReleaseGroupRelationships);
+    }
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>
