@@ -66,4 +66,10 @@ public class ReleaseTrack
     /// </summary>
     [Required]
     public ICollection<ReleaseTrackArtist> ReleaseTrackArtists { get; set; } = Enumerable.Empty<ReleaseTrackArtist>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "featured artist" role.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseTrackFeaturedArtist> ReleaseTrackFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseTrackFeaturedArtist>().ToList();
 }
