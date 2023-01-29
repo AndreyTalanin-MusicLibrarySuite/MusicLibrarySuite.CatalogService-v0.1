@@ -550,3 +550,25 @@ Table "dbo"."ReleaseTrack" {
 Ref "FK_ReleaseTrack_ReleaseMedia_MediaNumber_ReleaseId" {
     "dbo"."ReleaseTrack".("MediaNumber", "ReleaseId") > "dbo"."ReleaseMedia".("MediaNumber", "ReleaseId")
 }
+
+Table "dbo"."ReleaseTrackArtist" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ArtistId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId"]
+        "ArtistId" [name: "IX_ReleaseTrackArtist_ArtistId"]
+        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId_Order", unique]
+    }
+}
+
+Ref "FK_ReleaseTrackArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrackArtist".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseTrackArtist_Artist_ArtistId" {
+    "dbo"."ReleaseTrackArtist"."ArtistId" > "dbo"."Artist"."Id"
+}
