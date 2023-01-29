@@ -398,12 +398,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseTrackPerformerDto>().ToTable("ReleaseTrackPerformer", "dbo");
         modelBuilder.Entity<ReleaseTrackPerformerDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ArtistId });
         modelBuilder.Entity<ReleaseTrackPerformerDto>()
-            .HasOne<ReleaseTrackDto>()
+            .HasOne(entity => entity.ReleaseTrack)
             .WithMany(entity => entity.ReleaseTrackPerformers)
             .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseTrackPerformerDto>()
-            .HasOne<ArtistDto>()
+            .HasOne(entity => entity.Artist)
             .WithMany()
             .HasForeignKey(entity => entity.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
