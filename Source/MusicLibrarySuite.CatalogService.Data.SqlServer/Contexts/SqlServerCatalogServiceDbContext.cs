@@ -353,7 +353,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseTrackArtistDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ArtistId });
         modelBuilder.Entity<ReleaseTrackArtistDto>()
             .HasOne<ReleaseTrackDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleaseTrackArtists)
             .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseTrackArtistDto>()
