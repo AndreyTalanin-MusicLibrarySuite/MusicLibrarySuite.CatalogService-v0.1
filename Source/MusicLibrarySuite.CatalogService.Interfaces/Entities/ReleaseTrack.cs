@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -58,4 +60,10 @@ public class ReleaseTrack
     /// Gets or sets the release track's International Standard Recording Code (ISRC).
     /// </summary>
     public string? InternationalStandardRecordingCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseTrackArtist> ReleaseTrackArtists { get; set; } = Enumerable.Empty<ReleaseTrackArtist>().ToList();
 }
