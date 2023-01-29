@@ -372,6 +372,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>().ToTable("ReleaseTrackFeaturedArtist", "dbo");
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ArtistId });
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>()
+            .HasOne<ReleaseTrackDto>()
+            .WithMany()
+            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>()
+            .HasOne<ArtistDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseTrackFeaturedArtist_TrackNumber_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>()
+            .HasIndex(entity => entity.ArtistId)
+            .HasDatabaseName("IX_ReleaseTrackFeaturedArtist_ArtistId");
+        modelBuilder.Entity<ReleaseTrackFeaturedArtistDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseTrackFeaturedArtist_TrackNumber_MediaNumber_ReleaseId_Order")
+            .IsUnique();
+
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
