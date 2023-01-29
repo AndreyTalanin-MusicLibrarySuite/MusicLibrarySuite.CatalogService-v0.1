@@ -58,4 +58,9 @@ public class ReleaseTrackDto
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "featured artist" role.
     /// </summary>
     public ICollection<ReleaseTrackFeaturedArtistDto> ReleaseTrackFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseTrackFeaturedArtistDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "performer" role.
+    /// </summary>
+    public ICollection<ReleaseTrackPerformerDto> ReleaseTrackPerformers { get; set; } = Enumerable.Empty<ReleaseTrackPerformerDto>().ToList();
 }
