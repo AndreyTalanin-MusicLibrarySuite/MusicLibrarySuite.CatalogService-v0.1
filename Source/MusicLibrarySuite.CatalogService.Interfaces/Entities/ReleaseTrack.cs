@@ -78,4 +78,10 @@ public class ReleaseTrack
     /// </summary>
     [Required]
     public ICollection<ReleaseTrackPerformer> ReleaseTrackPerformers { get; set; } = Enumerable.Empty<ReleaseTrackPerformer>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "composer" role.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseTrackComposer> ReleaseTrackComposers { get; set; } = Enumerable.Empty<ReleaseTrackComposer>().ToList();
 }
