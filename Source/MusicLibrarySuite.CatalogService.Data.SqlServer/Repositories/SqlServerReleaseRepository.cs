@@ -60,6 +60,18 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
             .FirstOrDefaultAsync();
 
         if (release is not null)
@@ -76,6 +88,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
             foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
             {
                 OrderReleaseTrackCollection(releaseMedia);
+                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+                {
+                    OrderReleaseTrackArtists(releaseTrack);
+                    OrderReleaseTrackFeaturedArtists(releaseTrack);
+                    OrderReleaseTrackPerformers(releaseTrack);
+                    OrderReleaseTrackComposers(releaseTrack);
+                }
             }
         }
 
@@ -106,6 +125,18 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
             .ToArrayAsync();
 
         foreach (ReleaseDto release in releases)
@@ -122,6 +153,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
             foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
             {
                 OrderReleaseTrackCollection(releaseMedia);
+                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+                {
+                    OrderReleaseTrackArtists(releaseTrack);
+                    OrderReleaseTrackFeaturedArtists(releaseTrack);
+                    OrderReleaseTrackPerformers(releaseTrack);
+                    OrderReleaseTrackComposers(releaseTrack);
+                }
             }
         }
 
@@ -161,6 +199,18 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
             .ToArrayAsync();
 
         foreach (ReleaseDto release in releases)
@@ -177,6 +227,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
             foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
             {
                 OrderReleaseTrackCollection(releaseMedia);
+                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+                {
+                    OrderReleaseTrackArtists(releaseTrack);
+                    OrderReleaseTrackFeaturedArtists(releaseTrack);
+                    OrderReleaseTrackPerformers(releaseTrack);
+                    OrderReleaseTrackComposers(releaseTrack);
+                }
             }
         }
 
@@ -207,6 +264,18 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
             .ToArrayAsync();
 
         foreach (ReleaseDto release in releases)
@@ -223,6 +292,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
             foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
             {
                 OrderReleaseTrackCollection(releaseMedia);
+                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+                {
+                    OrderReleaseTrackArtists(releaseTrack);
+                    OrderReleaseTrackFeaturedArtists(releaseTrack);
+                    OrderReleaseTrackPerformers(releaseTrack);
+                    OrderReleaseTrackComposers(releaseTrack);
+                }
             }
         }
 
@@ -262,6 +338,18 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
             .OrderBy(release => release.Title)
             .Skip(releaseRequest.PageSize * releaseRequest.PageIndex)
             .Take(releaseRequest.PageSize)
@@ -281,6 +369,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
             foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
             {
                 OrderReleaseTrackCollection(releaseMedia);
+                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+                {
+                    OrderReleaseTrackArtists(releaseTrack);
+                    OrderReleaseTrackFeaturedArtists(releaseTrack);
+                    OrderReleaseTrackPerformers(releaseTrack);
+                    OrderReleaseTrackComposers(releaseTrack);
+                }
             }
         }
 
@@ -399,6 +494,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
         foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
         {
             SetReleaseTrackForeignKeys(releaseMedia.MediaNumber, releaseMedia.ReleaseId, releaseMedia.ReleaseTrackCollection);
+            foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+            {
+                SetReleaseTrackArtistOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackArtists);
+                SetReleaseTrackFeaturedArtistOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackFeaturedArtists);
+                SetReleaseTrackPerformerOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackPerformers);
+                SetReleaseTrackComposerOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackComposers);
+            }
         }
 
         using var releaseRelationshipsDataTable = new DataTable();
@@ -545,7 +647,8 @@ public class SqlServerReleaseRepository : IReleaseRepository
         releaseTrackCollectionDataTable.Columns.Add(nameof(ReleaseTrackDto.Description), typeof(string));
         releaseTrackCollectionDataTable.Columns.Add(nameof(ReleaseTrackDto.DisambiguationText), typeof(string));
         releaseTrackCollectionDataTable.Columns.Add(nameof(ReleaseTrackDto.InternationalStandardRecordingCode), typeof(string));
-        foreach (ReleaseTrackDto releaseTrack in release.ReleaseMediaCollection.SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection))
+        foreach (ReleaseTrackDto releaseTrack in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection))
         {
             releaseTrackCollectionDataTable.Rows.Add(
                 releaseTrack.TrackNumber.AsDbValue(),
@@ -555,6 +658,78 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 releaseTrack.Description.AsDbValue(),
                 releaseTrack.DisambiguationText.AsDbValue(),
                 releaseTrack.InternationalStandardRecordingCode.AsDbValue());
+        }
+
+        using var releaseTrackArtistsDataTable = new DataTable();
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.TrackNumber), typeof(byte));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.MediaNumber), typeof(byte));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.ReleaseId), typeof(Guid));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.ArtistId), typeof(Guid));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.Order), typeof(int));
+        foreach (ReleaseTrackArtistDto releaseTrackArtist in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackArtists))
+        {
+            releaseTrackArtistsDataTable.Rows.Add(
+                releaseTrackArtist.TrackNumber.AsDbValue(),
+                releaseTrackArtist.MediaNumber.AsDbValue(),
+                releaseTrackArtist.ReleaseId.AsDbValue(),
+                releaseTrackArtist.ArtistId.AsDbValue(),
+                releaseTrackArtist.Order.AsDbValue());
+        }
+
+        using var releaseTrackFeaturedArtistsDataTable = new DataTable();
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.TrackNumber), typeof(byte));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.MediaNumber), typeof(byte));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.ReleaseId), typeof(Guid));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.ArtistId), typeof(Guid));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.Order), typeof(int));
+        foreach (ReleaseTrackFeaturedArtistDto releaseTrackFeaturedArtist in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists))
+        {
+            releaseTrackFeaturedArtistsDataTable.Rows.Add(
+                releaseTrackFeaturedArtist.TrackNumber.AsDbValue(),
+                releaseTrackFeaturedArtist.MediaNumber.AsDbValue(),
+                releaseTrackFeaturedArtist.ReleaseId.AsDbValue(),
+                releaseTrackFeaturedArtist.ArtistId.AsDbValue(),
+                releaseTrackFeaturedArtist.Order.AsDbValue());
+        }
+
+        using var releaseTrackPerformersDataTable = new DataTable();
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.TrackNumber), typeof(byte));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.MediaNumber), typeof(byte));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.ReleaseId), typeof(Guid));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.ArtistId), typeof(Guid));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.Order), typeof(int));
+        foreach (ReleaseTrackPerformerDto releaseTrackPerformer in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackPerformers))
+        {
+            releaseTrackPerformersDataTable.Rows.Add(
+                releaseTrackPerformer.TrackNumber.AsDbValue(),
+                releaseTrackPerformer.MediaNumber.AsDbValue(),
+                releaseTrackPerformer.ReleaseId.AsDbValue(),
+                releaseTrackPerformer.ArtistId.AsDbValue(),
+                releaseTrackPerformer.Order.AsDbValue());
+        }
+
+        using var releaseTrackComposersDataTable = new DataTable();
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.TrackNumber), typeof(byte));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.MediaNumber), typeof(byte));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.ReleaseId), typeof(Guid));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.ArtistId), typeof(Guid));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.Order), typeof(int));
+        foreach (ReleaseTrackComposerDto releaseTrackComposer in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackComposers))
+        {
+            releaseTrackComposersDataTable.Rows.Add(
+                releaseTrackComposer.TrackNumber.AsDbValue(),
+                releaseTrackComposer.MediaNumber.AsDbValue(),
+                releaseTrackComposer.ReleaseId.AsDbValue(),
+                releaseTrackComposer.ArtistId.AsDbValue(),
+                releaseTrackComposer.Order.AsDbValue());
         }
 
         SqlParameter resultIdParameter;
@@ -583,6 +758,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseDto.ReleaseToReleaseGroupRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseToReleaseGroupRelationship]", Value = releaseToReleaseGroupRelationshipsDataTable },
             new SqlParameter(nameof(ReleaseDto.ReleaseMediaCollection), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseMedia]", Value = releaseMediaCollectionDataTable },
             new SqlParameter(nameof(ReleaseMediaDto.ReleaseTrackCollection), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrack]", Value = releaseTrackCollectionDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackArtists), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackArtist]", Value = releaseTrackArtistsDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackFeaturedArtists), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackFeaturedArtist]", Value = releaseTrackFeaturedArtistsDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackPerformers), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackPerformer]", Value = releaseTrackPerformersDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackComposers), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackComposer]", Value = releaseTrackComposersDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ReleaseDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ReleaseDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ReleaseDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -611,6 +790,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseDto.ReleaseToReleaseGroupRelationships)},
                 @{nameof(ReleaseDto.ReleaseMediaCollection)},
                 @{nameof(ReleaseMediaDto.ReleaseTrackCollection)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackArtists)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackFeaturedArtists)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackPerformers)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackComposers)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -641,6 +824,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
         foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
         {
             SetReleaseTrackForeignKeys(releaseMedia.MediaNumber, releaseMedia.ReleaseId, releaseMedia.ReleaseTrackCollection);
+            foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
+            {
+                SetReleaseTrackArtistOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackArtists);
+                SetReleaseTrackFeaturedArtistOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackFeaturedArtists);
+                SetReleaseTrackPerformerOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackPerformers);
+                SetReleaseTrackComposerOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackComposers);
+            }
         }
 
         using var releaseRelationshipsDataTable = new DataTable();
@@ -787,7 +977,8 @@ public class SqlServerReleaseRepository : IReleaseRepository
         releaseTrackCollectionDataTable.Columns.Add(nameof(ReleaseTrackDto.Description), typeof(string));
         releaseTrackCollectionDataTable.Columns.Add(nameof(ReleaseTrackDto.DisambiguationText), typeof(string));
         releaseTrackCollectionDataTable.Columns.Add(nameof(ReleaseTrackDto.InternationalStandardRecordingCode), typeof(string));
-        foreach (ReleaseTrackDto releaseTrack in release.ReleaseMediaCollection.SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection))
+        foreach (ReleaseTrackDto releaseTrack in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection))
         {
             releaseTrackCollectionDataTable.Rows.Add(
                 releaseTrack.TrackNumber.AsDbValue(),
@@ -797,6 +988,78 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 releaseTrack.Description.AsDbValue(),
                 releaseTrack.DisambiguationText.AsDbValue(),
                 releaseTrack.InternationalStandardRecordingCode.AsDbValue());
+        }
+
+        using var releaseTrackArtistsDataTable = new DataTable();
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.TrackNumber), typeof(byte));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.MediaNumber), typeof(byte));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.ReleaseId), typeof(Guid));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.ArtistId), typeof(Guid));
+        releaseTrackArtistsDataTable.Columns.Add(nameof(ReleaseTrackArtistDto.Order), typeof(int));
+        foreach (ReleaseTrackArtistDto releaseTrackArtist in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackArtists))
+        {
+            releaseTrackArtistsDataTable.Rows.Add(
+                releaseTrackArtist.TrackNumber.AsDbValue(),
+                releaseTrackArtist.MediaNumber.AsDbValue(),
+                releaseTrackArtist.ReleaseId.AsDbValue(),
+                releaseTrackArtist.ArtistId.AsDbValue(),
+                releaseTrackArtist.Order.AsDbValue());
+        }
+
+        using var releaseTrackFeaturedArtistsDataTable = new DataTable();
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.TrackNumber), typeof(byte));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.MediaNumber), typeof(byte));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.ReleaseId), typeof(Guid));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.ArtistId), typeof(Guid));
+        releaseTrackFeaturedArtistsDataTable.Columns.Add(nameof(ReleaseTrackFeaturedArtistDto.Order), typeof(int));
+        foreach (ReleaseTrackFeaturedArtistDto releaseTrackFeaturedArtist in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists))
+        {
+            releaseTrackFeaturedArtistsDataTable.Rows.Add(
+                releaseTrackFeaturedArtist.TrackNumber.AsDbValue(),
+                releaseTrackFeaturedArtist.MediaNumber.AsDbValue(),
+                releaseTrackFeaturedArtist.ReleaseId.AsDbValue(),
+                releaseTrackFeaturedArtist.ArtistId.AsDbValue(),
+                releaseTrackFeaturedArtist.Order.AsDbValue());
+        }
+
+        using var releaseTrackPerformersDataTable = new DataTable();
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.TrackNumber), typeof(byte));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.MediaNumber), typeof(byte));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.ReleaseId), typeof(Guid));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.ArtistId), typeof(Guid));
+        releaseTrackPerformersDataTable.Columns.Add(nameof(ReleaseTrackPerformerDto.Order), typeof(int));
+        foreach (ReleaseTrackPerformerDto releaseTrackPerformer in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackPerformers))
+        {
+            releaseTrackPerformersDataTable.Rows.Add(
+                releaseTrackPerformer.TrackNumber.AsDbValue(),
+                releaseTrackPerformer.MediaNumber.AsDbValue(),
+                releaseTrackPerformer.ReleaseId.AsDbValue(),
+                releaseTrackPerformer.ArtistId.AsDbValue(),
+                releaseTrackPerformer.Order.AsDbValue());
+        }
+
+        using var releaseTrackComposersDataTable = new DataTable();
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.TrackNumber), typeof(byte));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.MediaNumber), typeof(byte));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.ReleaseId), typeof(Guid));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.ArtistId), typeof(Guid));
+        releaseTrackComposersDataTable.Columns.Add(nameof(ReleaseTrackComposerDto.Order), typeof(int));
+        foreach (ReleaseTrackComposerDto releaseTrackComposer in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackComposers))
+        {
+            releaseTrackComposersDataTable.Rows.Add(
+                releaseTrackComposer.TrackNumber.AsDbValue(),
+                releaseTrackComposer.MediaNumber.AsDbValue(),
+                releaseTrackComposer.ReleaseId.AsDbValue(),
+                releaseTrackComposer.ArtistId.AsDbValue(),
+                releaseTrackComposer.Order.AsDbValue());
         }
 
         SqlParameter resultRowsUpdatedParameter;
@@ -823,6 +1086,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseDto.ReleaseToReleaseGroupRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseToReleaseGroupRelationship]", Value = releaseToReleaseGroupRelationshipsDataTable },
             new SqlParameter(nameof(ReleaseDto.ReleaseMediaCollection), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseMedia]", Value = releaseMediaCollectionDataTable },
             new SqlParameter(nameof(ReleaseMediaDto.ReleaseTrackCollection), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrack]", Value = releaseTrackCollectionDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackArtists), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackArtist]", Value = releaseTrackArtistsDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackFeaturedArtists), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackFeaturedArtist]", Value = releaseTrackFeaturedArtistsDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackPerformers), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackPerformer]", Value = releaseTrackPerformersDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackComposers), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackComposer]", Value = releaseTrackComposersDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -849,6 +1116,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseDto.ReleaseToReleaseGroupRelationships)},
                 @{nameof(ReleaseDto.ReleaseMediaCollection)},
                 @{nameof(ReleaseMediaDto.ReleaseTrackCollection)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackArtists)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackFeaturedArtists)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackPerformers)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackComposers)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -1054,6 +1325,34 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ToList();
     }
 
+    private static void OrderReleaseTrackArtists(ReleaseTrackDto releaseTrack)
+    {
+        releaseTrack.ReleaseTrackArtists = releaseTrack.ReleaseTrackArtists
+            .OrderBy(releaseTrackArtist => releaseTrackArtist.Order)
+            .ToList();
+    }
+
+    private static void OrderReleaseTrackFeaturedArtists(ReleaseTrackDto releaseTrack)
+    {
+        releaseTrack.ReleaseTrackFeaturedArtists = releaseTrack.ReleaseTrackFeaturedArtists
+            .OrderBy(releaseTrackFeaturedArtist => releaseTrackFeaturedArtist.Order)
+            .ToList();
+    }
+
+    private static void OrderReleaseTrackPerformers(ReleaseTrackDto releaseTrack)
+    {
+        releaseTrack.ReleaseTrackPerformers = releaseTrack.ReleaseTrackPerformers
+            .OrderBy(releaseTrackPerformer => releaseTrackPerformer.Order)
+            .ToList();
+    }
+
+    private static void OrderReleaseTrackComposers(ReleaseTrackDto releaseTrack)
+    {
+        releaseTrack.ReleaseTrackComposers = releaseTrack.ReleaseTrackComposers
+            .OrderBy(releaseTrackComposer => releaseTrackComposer.Order)
+            .ToList();
+    }
+
     private static void SetReleaseRelationshipOrders(ICollection<ReleaseRelationshipDto> releaseRelationships)
     {
         var i = 0;
@@ -1140,6 +1439,54 @@ public class SqlServerReleaseRepository : IReleaseRepository
         {
             releaseTrack.MediaNumber = mediaNumber;
             releaseTrack.ReleaseId = releaseId;
+        }
+    }
+
+    private static void SetReleaseTrackArtistOrders(byte trackNumber, byte mediaNumber, Guid releaseId, IEnumerable<ReleaseTrackArtistDto> releaseTrackArtists)
+    {
+        var i = 0;
+        foreach (ReleaseTrackArtistDto releaseTrackArtist in releaseTrackArtists)
+        {
+            releaseTrackArtist.TrackNumber = trackNumber;
+            releaseTrackArtist.MediaNumber = mediaNumber;
+            releaseTrackArtist.ReleaseId = releaseId;
+            releaseTrackArtist.Order = i++;
+        }
+    }
+
+    private static void SetReleaseTrackFeaturedArtistOrders(byte trackNumber, byte mediaNumber, Guid releaseId, IEnumerable<ReleaseTrackFeaturedArtistDto> releaseTrackFeaturedArtists)
+    {
+        var i = 0;
+        foreach (ReleaseTrackFeaturedArtistDto releaseTrackFeaturedArtist in releaseTrackFeaturedArtists)
+        {
+            releaseTrackFeaturedArtist.TrackNumber = trackNumber;
+            releaseTrackFeaturedArtist.MediaNumber = mediaNumber;
+            releaseTrackFeaturedArtist.ReleaseId = releaseId;
+            releaseTrackFeaturedArtist.Order = i++;
+        }
+    }
+
+    private static void SetReleaseTrackPerformerOrders(byte trackNumber, byte mediaNumber, Guid releaseId, IEnumerable<ReleaseTrackPerformerDto> releaseTrackPerformers)
+    {
+        var i = 0;
+        foreach (ReleaseTrackPerformerDto releaseTrackPerformer in releaseTrackPerformers)
+        {
+            releaseTrackPerformer.TrackNumber = trackNumber;
+            releaseTrackPerformer.MediaNumber = mediaNumber;
+            releaseTrackPerformer.ReleaseId = releaseId;
+            releaseTrackPerformer.Order = i++;
+        }
+    }
+
+    private static void SetReleaseTrackComposerOrders(byte trackNumber, byte mediaNumber, Guid releaseId, IEnumerable<ReleaseTrackComposerDto> releaseTrackComposers)
+    {
+        var i = 0;
+        foreach (ReleaseTrackComposerDto releaseTrackComposer in releaseTrackComposers)
+        {
+            releaseTrackComposer.TrackNumber = trackNumber;
+            releaseTrackComposer.MediaNumber = mediaNumber;
+            releaseTrackComposer.ReleaseId = releaseId;
+            releaseTrackComposer.Order = i++;
         }
     }
 }
