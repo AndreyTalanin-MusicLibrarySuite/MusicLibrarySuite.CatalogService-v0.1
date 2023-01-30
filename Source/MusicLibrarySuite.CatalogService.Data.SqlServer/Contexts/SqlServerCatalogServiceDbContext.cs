@@ -441,6 +441,29 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ReleaseTrackComposer_TrackNumber_MediaNumber_ReleaseId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseTrackGenreDto>().ToTable("ReleaseTrackGenre", "dbo");
+        modelBuilder.Entity<ReleaseTrackGenreDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.GenreId });
+        modelBuilder.Entity<ReleaseTrackGenreDto>()
+            .HasOne<ReleaseTrackDto>()
+            .WithMany()
+            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackGenreDto>()
+            .HasOne<GenreDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackGenreDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseTrackGenre_TrackNumber_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackGenreDto>()
+            .HasIndex(entity => entity.GenreId)
+            .HasDatabaseName("IX_ReleaseTrackGenre_GenreId");
+        modelBuilder.Entity<ReleaseTrackGenreDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseTrackGenre_TrackNumber_MediaNumber_ReleaseId_Order")
+            .IsUnique();
+
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
