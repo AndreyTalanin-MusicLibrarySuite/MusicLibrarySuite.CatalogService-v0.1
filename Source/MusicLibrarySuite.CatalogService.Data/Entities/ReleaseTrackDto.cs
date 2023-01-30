@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -46,4 +48,24 @@ public class ReleaseTrackDto
     /// </summary>
     [StringLength(32)]
     public string? InternationalStandardRecordingCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track.
+    /// </summary>
+    public ICollection<ReleaseTrackArtistDto> ReleaseTrackArtists { get; set; } = Enumerable.Empty<ReleaseTrackArtistDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "featured artist" role.
+    /// </summary>
+    public ICollection<ReleaseTrackFeaturedArtistDto> ReleaseTrackFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseTrackFeaturedArtistDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "performer" role.
+    /// </summary>
+    public ICollection<ReleaseTrackPerformerDto> ReleaseTrackPerformers { get; set; } = Enumerable.Empty<ReleaseTrackPerformerDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "composer" role.
+    /// </summary>
+    public ICollection<ReleaseTrackComposerDto> ReleaseTrackComposers { get; set; } = Enumerable.Empty<ReleaseTrackComposerDto>().ToList();
 }
