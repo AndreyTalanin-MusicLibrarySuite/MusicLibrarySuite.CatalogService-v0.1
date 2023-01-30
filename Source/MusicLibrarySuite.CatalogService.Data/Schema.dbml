@@ -638,3 +638,25 @@ Ref "FK_ReleaseTrackComposer_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
 Ref "FK_ReleaseTrackComposer_Artist_ArtistId" {
     "dbo"."ReleaseTrackComposer"."ArtistId" > "dbo"."Artist"."Id"
 }
+
+Table "dbo"."ReleaseTrackGenre" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "GenreId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+
+    Indexes {
+        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackGenre_TrackNumber_MediaNumber_ReleaseId"]
+        "GenreId" [name: "IX_ReleaseTrackGenre_GenreId"]
+        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackGenre_TrackNumber_MediaNumber_ReleaseId_Order", unique]
+    }
+}
+
+Ref "FK_ReleaseTrackGenre_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrackGenre".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseTrackGenre_Genre_GenreId" {
+    "dbo"."ReleaseTrackGenre"."GenreId" > "dbo"."Genre"."Id"
+}

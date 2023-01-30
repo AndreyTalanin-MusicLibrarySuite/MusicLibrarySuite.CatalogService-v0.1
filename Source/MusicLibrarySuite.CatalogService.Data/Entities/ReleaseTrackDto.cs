@@ -68,4 +68,9 @@ public class ReleaseTrackDto
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "composer" role.
     /// </summary>
     public ICollection<ReleaseTrackComposerDto> ReleaseTrackComposers { get; set; } = Enumerable.Empty<ReleaseTrackComposerDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-genre relationships associated to the current release track.
+    /// </summary>
+    public ICollection<ReleaseTrackGenreDto> ReleaseTrackGenres { get; set; } = Enumerable.Empty<ReleaseTrackGenreDto>().ToList();
 }
