@@ -84,4 +84,10 @@ public class ReleaseTrack
     /// </summary>
     [Required]
     public ICollection<ReleaseTrackComposer> ReleaseTrackComposers { get; set; } = Enumerable.Empty<ReleaseTrackComposer>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-genre relationships associated to the current release track.
+    /// </summary>
+    [Required]
+    public ICollection<ReleaseTrackGenre> ReleaseTrackGenres { get; set; } = Enumerable.Empty<ReleaseTrackGenre>().ToList();
 }
