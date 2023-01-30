@@ -444,12 +444,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseTrackGenreDto>().ToTable("ReleaseTrackGenre", "dbo");
         modelBuilder.Entity<ReleaseTrackGenreDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.GenreId });
         modelBuilder.Entity<ReleaseTrackGenreDto>()
-            .HasOne<ReleaseTrackDto>()
+            .HasOne(entity => entity.ReleaseTrack)
             .WithMany(entity => entity.ReleaseTrackGenres)
             .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseTrackGenreDto>()
-            .HasOne<GenreDto>()
+            .HasOne(entity => entity.Genre)
             .WithMany()
             .HasForeignKey(entity => entity.GenreId)
             .OnDelete(DeleteBehavior.Cascade);
