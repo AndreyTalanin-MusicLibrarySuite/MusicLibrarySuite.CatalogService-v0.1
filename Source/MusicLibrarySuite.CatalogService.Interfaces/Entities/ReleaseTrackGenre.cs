@@ -31,4 +31,16 @@ public class ReleaseTrackGenre
     /// </summary>
     [Required]
     public Guid GenreId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release track.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ReleaseTrack? ReleaseTrack { get; set; }
+
+    /// <summary>
+    /// Gets or sets the genre.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public Genre? Genre { get; set; }
 }
