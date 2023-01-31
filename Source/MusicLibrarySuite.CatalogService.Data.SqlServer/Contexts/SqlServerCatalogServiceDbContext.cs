@@ -468,7 +468,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ProductId });
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
             .HasOne<ReleaseTrackDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleaseTrackToProductRelationships)
             .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
