@@ -175,6 +175,17 @@ public interface IReleaseRepository
     public Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationships, bool useReferenceOrder = false);
 
     /// <summary>
+    /// Asynchronously updates order of existing release-track-to-product relationships.
+    /// </summary>
+    /// <param name="releaseTrackToProductRelationships">A collection of release-track-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the <see cref="ReleaseTrackToProductRelationshipDto.ReferenceOrder" /> property should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any release-track-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateReleaseTrackToProductRelationshipsOrderAsync(ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
     /// Asynchronously deletes an existing release.
     /// </summary>
     /// <param name="releaseId">The unique identifier of the release to delete from the database.</param>

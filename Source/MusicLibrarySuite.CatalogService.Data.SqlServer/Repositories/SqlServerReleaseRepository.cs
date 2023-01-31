@@ -1404,6 +1404,62 @@ public class SqlServerReleaseRepository : IReleaseRepository
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateReleaseTrackToProductRelationshipsOrderAsync(ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationships, bool useReferenceOrder)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        var i = 0;
+        foreach (ReleaseTrackToProductRelationshipDto releaseTrackToProductRelationship in releaseTrackToProductRelationships)
+        {
+            if (!useReferenceOrder)
+                releaseTrackToProductRelationship.Order = i++;
+            else
+                releaseTrackToProductRelationship.ReferenceOrder = i++;
+        }
+
+        using var releaseTrackToProductRelationshipsDataTable = new DataTable();
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.TrackNumber), typeof(byte));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.MediaNumber), typeof(byte));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.ReleaseId), typeof(Guid));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.ProductId), typeof(Guid));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.Name), typeof(string));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.Description), typeof(string));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.Order), typeof(int));
+        releaseTrackToProductRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToProductRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (ReleaseTrackToProductRelationshipDto releaseTrackToProductRelationship in releaseTrackToProductRelationships)
+        {
+            releaseTrackToProductRelationshipsDataTable.Rows.Add(
+                releaseTrackToProductRelationship.TrackNumber.AsDbValue(),
+                releaseTrackToProductRelationship.MediaNumber.AsDbValue(),
+                releaseTrackToProductRelationship.ReleaseId.AsDbValue(),
+                releaseTrackToProductRelationship.ProductId.AsDbValue(),
+                releaseTrackToProductRelationship.Name.AsDbValue(),
+                releaseTrackToProductRelationship.Description.AsDbValue(),
+                releaseTrackToProductRelationship.Order.AsDbValue(),
+                releaseTrackToProductRelationship.ReferenceOrder.AsDbValue());
+        }
+
+        SqlParameter resultRowsUpdatedParameter;
+        var parameters = new SqlParameter[]
+        {
+            new SqlParameter("UseReferenceOrder", useReferenceOrder.AsDbValue()),
+            new SqlParameter("ReleaseTrackToProductRelationships", SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackToProductRelationship]", Value = releaseTrackToProductRelationshipsDataTable },
+            resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
+        };
+
+        var query = @$"
+            EXEC [dbo].[sp_UpdateReleaseTrackToProductRelationshipsOrder]
+                @UseReferenceOrder,
+                @ReleaseTrackToProductRelationships,
+                @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
+
+        await context.Database.ExecuteSqlRawAsync(query, parameters);
+
+        var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
+        return rowsUpdated > 0;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteReleaseAsync(Guid releaseId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();

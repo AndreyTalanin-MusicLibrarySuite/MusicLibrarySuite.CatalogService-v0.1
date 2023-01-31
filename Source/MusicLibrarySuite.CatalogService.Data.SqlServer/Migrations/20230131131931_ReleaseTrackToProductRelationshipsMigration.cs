@@ -1332,6 +1332,33 @@ public partial class ReleaseTrackToProductRelationshipsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateReleaseTrackToProductRelationshipsOrder]
+            (
+                @UseReferenceOrder BIT,
+                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceReleaseTrackToProductRelationship] AS
+                (
+                    SELECT * FROM @ReleaseTrackToProductRelationships
+                )
+                MERGE INTO [dbo].[ReleaseTrackToProductRelationship] AS [target]
+                USING [SourceReleaseTrackToProductRelationship] AS [source]
+                ON [target].[TrackNumber] = [source].[TrackNumber]
+                    AND [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[ProductId] = [source].[ProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Order] = CASE WHEN @UseReferenceOrder = 0 THEN [source].[Order] ELSE [target].[Order] END,
+                    [target].[ReferenceOrder] = CASE WHEN @UseReferenceOrder = 1 THEN [source].[ReferenceOrder] ELSE [target].[ReferenceOrder] END;
+
+                SET @ResultRowsUpdated = @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_DeleteRelease]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -1351,6 +1378,8 @@ public partial class ReleaseTrackToProductRelationshipsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseTrackToProductRelationshipsOrder];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
 
