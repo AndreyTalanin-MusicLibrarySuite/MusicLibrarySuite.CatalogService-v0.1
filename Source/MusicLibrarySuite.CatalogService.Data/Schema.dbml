@@ -660,3 +660,27 @@ Ref "FK_ReleaseTrackGenre_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
 Ref "FK_ReleaseTrackGenre_Genre_GenreId" {
     "dbo"."ReleaseTrackGenre"."GenreId" > "dbo"."Genre"."Id"
 }
+
+Table "dbo"."ReleaseTrackToProductRelationship" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId"]
+        "ProductId" [name: "IX_ReleaseTrackToProductRelationship_ProductId"]
+        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseTrackToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrackToProductRelationship".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseTrackToProductRelationship_Product_ProductId" {
+    "dbo"."ReleaseTrackToProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
