@@ -467,12 +467,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().ToTable("ReleaseTrackToProductRelationship", "dbo");
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ProductId });
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasOne<ReleaseTrackDto>()
+            .HasOne(entity => entity.ReleaseTrack)
             .WithMany(entity => entity.ReleaseTrackToProductRelationships)
             .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasOne<ProductDto>()
+            .HasOne(entity => entity.Product)
             .WithMany()
             .HasForeignKey(entity => entity.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
