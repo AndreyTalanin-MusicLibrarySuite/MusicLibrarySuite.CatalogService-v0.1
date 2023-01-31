@@ -42,4 +42,16 @@ public class ReleaseTrackToProductRelationship
     /// Gets or sets the relationship's description.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release track.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public ReleaseTrack? ReleaseTrack { get; set; }
+
+    /// <summary>
+    /// Gets or sets the product.
+    /// </summary>
+    /// <remarks>This property is only used to store data returned from the database.</remarks>
+    public Product? Product { get; set; }
 }
