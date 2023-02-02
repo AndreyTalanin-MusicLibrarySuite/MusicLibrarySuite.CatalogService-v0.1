@@ -147,6 +147,22 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseTrackToProductRelationship[]> GetReleaseTrackToProductRelationshipsAsync(Guid releaseId)
+    {
+        ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseTrackToProductRelationshipsAsync(releaseId);
+        ReleaseTrackToProductRelationship[] releaseTrackToProductRelationshipArray = m_mapper.Map<ReleaseTrackToProductRelationship[]>(releaseTrackToProductRelationshipDtoArray);
+        return releaseTrackToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseTrackToProductRelationship[]> GetReleaseTrackToProductRelationshipsByProductAsync(Guid productId)
+    {
+        ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseTrackToProductRelationshipsByProductAsync(productId);
+        ReleaseTrackToProductRelationship[] releaseTrackToProductRelationshipArray = m_mapper.Map<ReleaseTrackToProductRelationship[]>(releaseTrackToProductRelationshipDtoArray);
+        return releaseTrackToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<Release> CreateReleaseAsync(Release release)
     {
         ReleaseDto releaseDto = m_mapper.Map<ReleaseDto>(release);
@@ -176,6 +192,14 @@ public class ReleaseService : IReleaseService
     {
         ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationshipDtoArray = m_mapper.Map<ReleaseToReleaseGroupRelationshipDto[]>(releaseToReleaseGroupRelationships);
         var updated = await m_releaseRepository.UpdateReleaseToReleaseGroupRelationshipsOrderAsync(releaseToReleaseGroupRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> UpdateReleaseTrackToProductRelationshipsOrderAsync(ReleaseTrackToProductRelationship[] releaseTrackToProductRelationships, bool useReferenceOrder)
+    {
+        ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationshipDtoArray = m_mapper.Map<ReleaseTrackToProductRelationshipDto[]>(releaseTrackToProductRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseTrackToProductRelationshipsOrderAsync(releaseTrackToProductRelationshipDtoArray, useReferenceOrder);
         return updated;
     }
 

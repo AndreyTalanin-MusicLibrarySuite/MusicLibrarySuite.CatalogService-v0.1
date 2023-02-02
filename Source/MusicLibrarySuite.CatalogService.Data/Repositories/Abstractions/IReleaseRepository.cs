@@ -113,6 +113,26 @@ public interface IReleaseRepository
     public Task<ReleaseToReleaseGroupRelationshipDto[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId);
 
     /// <summary>
+    /// Asynchronously gets all release-track-to-product relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-track-to-product relationships.
+    /// </returns>
+    public Task<ReleaseTrackToProductRelationshipDto[]> GetReleaseTrackToProductRelationshipsAsync(Guid releaseId);
+
+    /// <summary>
+    /// Asynchronously gets all release-track-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-track-to-product relationships.
+    /// </returns>
+    public Task<ReleaseTrackToProductRelationshipDto[]> GetReleaseTrackToProductRelationshipsByProductAsync(Guid productId);
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create in the database.</param>
@@ -153,6 +173,17 @@ public interface IReleaseRepository
     /// The task's result will be a value indicating whether any release-to-release-group relationship was found and updated.
     /// </returns>
     public Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
+    /// Asynchronously updates order of existing release-track-to-product relationships.
+    /// </summary>
+    /// <param name="releaseTrackToProductRelationships">A collection of release-track-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the <see cref="ReleaseTrackToProductRelationshipDto.ReferenceOrder" /> property should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any release-track-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateReleaseTrackToProductRelationshipsOrderAsync(ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationships, bool useReferenceOrder = false);
 
     /// <summary>
     /// Asynchronously deletes an existing release.

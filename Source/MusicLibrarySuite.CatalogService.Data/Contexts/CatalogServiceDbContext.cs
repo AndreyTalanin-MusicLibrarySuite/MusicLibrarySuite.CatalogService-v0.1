@@ -105,6 +105,11 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<ReleaseTrackGenreDto> ReleaseTrackGenres { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseTrackToProductRelationshipDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseTrackToProductRelationshipDto> ReleaseTrackToProductRelationships { get; }
+
+    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseGroupDto" /> type.
     /// </summary>
     public DbSet<ReleaseGroupDto> ReleaseGroups { get; }
@@ -199,6 +204,7 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseTrackPerformers = Set<ReleaseTrackPerformerDto>();
         ReleaseTrackComposers = Set<ReleaseTrackComposerDto>();
         ReleaseTrackGenres = Set<ReleaseTrackGenreDto>();
+        ReleaseTrackToProductRelationships = Set<ReleaseTrackToProductRelationshipDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
         ReleaseGroupRelationships = Set<ReleaseGroupRelationshipDto>();
         Genres = Set<GenreDto>();
@@ -241,6 +247,7 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseTrackPerformers = Set<ReleaseTrackPerformerDto>();
         ReleaseTrackComposers = Set<ReleaseTrackComposerDto>();
         ReleaseTrackGenres = Set<ReleaseTrackGenreDto>();
+        ReleaseTrackToProductRelationships = Set<ReleaseTrackToProductRelationshipDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
         ReleaseGroupRelationships = Set<ReleaseGroupRelationshipDto>();
         Genres = Set<GenreDto>();

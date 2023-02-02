@@ -464,6 +464,35 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ReleaseTrackGenre_TrackNumber_MediaNumber_ReleaseId_Order")
             .IsUnique();
 
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().ToTable("ReleaseTrackToProductRelationship", "dbo");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ProductId });
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasOne(entity => entity.ReleaseTrack)
+            .WithMany(entity => entity.ReleaseTrackToProductRelationships)
+            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ReleaseTrackToProductRelationship_ProductId");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseTrackToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<ReleaseGroupDto>().HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
