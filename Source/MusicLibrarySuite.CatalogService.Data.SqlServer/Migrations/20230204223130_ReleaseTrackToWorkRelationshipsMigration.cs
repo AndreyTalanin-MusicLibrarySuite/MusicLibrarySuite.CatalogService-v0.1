@@ -1466,6 +1466,33 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateReleaseTrackToWorkRelationshipsOrder]
+            (
+                @UseReferenceOrder BIT,
+                @ReleaseTrackToWorkRelationships [dbo].[ReleaseTrackToWorkRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceReleaseTrackToWorkRelationship] AS
+                (
+                    SELECT * FROM @ReleaseTrackToWorkRelationships
+                )
+                MERGE INTO [dbo].[ReleaseTrackToWorkRelationship] AS [target]
+                USING [SourceReleaseTrackToWorkRelationship] AS [source]
+                ON [target].[TrackNumber] = [source].[TrackNumber]
+                    AND [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[WorkId] = [source].[WorkId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Order] = CASE WHEN @UseReferenceOrder = 0 THEN [source].[Order] ELSE [target].[Order] END,
+                    [target].[ReferenceOrder] = CASE WHEN @UseReferenceOrder = 1 THEN [source].[ReferenceOrder] ELSE [target].[ReferenceOrder] END;
+
+                SET @ResultRowsUpdated = @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_DeleteRelease]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -1485,6 +1512,8 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseTrackToWorkRelationshipsOrder];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
 

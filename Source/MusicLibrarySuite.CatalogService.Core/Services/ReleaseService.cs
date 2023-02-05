@@ -220,6 +220,14 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateReleaseTrackToWorkRelationshipsOrderAsync(ReleaseTrackToWorkRelationship[] releaseTrackToWorkRelationships, bool useReferenceOrder)
+    {
+        ReleaseTrackToWorkRelationshipDto[] releaseTrackToWorkRelationshipDtoArray = m_mapper.Map<ReleaseTrackToWorkRelationshipDto[]>(releaseTrackToWorkRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseTrackToWorkRelationshipsOrderAsync(releaseTrackToWorkRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteReleaseAsync(Guid releaseId)
     {
         var deleted = await m_releaseRepository.DeleteReleaseAsync(releaseId);

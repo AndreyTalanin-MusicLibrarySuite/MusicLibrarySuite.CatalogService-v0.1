@@ -340,6 +340,21 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously updates order of existing release-track-to-work relationships.
+    /// </summary>
+    /// <param name="releaseTrackToWorkRelationships">A collection of release-track-to-work relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateReleaseTrackToWorkRelationshipsOrderAsync([Required][FromBody] ReleaseTrackToWorkRelationship[] releaseTrackToWorkRelationships, [FromQuery] bool? useReferenceOrder)
+    {
+        var result = await m_releaseService.UpdateReleaseTrackToWorkRelationshipsOrderAsync(releaseTrackToWorkRelationships, useReferenceOrder == true);
+        return result ? Ok() : NotFound();
+    }
+
+    /// <summary>
     /// Asynchronously deletes an existing release.
     /// </summary>
     /// <param name="releaseId">The unique identifier of the release to delete.</param>
