@@ -97,4 +97,11 @@ public class ReleaseTrack
     /// <remarks>An entity of the <see cref="ReleaseTrackToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
     [Required]
     public ICollection<ReleaseTrackToProductRelationship> ReleaseTrackToProductRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToProductRelationship>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-work relationships associated to the current release track.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseTrackToWorkRelationship" /> type has a display order on each end of the relationship.</remarks>
+    [Required]
+    public ICollection<ReleaseTrackToWorkRelationship> ReleaseTrackToWorkRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToWorkRelationship>().ToList();
 }
