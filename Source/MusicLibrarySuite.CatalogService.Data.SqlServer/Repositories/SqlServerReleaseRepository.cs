@@ -502,7 +502,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         return releaseToProductRelationships;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ReleaseToProductRelationshipDto[]> GetReleaseToProductRelationshipsByProductAsync(Guid productId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -532,7 +532,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         return releaseToReleaseGroupRelationships;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ReleaseToReleaseGroupRelationshipDto[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -562,7 +562,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         return releaseTrackToProductRelationships;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ReleaseTrackToProductRelationshipDto[]> GetReleaseTrackToProductRelationshipsByProductAsync(Guid productId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -587,6 +587,21 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .Where(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReleaseId == releaseId)
             .OrderBy(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Order)
+            .ToArrayAsync();
+
+        return releaseTrackToWorkRelationships;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseTrackToWorkRelationshipDto[]> GetReleaseTrackToWorkRelationshipsByWorkAsync(Guid workId)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        ReleaseTrackToWorkRelationshipDto[] releaseTrackToWorkRelationships = await context.ReleaseTrackToWorkRelationships.AsNoTracking()
+            .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReleaseTrack)
+            .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
+            .Where(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.WorkId == workId)
+            .OrderBy(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReferenceOrder)
             .ToArrayAsync();
 
         return releaseTrackToWorkRelationships;
