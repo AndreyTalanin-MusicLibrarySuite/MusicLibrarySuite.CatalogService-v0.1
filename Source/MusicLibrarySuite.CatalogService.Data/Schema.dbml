@@ -684,3 +684,27 @@ Ref "FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_R
 Ref "FK_ReleaseTrackToProductRelationship_Product_ProductId" {
     "dbo"."ReleaseTrackToProductRelationship"."ProductId" > "dbo"."Product"."Id"
 }
+
+Table "dbo"."ReleaseTrackToWorkRelationship" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "WorkId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId"]
+        "WorkId" [name: "IX_ReleaseTrackToWorkRelationship_WorkId"]
+        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId_Order", unique]
+        ("WorkId", "ReferenceOrder") [name: "UIX_ReleaseTrackToWorkRelationship_WorkId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseTrackToWorkRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrackToWorkRelationship".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseTrackToWorkRelationship_Work_WorkId" {
+    "dbo"."ReleaseTrackToWorkRelationship"."WorkId" > "dbo"."Work"."Id"
+}

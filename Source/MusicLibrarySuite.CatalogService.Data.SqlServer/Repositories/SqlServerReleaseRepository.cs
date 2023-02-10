@@ -79,6 +79,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
             .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
+            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .FirstOrDefaultAsync();
 
         if (release is not null)
@@ -103,6 +107,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                     OrderReleaseTrackComposers(releaseTrack);
                     OrderReleaseTrackGenres(releaseTrack);
                     OrderReleaseTrackToProductRelationships(releaseTrack);
+                    OrderReleaseTrackToWorkRelationships(releaseTrack);
                 }
             }
         }
@@ -153,6 +158,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
             .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
+            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .ToArrayAsync();
 
         foreach (ReleaseDto release in releases)
@@ -177,6 +186,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                     OrderReleaseTrackComposers(releaseTrack);
                     OrderReleaseTrackGenres(releaseTrack);
                     OrderReleaseTrackToProductRelationships(releaseTrack);
+                    OrderReleaseTrackToWorkRelationships(releaseTrack);
                 }
             }
         }
@@ -236,6 +246,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
             .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
+            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .ToArrayAsync();
 
         foreach (ReleaseDto release in releases)
@@ -260,6 +274,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                     OrderReleaseTrackComposers(releaseTrack);
                     OrderReleaseTrackGenres(releaseTrack);
                     OrderReleaseTrackToProductRelationships(releaseTrack);
+                    OrderReleaseTrackToWorkRelationships(releaseTrack);
                 }
             }
         }
@@ -310,6 +325,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
             .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
+            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .ToArrayAsync();
 
         foreach (ReleaseDto release in releases)
@@ -334,6 +353,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                     OrderReleaseTrackComposers(releaseTrack);
                     OrderReleaseTrackGenres(releaseTrack);
                     OrderReleaseTrackToProductRelationships(releaseTrack);
+                    OrderReleaseTrackToWorkRelationships(releaseTrack);
                 }
             }
         }
@@ -393,6 +413,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
             .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
+            .Include(release => release.ReleaseMediaCollection)
+            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
+            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .OrderBy(release => release.Title)
             .Skip(releaseRequest.PageSize * releaseRequest.PageIndex)
             .Take(releaseRequest.PageSize)
@@ -420,6 +444,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                     OrderReleaseTrackComposers(releaseTrack);
                     OrderReleaseTrackGenres(releaseTrack);
                     OrderReleaseTrackToProductRelationships(releaseTrack);
+                    OrderReleaseTrackToWorkRelationships(releaseTrack);
                 }
             }
         }
@@ -477,7 +502,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         return releaseToProductRelationships;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ReleaseToProductRelationshipDto[]> GetReleaseToProductRelationshipsByProductAsync(Guid productId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -507,7 +532,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         return releaseToReleaseGroupRelationships;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ReleaseToReleaseGroupRelationshipDto[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -537,7 +562,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         return releaseTrackToProductRelationships;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public async Task<ReleaseTrackToProductRelationshipDto[]> GetReleaseTrackToProductRelationshipsByProductAsync(Guid productId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -550,6 +575,36 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ToArrayAsync();
 
         return releaseTrackToProductRelationships;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseTrackToWorkRelationshipDto[]> GetReleaseTrackToWorkRelationshipsAsync(Guid releaseId)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        ReleaseTrackToWorkRelationshipDto[] releaseTrackToWorkRelationships = await context.ReleaseTrackToWorkRelationships.AsNoTracking()
+            .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReleaseTrack)
+            .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
+            .Where(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReleaseId == releaseId)
+            .OrderBy(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Order)
+            .ToArrayAsync();
+
+        return releaseTrackToWorkRelationships;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseTrackToWorkRelationshipDto[]> GetReleaseTrackToWorkRelationshipsByWorkAsync(Guid workId)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        ReleaseTrackToWorkRelationshipDto[] releaseTrackToWorkRelationships = await context.ReleaseTrackToWorkRelationships.AsNoTracking()
+            .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReleaseTrack)
+            .Include(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
+            .Where(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.WorkId == workId)
+            .OrderBy(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.ReferenceOrder)
+            .ToArrayAsync();
+
+        return releaseTrackToWorkRelationships;
     }
 
     /// <inheritdoc />
@@ -577,6 +632,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 SetReleaseTrackComposerOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackComposers);
                 SetReleaseTrackGenreOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackGenres);
                 SetReleaseTrackToProductRelationshipOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackToProductRelationships);
+                SetReleaseTrackToWorkRelationshipOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackToWorkRelationships);
             }
         }
 
@@ -851,6 +907,30 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 releaseTrackToProductRelationship.ReferenceOrder.AsDbValue());
         }
 
+        using var releaseTrackToWorkRelationshipsDataTable = new DataTable();
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.TrackNumber), typeof(byte));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.MediaNumber), typeof(byte));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.ReleaseId), typeof(Guid));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.WorkId), typeof(Guid));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Name), typeof(string));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Description), typeof(string));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Order), typeof(int));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (ReleaseTrackToWorkRelationshipDto releaseTrackToWorkRelationship in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships))
+        {
+            releaseTrackToWorkRelationshipsDataTable.Rows.Add(
+                releaseTrackToWorkRelationship.TrackNumber.AsDbValue(),
+                releaseTrackToWorkRelationship.MediaNumber.AsDbValue(),
+                releaseTrackToWorkRelationship.ReleaseId.AsDbValue(),
+                releaseTrackToWorkRelationship.WorkId.AsDbValue(),
+                releaseTrackToWorkRelationship.Name.AsDbValue(),
+                releaseTrackToWorkRelationship.Description.AsDbValue(),
+                releaseTrackToWorkRelationship.Order.AsDbValue(),
+                releaseTrackToWorkRelationship.ReferenceOrder.AsDbValue());
+        }
+
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -883,6 +963,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackComposers), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackComposer]", Value = releaseTrackComposersDataTable },
             new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackGenres), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackGenre]", Value = releaseTrackGenresDataTable },
             new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackToProductRelationship]", Value = releaseTrackToProductRelationshipsDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackToWorkRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackToWorkRelationship]", Value = releaseTrackToWorkRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(ReleaseDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(ReleaseDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(ReleaseDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -917,6 +998,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseTrackDto.ReleaseTrackComposers)},
                 @{nameof(ReleaseTrackDto.ReleaseTrackGenres)},
                 @{nameof(ReleaseTrackDto.ReleaseTrackToProductRelationships)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackToWorkRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -955,6 +1037,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 SetReleaseTrackComposerOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackComposers);
                 SetReleaseTrackGenreOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackGenres);
                 SetReleaseTrackToProductRelationshipOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackToProductRelationships);
+                SetReleaseTrackToWorkRelationshipOrders(releaseTrack.TrackNumber, releaseTrack.MediaNumber, releaseTrack.ReleaseId, releaseTrack.ReleaseTrackToWorkRelationships);
             }
         }
 
@@ -1229,6 +1312,30 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 releaseTrackToProductRelationship.ReferenceOrder.AsDbValue());
         }
 
+        using var releaseTrackToWorkRelationshipsDataTable = new DataTable();
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.TrackNumber), typeof(byte));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.MediaNumber), typeof(byte));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.ReleaseId), typeof(Guid));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.WorkId), typeof(Guid));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Name), typeof(string));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Description), typeof(string));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Order), typeof(int));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (ReleaseTrackToWorkRelationshipDto releaseTrackToWorkRelationship in release.ReleaseMediaCollection
+            .SelectMany(releaseMedia => releaseMedia.ReleaseTrackCollection)
+            .SelectMany(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships))
+        {
+            releaseTrackToWorkRelationshipsDataTable.Rows.Add(
+                releaseTrackToWorkRelationship.TrackNumber.AsDbValue(),
+                releaseTrackToWorkRelationship.MediaNumber.AsDbValue(),
+                releaseTrackToWorkRelationship.ReleaseId.AsDbValue(),
+                releaseTrackToWorkRelationship.WorkId.AsDbValue(),
+                releaseTrackToWorkRelationship.Name.AsDbValue(),
+                releaseTrackToWorkRelationship.Description.AsDbValue(),
+                releaseTrackToWorkRelationship.Order.AsDbValue(),
+                releaseTrackToWorkRelationship.ReferenceOrder.AsDbValue());
+        }
+
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -1259,6 +1366,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackComposers), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackComposer]", Value = releaseTrackComposersDataTable },
             new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackGenres), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackGenre]", Value = releaseTrackGenresDataTable },
             new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackToProductRelationship]", Value = releaseTrackToProductRelationshipsDataTable },
+            new SqlParameter(nameof(ReleaseTrackDto.ReleaseTrackToWorkRelationships), SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackToWorkRelationship]", Value = releaseTrackToWorkRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -1291,6 +1399,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseTrackDto.ReleaseTrackComposers)},
                 @{nameof(ReleaseTrackDto.ReleaseTrackGenres)},
                 @{nameof(ReleaseTrackDto.ReleaseTrackToProductRelationships)},
+                @{nameof(ReleaseTrackDto.ReleaseTrackToWorkRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -1460,6 +1569,62 @@ public class SqlServerReleaseRepository : IReleaseRepository
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateReleaseTrackToWorkRelationshipsOrderAsync(ReleaseTrackToWorkRelationshipDto[] releaseTrackToWorkRelationships, bool useReferenceOrder)
+    {
+        using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
+
+        var i = 0;
+        foreach (ReleaseTrackToWorkRelationshipDto releaseTrackToWorkRelationship in releaseTrackToWorkRelationships)
+        {
+            if (!useReferenceOrder)
+                releaseTrackToWorkRelationship.Order = i++;
+            else
+                releaseTrackToWorkRelationship.ReferenceOrder = i++;
+        }
+
+        using var releaseTrackToWorkRelationshipsDataTable = new DataTable();
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.TrackNumber), typeof(byte));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.MediaNumber), typeof(byte));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.ReleaseId), typeof(Guid));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.WorkId), typeof(Guid));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Name), typeof(string));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Description), typeof(string));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.Order), typeof(int));
+        releaseTrackToWorkRelationshipsDataTable.Columns.Add(nameof(ReleaseTrackToWorkRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (ReleaseTrackToWorkRelationshipDto releaseTrackToWorkRelationship in releaseTrackToWorkRelationships)
+        {
+            releaseTrackToWorkRelationshipsDataTable.Rows.Add(
+                releaseTrackToWorkRelationship.TrackNumber.AsDbValue(),
+                releaseTrackToWorkRelationship.MediaNumber.AsDbValue(),
+                releaseTrackToWorkRelationship.ReleaseId.AsDbValue(),
+                releaseTrackToWorkRelationship.WorkId.AsDbValue(),
+                releaseTrackToWorkRelationship.Name.AsDbValue(),
+                releaseTrackToWorkRelationship.Description.AsDbValue(),
+                releaseTrackToWorkRelationship.Order.AsDbValue(),
+                releaseTrackToWorkRelationship.ReferenceOrder.AsDbValue());
+        }
+
+        SqlParameter resultRowsUpdatedParameter;
+        var parameters = new SqlParameter[]
+        {
+            new SqlParameter("UseReferenceOrder", useReferenceOrder.AsDbValue()),
+            new SqlParameter("ReleaseTrackToWorkRelationships", SqlDbType.Structured) { TypeName = "[dbo].[ReleaseTrackToWorkRelationship]", Value = releaseTrackToWorkRelationshipsDataTable },
+            resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
+        };
+
+        var query = @$"
+            EXEC [dbo].[sp_UpdateReleaseTrackToWorkRelationshipsOrder]
+                @UseReferenceOrder,
+                @ReleaseTrackToWorkRelationships,
+                @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
+
+        await context.Database.ExecuteSqlRawAsync(query, parameters);
+
+        var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
+        return rowsUpdated > 0;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> DeleteReleaseAsync(Guid releaseId)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
@@ -1584,6 +1749,13 @@ public class SqlServerReleaseRepository : IReleaseRepository
     {
         releaseTrack.ReleaseTrackGenres = releaseTrack.ReleaseTrackGenres
             .OrderBy(releaseTrackGenre => releaseTrackGenre.Order)
+            .ToList();
+    }
+
+    private static void OrderReleaseTrackToWorkRelationships(ReleaseTrackDto releaseTrack)
+    {
+        releaseTrack.ReleaseTrackToWorkRelationships = releaseTrack.ReleaseTrackToWorkRelationships
+            .OrderBy(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Order)
             .ToList();
     }
 
@@ -1752,6 +1924,18 @@ public class SqlServerReleaseRepository : IReleaseRepository
             releaseTrackToProductRelationship.MediaNumber = mediaNumber;
             releaseTrackToProductRelationship.ReleaseId = releaseId;
             releaseTrackToProductRelationship.Order = i++;
+        }
+    }
+
+    private static void SetReleaseTrackToWorkRelationshipOrders(byte trackNumber, byte mediaNumber, Guid releaseId, IEnumerable<ReleaseTrackToWorkRelationshipDto> releaseTrackToWorkRelationships)
+    {
+        var i = 0;
+        foreach (ReleaseTrackToWorkRelationshipDto releaseTrackToWorkRelationship in releaseTrackToWorkRelationships)
+        {
+            releaseTrackToWorkRelationship.TrackNumber = trackNumber;
+            releaseTrackToWorkRelationship.MediaNumber = mediaNumber;
+            releaseTrackToWorkRelationship.ReleaseId = releaseId;
+            releaseTrackToWorkRelationship.Order = i++;
         }
     }
 }

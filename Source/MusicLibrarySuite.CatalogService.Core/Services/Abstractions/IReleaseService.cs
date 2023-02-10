@@ -122,6 +122,26 @@ public interface IReleaseService
     public Task<ReleaseTrackToProductRelationship[]> GetReleaseTrackToProductRelationshipsByProductAsync(Guid productId);
 
     /// <summary>
+    /// Asynchronously gets all release-track-to-work relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-track-to-work relationships.
+    /// </returns>
+    public Task<ReleaseTrackToWorkRelationship[]> GetReleaseTrackToWorkRelationshipsAsync(Guid releaseId);
+
+    /// <summary>
+    /// Asynchronously gets all release-track-to-work relationships by a work's unique identifier.
+    /// </summary>
+    /// <param name="workId">The work's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-track-to-work relationships.
+    /// </returns>
+    public Task<ReleaseTrackToWorkRelationship[]> GetReleaseTrackToWorkRelationshipsByWorkAsync(Guid workId);
+
+    /// <summary>
     /// Asynchronously creates a new release.
     /// </summary>
     /// <param name="release">The release to create.</param>
@@ -173,6 +193,17 @@ public interface IReleaseService
     /// The task's result will be a value indicating whether any release-track-to-product relationship was found and updated.
     /// </returns>
     public Task<bool> UpdateReleaseTrackToProductRelationshipsOrderAsync(ReleaseTrackToProductRelationship[] releaseTrackToProductRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
+    /// Asynchronously updates order of existing release-track-to-work relationships.
+    /// </summary>
+    /// <param name="releaseTrackToWorkRelationships">A collection of release-track-to-work relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any release-track-to-work relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateReleaseTrackToWorkRelationshipsOrderAsync(ReleaseTrackToWorkRelationship[] releaseTrackToWorkRelationships, bool useReferenceOrder = false);
 
     /// <summary>
     /// Asynchronously deletes an existing release.
