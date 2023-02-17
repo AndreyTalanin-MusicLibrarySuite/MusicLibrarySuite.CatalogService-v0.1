@@ -1,3 +1,15 @@
+// ================================================================================
+// Genre
+//
+// Tables:
+//     dbo.Genre - Entity
+//     dbo.GenreRelationship - Relationship, Named, One-Directional Ordering
+//
+// References:
+//     FK_GenreRelationship_Genre_GenreId
+//     FK_GenreRelationship_Genre_DependentGenreId
+// ================================================================================
+
 Table "dbo"."Genre" {
     "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
     "Name" nvarchar(256) [not null]
@@ -30,6 +42,21 @@ Ref "FK_GenreRelationship_Genre_DependentGenreId" {
     "dbo"."GenreRelationship"."DependentGenreId" > "dbo"."Genre"."Id"
 }
 
+
+// ================================================================================
+// Artist
+//
+// Tables:
+//     dbo.Artist - Entity
+//     dbo.ArtistRelationship - Relationship, Named, One-Directional Ordering
+//     dbo.ArtistGenre - Relationship, One-Directional Ordering
+//
+// References:
+//     FK_ArtistRelationship_Artist_ArtistId
+//     FK_ArtistRelationship_Artist_DependentArtistId
+//     FK_ArtistGenre_Artist_ArtistId
+//     FK_ArtistGenre_Genre_GenreId
+// ================================================================================
 
 Table "dbo"."Artist" {
     "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
@@ -85,6 +112,18 @@ Ref "FK_ArtistGenre_Genre_GenreId" {
 }
 
 
+// ================================================================================
+// Product
+//
+// Tables:
+//     dbo.Product - Entity
+//     dbo.ProductRelationship - Relationship, Named, One-Directional Ordering
+//
+// References:
+//     FK_ProductRelationship_Product_ProductId
+//     FK_ProductRelationship_Product_DependentProductId
+// ================================================================================
+
 Table "dbo"."Product" {
     "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
     "Title" nvarchar(256) [not null]
@@ -120,6 +159,36 @@ Ref "FK_ProductRelationship_Product_DependentProductId" {
     "dbo"."ProductRelationship"."DependentProductId" > "dbo"."Product"."Id"
 }
 
+
+// ================================================================================
+// Work
+//
+// Tables:
+//     dbo.Work - Entity
+//     dbo.WorkRelationship - Relationship, Named, One-Directional Ordering
+//     dbo.WorkArtist - Relationship, One-Directional Ordering
+//     dbo.WorkFeaturedArtist - Relationship, One-Directional Ordering
+//     dbo.WorkPerformer - Relationship, One-Directional Ordering
+//     dbo.WorkComposer - Relationship, One-Directional Ordering
+//     dbo.WorkGenre - Relationship, One-Directional Ordering
+//     dbo.WorkToProductRelationship - Relationship, Named, Two-Directional Ordering
+//
+// References:
+//     FK_WorkRelationship_Work_WorkId
+//     FK_WorkRelationship_Work_DependentWorkId
+//     FK_WorkArtist_Work_WorkId
+//     FK_WorkArtist_Artist_ArtistId
+//     FK_WorkFeaturedArtist_Work_WorkId
+//     FK_WorkFeaturedArtist_Artist_ArtistId
+//     FK_WorkPerformer_Work_WorkId
+//     FK_WorkPerformer_Artist_ArtistId
+//     FK_WorkComposer_Work_WorkId
+//     FK_WorkComposer_Artist_ArtistId
+//     FK_WorkGenre_Work_WorkId
+//     FK_WorkGenre_Genre_GenreId
+//     FK_WorkToProductRelationship_Work_WorkId
+//     FK_WorkToProductRelationship_Product_ProductId
+// ================================================================================
 
 Table "dbo"."Work" {
     "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
@@ -286,6 +355,18 @@ Ref "FK_WorkToProductRelationship_Product_ProductId" {
 }
 
 
+// ================================================================================
+// ReleaseGroup
+//
+// Tables:
+//     dbo.ReleaseGroup - Entity
+//     dbo.ReleaseGroupRelationship - Relationship, Named, One-Directional Ordering
+//
+// References:
+//     FK_ReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId
+//     FK_ReleaseGroupRelationship_ReleaseGroup_DependentReleaseGroupId
+// ================================================================================
+
 Table "dbo"."ReleaseGroup" {
     "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
     "Title" nvarchar(256) [not null]
@@ -318,6 +399,39 @@ Ref "FK_ReleaseGroupRelationship_ReleaseGroup_DependentReleaseGroupId" {
     "dbo"."ReleaseGroupRelationship"."DependentReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
 }
 
+
+// ================================================================================
+// Release
+//
+// Tables:
+//     dbo.Release - Entity
+//     dbo.ReleaseRelationship - Relationship, Named, One-Directional Ordering
+//     dbo.ReleaseArtist - Relationship, One-Directional Ordering
+//     dbo.ReleaseFeaturedArtist - Relationship, One-Directional Ordering
+//     dbo.ReleasePerformer - Relationship, One-Directional Ordering
+//     dbo.ReleaseComposer - Relationship, One-Directional Ordering
+//     dbo.ReleaseGenre - Relationship, One-Directional Ordering
+//     dbo.ReleaseToProductRelationship - Relationship, Named, Two-Directional Ordering
+//     dbo.ReleaseToReleaseGroupRelationship - Relationship, Named, Two-Directional Ordering
+//
+// References:
+//     FK_ReleaseRelationship_Release_ReleaseId
+//     FK_ReleaseRelationship_Release_DependentReleaseId
+//     FK_ReleaseArtist_Release_ReleaseId
+//     FK_ReleaseArtist_Artist_ArtistId
+//     FK_ReleaseFeaturedArtist_Release_ReleaseId
+//     FK_ReleaseFeaturedArtist_Artist_ArtistId
+//     FK_ReleasePerformer_Release_ReleaseId
+//     FK_ReleasePerformer_Artist_ArtistId
+//     FK_ReleaseComposer_Release_ReleaseId
+//     FK_ReleaseComposer_Artist_ArtistId
+//     FK_ReleaseGenre_Release_ReleaseId
+//     FK_ReleaseGenre_Genre_GenreId
+//     FK_ReleaseToProductRelationship_Release_ReleaseId
+//     FK_ReleaseToProductRelationship_Product_ProductId
+//     FK_ReleaseToReleaseGroupRelationship_Release_ReleaseId
+//     FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId
+// ================================================================================
 
 Table "dbo"."Release" {
     "Id" uniqueidentifier [primary key, not null, default: `NEWID()`]
@@ -507,6 +621,19 @@ Ref "FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId" {
 }
 
 
+// ================================================================================
+// ReleaseMedia
+//
+// Tables:
+//     dbo.ReleaseMedia - Entity
+//     dbo.ReleaseMediaToProductRelationship - Relationship, Named, Two-Directional Ordering
+//
+// References:
+//     FK_ReleaseMedia_Release_ReleaseId
+//     FK_ReleaseMediaToProductRelationship_ReleaseMedia_MediaNumber_ReleaseId
+//     FK_ReleaseMediaToProductRelationship_Product_ProductId
+// ================================================================================
+
 Table "dbo"."ReleaseMedia" {
     "MediaNumber" tinyint [primary key, not null]
     "ReleaseId" uniqueidentifier [primary key, not null]
@@ -545,7 +672,7 @@ Table "dbo"."ReleaseMediaToProductRelationship" {
     }
 }
 
-Ref "FK_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId" {
+Ref "FK_ReleaseMediaToProductRelationship_ReleaseMedia_MediaNumber_ReleaseId" {
     "dbo"."ReleaseMediaToProductRelationship".("MediaNumber", "ReleaseId") > "dbo"."ReleaseMedia".("MediaNumber", "ReleaseId")
 }
 
@@ -553,6 +680,37 @@ Ref "FK_ReleaseMediaToProductRelationship_Product_ProductId" {
     "dbo"."ReleaseMediaToProductRelationship"."ProductId" > "dbo"."Product"."Id"
 }
 
+
+// ================================================================================
+// ReleaseTrack
+//
+// Tables:
+//     dbo.ReleaseTrack - Entity
+//     dbo.ReleaseTrackArtist - Relationship, One-Directional Ordering
+//     dbo.ReleaseTrackFeaturedArtist - Relationship, One-Directional Ordering
+//     dbo.ReleaseTrackPerformer - Relationship, One-Directional Ordering
+//     dbo.ReleaseTrackComposer - Relationship, One-Directional Ordering
+//     dbo.ReleaseTrackGenre - Relationship, One-Directional Ordering
+//     dbo.ReleaseTrackToProductRelationship - Relationship, Named, Two-Directional Ordering
+//     dbo.ReleaseTrackToWorkRelationship - Relationship, Named, Two-Directional Ordering
+//
+// References:
+//     FK_ReleaseTrack_ReleaseMedia_MediaNumber_ReleaseId
+//     FK_ReleaseTrackArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackArtist_Artist_ArtistId
+//     FK_ReleaseTrackFeaturedArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackFeaturedArtist_Artist_ArtistId
+//     FK_ReleaseTrackPerformer_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackPerformer_Artist_ArtistId
+//     FK_ReleaseTrackComposer_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackComposer_Artist_ArtistId
+//     FK_ReleaseTrackGenre_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackGenre_Genre_GenreId
+//     FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackToProductRelationship_Product_ProductId
+//     FK_ReleaseTrackToWorkRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackToWorkRelationship_Work_WorkId
+// ================================================================================
 
 Table "dbo"."ReleaseTrack" {
     "TrackNumber" tinyint [primary key, not null]
