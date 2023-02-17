@@ -390,17 +390,17 @@ public class SqlServerReleaseRepository : IReleaseRepository
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ReleaseDto>> GetReleasesAsync(ReleaseRequestDto releaseRequest)
+    public async Task<PageResponseDto<ReleaseDto>> GetReleasesAsync(ReleasePageRequestDto releasePageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         IQueryable<ReleaseDto> baseCollection = context.Releases.AsNoTracking();
 
-        if (releaseRequest.Title is not null)
-            baseCollection = baseCollection.Where(release => release.Title.Contains(releaseRequest.Title));
+        if (releasePageRequest.Title is not null)
+            baseCollection = baseCollection.Where(release => release.Title.Contains(releasePageRequest.Title));
 
-        if (releaseRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(release => release.Enabled == (bool)releaseRequest.Enabled);
+        if (releasePageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(release => release.Enabled == (bool)releasePageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ReleaseDto> releases = await baseCollection
@@ -450,8 +450,8 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
             .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
             .OrderBy(release => release.Title)
-            .Skip(releaseRequest.PageSize * releaseRequest.PageIndex)
-            .Take(releaseRequest.PageSize)
+            .Skip(releasePageRequest.PageSize * releasePageRequest.PageIndex)
+            .Take(releasePageRequest.PageSize)
             .ToListAsync();
 
         foreach (ReleaseDto release in releases)
@@ -486,8 +486,8 @@ public class SqlServerReleaseRepository : IReleaseRepository
 
         return new PageResponseDto<ReleaseDto>()
         {
-            PageSize = releaseRequest.PageSize,
-            PageIndex = releaseRequest.PageIndex,
+            PageSize = releasePageRequest.PageSize,
+            PageIndex = releasePageRequest.PageIndex,
             TotalCount = totalCount,
             Items = releases,
         };

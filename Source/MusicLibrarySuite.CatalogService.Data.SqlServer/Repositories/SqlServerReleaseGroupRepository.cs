@@ -118,25 +118,25 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupRequestDto releaseGroupRequest)
+    public async Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupPageRequestDto releaseGroupPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         IQueryable<ReleaseGroupDto> baseCollection = context.ReleaseGroups.AsNoTracking();
 
-        if (releaseGroupRequest.Title is not null)
-            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Title.Contains(releaseGroupRequest.Title));
+        if (releaseGroupPageRequest.Title is not null)
+            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Title.Contains(releaseGroupPageRequest.Title));
 
-        if (releaseGroupRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Enabled == (bool)releaseGroupRequest.Enabled);
+        if (releaseGroupPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Enabled == (bool)releaseGroupPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ReleaseGroupDto> releaseGroups = await baseCollection
             .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
             .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .OrderBy(releaseGroup => releaseGroup.Title)
-            .Skip(releaseGroupRequest.PageSize * releaseGroupRequest.PageIndex)
-            .Take(releaseGroupRequest.PageSize)
+            .Skip(releaseGroupPageRequest.PageSize * releaseGroupPageRequest.PageIndex)
+            .Take(releaseGroupPageRequest.PageSize)
             .ToListAsync();
 
         foreach (ReleaseGroupDto releaseGroup in releaseGroups)
@@ -146,8 +146,8 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 
         return new PageResponseDto<ReleaseGroupDto>()
         {
-            PageSize = releaseGroupRequest.PageSize,
-            PageIndex = releaseGroupRequest.PageIndex,
+            PageSize = releaseGroupPageRequest.PageSize,
+            PageIndex = releaseGroupPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = releaseGroups,
         };

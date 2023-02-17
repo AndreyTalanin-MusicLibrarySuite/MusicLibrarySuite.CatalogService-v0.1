@@ -130,17 +130,17 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistRequestDto artistRequest)
+    public async Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistPageRequestDto artistPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         IQueryable<ArtistDto> baseCollection = context.Artists.AsNoTracking();
 
-        if (artistRequest.Name is not null)
-            baseCollection = baseCollection.Where(artist => artist.Name.Contains(artistRequest.Name));
+        if (artistPageRequest.Name is not null)
+            baseCollection = baseCollection.Where(artist => artist.Name.Contains(artistPageRequest.Name));
 
-        if (artistRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(artist => artist.Enabled == (bool)artistRequest.Enabled);
+        if (artistPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(artist => artist.Enabled == (bool)artistPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ArtistDto> artists = await baseCollection
@@ -150,8 +150,8 @@ public class SqlServerArtistRepository : IArtistRepository
             .ThenInclude(artistGenre => artistGenre.Genre)
             .OrderByDescending(artist => artist.SystemEntity)
             .ThenBy(artist => artist.Name)
-            .Skip(artistRequest.PageSize * artistRequest.PageIndex)
-            .Take(artistRequest.PageSize)
+            .Skip(artistPageRequest.PageSize * artistPageRequest.PageIndex)
+            .Take(artistPageRequest.PageSize)
             .ToListAsync();
 
         foreach (ArtistDto artist in artists)
@@ -162,8 +162,8 @@ public class SqlServerArtistRepository : IArtistRepository
 
         return new PageResponseDto<ArtistDto>()
         {
-            PageSize = artistRequest.PageSize,
-            PageIndex = artistRequest.PageIndex,
+            PageSize = artistPageRequest.PageSize,
+            PageIndex = artistPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = artists,
         };

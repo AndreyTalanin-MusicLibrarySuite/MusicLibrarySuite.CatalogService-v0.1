@@ -97,7 +97,7 @@ public class GenreController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<GenrePageResponse>> GetPagedGenresAsync([Required][FromQuery] int pageSize, [Required][FromQuery] int pageIndex, [FromQuery] string? name, [FromQuery] bool? enabled)
     {
-        var genreRequest = new GenreRequest()
+        var genreRequest = new GenrePageRequest()
         {
             PageSize = pageSize,
             PageIndex = pageIndex,

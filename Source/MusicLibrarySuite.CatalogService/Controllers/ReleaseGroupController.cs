@@ -97,7 +97,7 @@ public class ReleaseGroupController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ReleaseGroupPageResponse>> GetPagedReleaseGroupsAsync([Required][FromQuery] int pageSize, [Required][FromQuery] int pageIndex, [FromQuery] string? title, [FromQuery] bool? enabled)
     {
-        var releaseGroupRequest = new ReleaseGroupRequest()
+        var releaseGroupRequest = new ReleaseGroupPageRequest()
         {
             PageSize = pageSize,
             PageIndex = pageIndex,

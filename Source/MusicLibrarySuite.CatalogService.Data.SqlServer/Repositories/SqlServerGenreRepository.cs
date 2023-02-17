@@ -118,17 +118,17 @@ public class SqlServerGenreRepository : IGenreRepository
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<GenreDto>> GetGenresAsync(GenreRequestDto genreRequest)
+    public async Task<PageResponseDto<GenreDto>> GetGenresAsync(GenrePageRequestDto genrePageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         IQueryable<GenreDto> baseCollection = context.Genres.AsNoTracking();
 
-        if (genreRequest.Name is not null)
-            baseCollection = baseCollection.Where(genre => genre.Name.Contains(genreRequest.Name));
+        if (genrePageRequest.Name is not null)
+            baseCollection = baseCollection.Where(genre => genre.Name.Contains(genrePageRequest.Name));
 
-        if (genreRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(genre => genre.Enabled == (bool)genreRequest.Enabled);
+        if (genrePageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(genre => genre.Enabled == (bool)genrePageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<GenreDto> genres = await baseCollection
@@ -136,8 +136,8 @@ public class SqlServerGenreRepository : IGenreRepository
             .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .OrderByDescending(genre => genre.SystemEntity)
             .ThenBy(genre => genre.Name)
-            .Skip(genreRequest.PageSize * genreRequest.PageIndex)
-            .Take(genreRequest.PageSize)
+            .Skip(genrePageRequest.PageSize * genrePageRequest.PageIndex)
+            .Take(genrePageRequest.PageSize)
             .ToListAsync();
 
         foreach (GenreDto genre in genres)
@@ -147,8 +147,8 @@ public class SqlServerGenreRepository : IGenreRepository
 
         return new PageResponseDto<GenreDto>()
         {
-            PageSize = genreRequest.PageSize,
-            PageIndex = genreRequest.PageIndex,
+            PageSize = genrePageRequest.PageSize,
+            PageIndex = genrePageRequest.PageIndex,
             TotalCount = totalCount,
             Items = genres,
         };

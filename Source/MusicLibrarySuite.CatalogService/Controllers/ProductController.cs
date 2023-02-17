@@ -97,7 +97,7 @@ public class ProductController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ProductPageResponse>> GetPagedProductsAsync([Required][FromQuery] int pageSize, [Required][FromQuery] int pageIndex, [FromQuery] string? title, [FromQuery] bool? enabled)
     {
-        var productRequest = new ProductRequest()
+        var productRequest = new ProductPageRequest()
         {
             PageSize = pageSize,
             PageIndex = pageIndex,

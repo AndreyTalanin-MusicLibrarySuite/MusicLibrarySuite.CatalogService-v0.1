@@ -56,15 +56,15 @@ public class ReleaseGroupService : IReleaseGroupService
     }
 
     /// <inheritdoc />
-    public async Task<ReleaseGroupPageResponse> GetReleaseGroupsAsync(ReleaseGroupRequest releaseGroupRequest)
+    public async Task<ReleaseGroupPageResponse> GetReleaseGroupsAsync(ReleaseGroupPageRequest releaseGroupPageRequest)
     {
-        ReleaseGroupRequestDto releaseGroupRequestDto = m_mapper.Map<ReleaseGroupRequestDto>(releaseGroupRequest);
-        PageResponseDto<ReleaseGroupDto> pageResponseDto = await m_releaseGroupRepository.GetReleaseGroupsAsync(releaseGroupRequestDto);
-        ReleaseGroupPageResponse pageResponse = m_mapper.Map<ReleaseGroupPageResponse>(pageResponseDto);
+        ReleaseGroupPageRequestDto releaseGroupPageRequestDto = m_mapper.Map<ReleaseGroupPageRequestDto>(releaseGroupPageRequest);
+        PageResponseDto<ReleaseGroupDto> releaseGroupPageResponseDto = await m_releaseGroupRepository.GetReleaseGroupsAsync(releaseGroupPageRequestDto);
+        ReleaseGroupPageResponse releaseGroupPageResponse = m_mapper.Map<ReleaseGroupPageResponse>(releaseGroupPageResponseDto);
 
-        pageResponse.CompletedOn = DateTimeOffset.Now;
+        releaseGroupPageResponse.CompletedOn = DateTimeOffset.Now;
 
-        return pageResponse;
+        return releaseGroupPageResponse;
     }
 
     /// <inheritdoc />

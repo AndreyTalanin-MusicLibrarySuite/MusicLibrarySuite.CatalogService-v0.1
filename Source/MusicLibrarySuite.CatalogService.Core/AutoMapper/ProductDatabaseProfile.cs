@@ -22,7 +22,7 @@ public class ProductDatabaseProfile : Profile
 
         CreateMap<Product, ProductDto>().ReverseMap();
         CreateMap<ProductRelationship, ProductRelationshipDto>().ReverseMap();
-        CreateMap<ProductRequest, ProductRequestDto>().ReverseMap();
+        CreateMap<ProductPageRequest, ProductPageRequestDto>().ReverseMap();
         CreateMap<ProductPageResponse, PageResponseDto<ProductDto>>().ReverseMap();
         CreateMap<PageResponse<Product>, PageResponseDto<ProductDto>>().ReverseMap();
     }

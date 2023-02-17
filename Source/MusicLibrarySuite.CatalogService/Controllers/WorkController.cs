@@ -97,7 +97,7 @@ public class WorkController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<WorkPageResponse>> GetPagedWorksAsync([Required][FromQuery] int pageSize, [Required][FromQuery] int pageIndex, [FromQuery] string? title, [FromQuery] bool? enabled)
     {
-        var workRequest = new WorkRequest()
+        var workRequest = new WorkPageRequest()
         {
             PageSize = pageSize,
             PageIndex = pageIndex,

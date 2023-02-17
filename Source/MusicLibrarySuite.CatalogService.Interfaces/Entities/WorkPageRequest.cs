@@ -5,7 +5,7 @@ namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 /// <summary>
 /// Represents a work page request.
 /// </summary>
-public class WorkRequest : PageRequest
+public class WorkPageRequest : PageRequest
 {
     /// <summary>
     /// Gets or sets a filter value for the <see cref="Work.Title" /> property.

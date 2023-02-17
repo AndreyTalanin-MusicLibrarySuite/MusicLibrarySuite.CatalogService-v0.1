@@ -43,12 +43,12 @@ public interface IReleaseService
     /// <summary>
     /// Asynchronously gets releases by a release page request.
     /// </summary>
-    /// <param name="releaseRequest">The release page request configuration.</param>
+    /// <param name="releasePageRequest">The release page request configuration.</param>
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// The task's result will be an array containing all releases corresponding to the request configuration.
     /// </returns>
-    public Task<ReleasePageResponse> GetReleasesAsync(ReleaseRequest releaseRequest);
+    public Task<ReleasePageResponse> GetReleasesAsync(ReleasePageRequest releasePageRequest);
 
     /// <summary>
     /// Asynchronously gets all release relationships by a release's unique identifier.

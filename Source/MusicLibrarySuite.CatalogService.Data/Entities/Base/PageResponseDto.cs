@@ -4,7 +4,7 @@ using System.Linq;
 namespace MusicLibrarySuite.CatalogService.Data.Entities.Base;
 
 /// <summary>
-/// Represents a data-transfer object for a generic page response.
+/// Represents a data transfer object for a generic page response.
 /// </summary>
 /// <typeparam name="T">The entitiy type.</typeparam>
 public class PageResponseDto<T>

@@ -3,17 +3,17 @@ using MusicLibrarySuite.CatalogService.Interfaces.Entities.Base;
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
 /// <summary>
-/// Represents a product page request.
+/// Represents a release group page request.
 /// </summary>
-public class ProductRequest : PageRequest
+public class ReleaseGroupPageRequest : PageRequest
 {
     /// <summary>
-    /// Gets or sets a filter value for the <see cref="Product.Title" /> property.
+    /// Gets or sets a filter value for the <see cref="ReleaseGroup.Title" /> property.
     /// </summary>
     public string? Title { get; set; }
 
     /// <summary>
-    /// Gets or sets a filter value for the <see cref="Product.Enabled" /> property.
+    /// Gets or sets a filter value for the <see cref="ReleaseGroup.Enabled" /> property.
     /// </summary>
     public bool? Enabled { get; set; }
 }

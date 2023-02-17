@@ -22,7 +22,7 @@ public class ReleaseGroupDatabaseProfile : Profile
 
         CreateMap<ReleaseGroup, ReleaseGroupDto>().ReverseMap();
         CreateMap<ReleaseGroupRelationship, ReleaseGroupRelationshipDto>().ReverseMap();
-        CreateMap<ReleaseGroupRequest, ReleaseGroupRequestDto>().ReverseMap();
+        CreateMap<ReleaseGroupPageRequest, ReleaseGroupPageRequestDto>().ReverseMap();
         CreateMap<ReleaseGroupPageResponse, PageResponseDto<ReleaseGroupDto>>().ReverseMap();
         CreateMap<PageResponse<ReleaseGroup>, PageResponseDto<ReleaseGroupDto>>().ReverseMap();
     }

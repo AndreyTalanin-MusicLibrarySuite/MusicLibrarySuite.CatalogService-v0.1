@@ -7,7 +7,7 @@ using System.Linq;
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
 /// <summary>
-/// Represents a database model and a data-transfer object for a genre.
+/// Represents a database model and a data transfer object for a genre.
 /// </summary>
 public class GenreDto
 {

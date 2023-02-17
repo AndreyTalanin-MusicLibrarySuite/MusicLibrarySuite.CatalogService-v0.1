@@ -190,17 +190,17 @@ public class SqlServerWorkRepository : IWorkRepository
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkRequestDto workRequest)
+    public async Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkPageRequestDto workPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         IQueryable<WorkDto> baseCollection = context.Works.AsNoTracking();
 
-        if (workRequest.Title is not null)
-            baseCollection = baseCollection.Where(work => work.Title.Contains(workRequest.Title));
+        if (workPageRequest.Title is not null)
+            baseCollection = baseCollection.Where(work => work.Title.Contains(workPageRequest.Title));
 
-        if (workRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(work => work.Enabled == (bool)workRequest.Enabled);
+        if (workPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(work => work.Enabled == (bool)workPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<WorkDto> works = await baseCollection
@@ -220,8 +220,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .OrderByDescending(work => work.SystemEntity)
             .ThenBy(work => work.Title)
-            .Skip(workRequest.PageSize * workRequest.PageIndex)
-            .Take(workRequest.PageSize)
+            .Skip(workPageRequest.PageSize * workPageRequest.PageIndex)
+            .Take(workPageRequest.PageSize)
             .ToListAsync();
 
         foreach (WorkDto work in works)
@@ -237,8 +237,8 @@ public class SqlServerWorkRepository : IWorkRepository
 
         return new PageResponseDto<WorkDto>()
         {
-            PageSize = workRequest.PageSize,
-            PageIndex = workRequest.PageIndex,
+            PageSize = workPageRequest.PageSize,
+            PageIndex = workPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = works,
         };

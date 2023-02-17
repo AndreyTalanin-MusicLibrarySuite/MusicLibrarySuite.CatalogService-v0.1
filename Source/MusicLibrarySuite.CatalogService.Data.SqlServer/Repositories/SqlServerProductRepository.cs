@@ -118,17 +118,17 @@ public class SqlServerProductRepository : IProductRepository
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ProductDto>> GetProductsAsync(ProductRequestDto productRequest)
+    public async Task<PageResponseDto<ProductDto>> GetProductsAsync(ProductPageRequestDto productPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         IQueryable<ProductDto> baseCollection = context.Products.AsNoTracking();
 
-        if (productRequest.Title is not null)
-            baseCollection = baseCollection.Where(product => product.Title.Contains(productRequest.Title));
+        if (productPageRequest.Title is not null)
+            baseCollection = baseCollection.Where(product => product.Title.Contains(productPageRequest.Title));
 
-        if (productRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(product => product.Enabled == (bool)productRequest.Enabled);
+        if (productPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(product => product.Enabled == (bool)productPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ProductDto> products = await baseCollection
@@ -136,8 +136,8 @@ public class SqlServerProductRepository : IProductRepository
             .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .OrderByDescending(product => product.SystemEntity)
             .ThenBy(product => product.Title)
-            .Skip(productRequest.PageSize * productRequest.PageIndex)
-            .Take(productRequest.PageSize)
+            .Skip(productPageRequest.PageSize * productPageRequest.PageIndex)
+            .Take(productPageRequest.PageSize)
             .ToListAsync();
 
         foreach (ProductDto product in products)
@@ -147,8 +147,8 @@ public class SqlServerProductRepository : IProductRepository
 
         return new PageResponseDto<ProductDto>()
         {
-            PageSize = productRequest.PageSize,
-            PageIndex = productRequest.PageIndex,
+            PageSize = productPageRequest.PageSize,
+            PageIndex = productPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = products,
         };

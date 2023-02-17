@@ -7,7 +7,7 @@ using System.Linq;
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
 /// <summary>
-/// Represents a database model and a data-transfer object for a work.
+/// Represents a database model and a data transfer object for a work.
 /// </summary>
 public class WorkDto
 {
