@@ -6,7 +6,7 @@ using MusicLibrarySuite.CatalogService.Data.Entities;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the catalog service database context.
+/// Represents a SQL-Server-specific implementation of the catalog service database context.
 /// </summary>
 public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
 {
@@ -128,6 +128,64 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ReleaseRelationshipDto>().HasCheckConstraint("CK_ReleaseRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().ToTable("ReleaseToProductRelationship", "dbo");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ProductId });
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleaseToProductRelationships)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseToProductRelationship_ReleaseId");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ReleaseToProductRelationship_ProductId");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseToProductRelationship_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().ToTable("ReleaseToReleaseGroupRelationship", "dbo");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ReleaseGroupId });
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasOne(entity => entity.Release)
+            .WithMany(entity => entity.ReleaseToReleaseGroupRelationships)
+            .HasForeignKey(entity => entity.ReleaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasOne(entity => entity.ReleaseGroup)
+            .WithMany()
+            .HasForeignKey(entity => entity.ReleaseGroupId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseId)
+            .HasDatabaseName("IX_ReleaseToReleaseGroupRelationship_ReleaseId");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => entity.ReleaseGroupId)
+            .HasDatabaseName("IX_ReleaseToReleaseGroupRelationship_ReleaseGroupId");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseToReleaseGroupRelationship_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
+            .HasIndex(entity => new { entity.ReleaseGroupId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseToReleaseGroupRelationship_ReleaseGroupId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<ReleaseArtistDto>().ToTable("ReleaseArtist", "dbo");
         modelBuilder.Entity<ReleaseArtistDto>().HasKey(entity => new { entity.ReleaseId, entity.ArtistId });
         modelBuilder.Entity<ReleaseArtistDto>()
@@ -243,64 +301,6 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasDatabaseName("UIX_ReleaseGenre_ReleaseId_Order")
             .IsUnique();
 
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>().ToTable("ReleaseToProductRelationship", "dbo");
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ProductId });
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
-            .HasOne(entity => entity.Release)
-            .WithMany(entity => entity.ReleaseToProductRelationships)
-            .HasForeignKey(entity => entity.ReleaseId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
-            .HasOne(entity => entity.Product)
-            .WithMany()
-            .HasForeignKey(entity => entity.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
-            .HasIndex(entity => entity.ReleaseId)
-            .HasDatabaseName("IX_ReleaseToProductRelationship_ReleaseId");
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
-            .HasIndex(entity => entity.ProductId)
-            .HasDatabaseName("IX_ReleaseToProductRelationship_ProductId");
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
-            .HasDatabaseName("UIX_ReleaseToProductRelationship_ReleaseId_Order")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
-            .HasDatabaseName("UIX_ReleaseToProductRelationship_ProductId_ReferenceOrder")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<ReleaseToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().ToTable("ReleaseToReleaseGroupRelationship", "dbo");
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasKey(entity => new { entity.ReleaseId, entity.ReleaseGroupId });
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasOne(entity => entity.Release)
-            .WithMany(entity => entity.ReleaseToReleaseGroupRelationships)
-            .HasForeignKey(entity => entity.ReleaseId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasOne(entity => entity.ReleaseGroup)
-            .WithMany()
-            .HasForeignKey(entity => entity.ReleaseGroupId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasIndex(entity => entity.ReleaseId)
-            .HasDatabaseName("IX_ReleaseToReleaseGroupRelationship_ReleaseId");
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasIndex(entity => entity.ReleaseGroupId)
-            .HasDatabaseName("IX_ReleaseToReleaseGroupRelationship_ReleaseGroupId");
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasIndex(entity => new { entity.ReleaseId, entity.Order })
-            .HasDatabaseName("UIX_ReleaseToReleaseGroupRelationship_ReleaseId_Order")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>()
-            .HasIndex(entity => new { entity.ReleaseGroupId, entity.ReferenceOrder })
-            .HasDatabaseName("UIX_ReleaseToReleaseGroupRelationship_ReleaseGroupId_ReferenceOrder")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<ReleaseToReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
         modelBuilder.Entity<ReleaseMediaDto>().ToTable("ReleaseMedia", "dbo");
         modelBuilder.Entity<ReleaseMediaDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseMediaDto>()
@@ -377,6 +377,64 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
         modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
         modelBuilder.Entity<ReleaseTrackDto>().HasCheckConstraint("CK_ReleaseTrack_InternationalStandardRecordingCode", "[InternationalStandardRecordingCode] IS NULL OR LEN(TRIM([InternationalStandardRecordingCode])) > 0");
+
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().ToTable("ReleaseTrackToProductRelationship", "dbo");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ProductId });
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasOne(entity => entity.ReleaseTrack)
+            .WithMany(entity => entity.ReleaseTrackToProductRelationships)
+            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ReleaseTrackToProductRelationship_ProductId");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseTrackToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().ToTable("ReleaseTrackToWorkRelationship", "dbo");
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.WorkId });
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
+            .HasOne(entity => entity.ReleaseTrack)
+            .WithMany(entity => entity.ReleaseTrackToWorkRelationships)
+            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany()
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_ReleaseTrackToWorkRelationship_WorkId");
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
+            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseTrackToWorkRelationship_WorkId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToWorkRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToWorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
         modelBuilder.Entity<ReleaseTrackArtistDto>().ToTable("ReleaseTrackArtist", "dbo");
         modelBuilder.Entity<ReleaseTrackArtistDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ArtistId });
@@ -492,64 +550,6 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
             .HasDatabaseName("UIX_ReleaseTrackGenre_TrackNumber_MediaNumber_ReleaseId_Order")
             .IsUnique();
-
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().ToTable("ReleaseTrackToProductRelationship", "dbo");
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.ProductId });
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasOne(entity => entity.ReleaseTrack)
-            .WithMany(entity => entity.ReleaseTrackToProductRelationships)
-            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasOne(entity => entity.Product)
-            .WithMany()
-            .HasForeignKey(entity => entity.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
-            .HasDatabaseName("IX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId");
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasIndex(entity => entity.ProductId)
-            .HasDatabaseName("IX_ReleaseTrackToProductRelationship_ProductId");
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
-            .HasDatabaseName("UIX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId_Order")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
-            .HasDatabaseName("UIX_ReleaseTrackToProductRelationship_ProductId_ReferenceOrder")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<ReleaseTrackToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().ToTable("ReleaseTrackToWorkRelationship", "dbo");
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.WorkId });
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
-            .HasOne(entity => entity.ReleaseTrack)
-            .WithMany(entity => entity.ReleaseTrackToWorkRelationships)
-            .HasForeignKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
-            .HasOne(entity => entity.Work)
-            .WithMany()
-            .HasForeignKey(entity => entity.WorkId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
-            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId })
-            .HasDatabaseName("IX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId");
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
-            .HasIndex(entity => entity.WorkId)
-            .HasDatabaseName("IX_ReleaseTrackToWorkRelationship_WorkId");
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
-            .HasIndex(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId, entity.Order })
-            .HasDatabaseName("UIX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId_Order")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>()
-            .HasIndex(entity => new { entity.WorkId, entity.ReferenceOrder })
-            .HasDatabaseName("UIX_ReleaseTrackToWorkRelationship_WorkId_ReferenceOrder")
-            .IsUnique();
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToWorkRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<ReleaseTrackToWorkRelationshipDto>().HasCheckConstraint("CK_ReleaseTrackToWorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
         modelBuilder.Entity<ReleaseGroupDto>().ToTable("ReleaseGroup", "dbo");
         modelBuilder.Entity<ReleaseGroupDto>().HasKey(entity => entity.Id);
@@ -684,6 +684,35 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<WorkRelationshipDto>().HasCheckConstraint("CK_WorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
+        modelBuilder.Entity<WorkToProductRelationshipDto>().ToTable("WorkToProductRelationship", "dbo");
+        modelBuilder.Entity<WorkToProductRelationshipDto>().HasKey(entity => new { entity.WorkId, entity.ProductId });
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasOne(entity => entity.Work)
+            .WithMany(entity => entity.WorkToProductRelationships)
+            .HasForeignKey(entity => entity.WorkId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => entity.WorkId)
+            .HasDatabaseName("IX_WorkToProductRelationship_WorkId");
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_WorkToProductRelationship_ProductId");
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.WorkId, entity.Order })
+            .HasDatabaseName("UIX_WorkToProductRelationship_WorkId_Order")
+            .IsUnique();
+        modelBuilder.Entity<WorkToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_WorkToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<WorkToProductRelationshipDto>().HasCheckConstraint("CK_WorkToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<WorkToProductRelationshipDto>().HasCheckConstraint("CK_WorkToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<WorkArtistDto>().ToTable("WorkArtist", "dbo");
         modelBuilder.Entity<WorkArtistDto>().HasKey(entity => new { entity.WorkId, entity.ArtistId });
         modelBuilder.Entity<WorkArtistDto>()
@@ -798,35 +827,6 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasIndex(entity => new { entity.WorkId, entity.Order })
             .HasDatabaseName("UIX_WorkGenre_WorkId_Order")
             .IsUnique();
-
-        modelBuilder.Entity<WorkToProductRelationshipDto>().ToTable("WorkToProductRelationship", "dbo");
-        modelBuilder.Entity<WorkToProductRelationshipDto>().HasKey(entity => new { entity.WorkId, entity.ProductId });
-        modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasOne(entity => entity.Work)
-            .WithMany(entity => entity.WorkToProductRelationships)
-            .HasForeignKey(entity => entity.WorkId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasOne(entity => entity.Product)
-            .WithMany()
-            .HasForeignKey(entity => entity.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasIndex(entity => entity.WorkId)
-            .HasDatabaseName("IX_WorkToProductRelationship_WorkId");
-        modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasIndex(entity => entity.ProductId)
-            .HasDatabaseName("IX_WorkToProductRelationship_ProductId");
-        modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.WorkId, entity.Order })
-            .HasDatabaseName("UIX_WorkToProductRelationship_WorkId_Order")
-            .IsUnique();
-        modelBuilder.Entity<WorkToProductRelationshipDto>()
-            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
-            .HasDatabaseName("UIX_WorkToProductRelationship_ProductId_ReferenceOrder")
-            .IsUnique();
-        modelBuilder.Entity<WorkToProductRelationshipDto>().HasCheckConstraint("CK_WorkToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<WorkToProductRelationshipDto>().HasCheckConstraint("CK_WorkToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
         base.OnModelCreating(modelBuilder);
     }

@@ -78,6 +78,13 @@ public class Work
     public ICollection<WorkRelationship> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationship>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of work-to-product relationships associated to the current work.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="WorkToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
+    [Required]
+    public ICollection<WorkToProductRelationship> WorkToProductRelationships { get; set; } = Enumerable.Empty<WorkToProductRelationship>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of work-to-artist relationships associated to the current work.
     /// </summary>
     [Required]
@@ -106,11 +113,4 @@ public class Work
     /// </summary>
     [Required]
     public ICollection<WorkGenre> WorkGenres { get; set; } = Enumerable.Empty<WorkGenre>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-product relationships associated to the current work.
-    /// </summary>
-    /// <remarks>An entity of the <see cref="WorkToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
-    [Required]
-    public ICollection<WorkToProductRelationship> WorkToProductRelationships { get; set; } = Enumerable.Empty<WorkToProductRelationship>().ToList();
 }

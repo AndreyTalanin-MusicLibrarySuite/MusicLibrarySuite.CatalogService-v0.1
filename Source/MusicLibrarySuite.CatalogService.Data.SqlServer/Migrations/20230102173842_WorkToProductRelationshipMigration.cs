@@ -190,12 +190,12 @@ public partial class WorkToProductRelationshipMigration : Migration
                 @SystemEntity BIT,
                 @Enabled BIT,
                 @WorkRelationships [dbo].[WorkRelationship] READONLY,
+                @WorkToProductRelationships [dbo].[WorkToProductRelationship] READONLY,
                 @WorkArtists [dbo].[WorkArtist] READONLY,
                 @WorkFeaturedArtists [dbo].[WorkFeaturedArtist] READONLY,
                 @WorkPerformers [dbo].[WorkPerformer] READONLY,
                 @WorkComposers [dbo].[WorkComposer] READONLY,
                 @WorkGenres [dbo].[WorkGenre] READONLY,
-                @WorkToProductRelationships [dbo].[WorkToProductRelationship] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
                 @ResultCreatedOn DATETIMEOFFSET OUTPUT,
                 @ResultUpdatedOn DATETIMEOFFSET OUTPUT
@@ -227,6 +227,10 @@ public partial class WorkToProductRelationshipMigration : Migration
                     @Id,
                     @WorkRelationships;
 
+                EXEC [dbo].[sp_Internal_MergeWorkToProductRelationships]
+                    @Id,
+                    @WorkToProductRelationships;
+
                 EXEC [dbo].[sp_Internal_MergeWorkArtists]
                     @Id,
                     @WorkArtists;
@@ -246,10 +250,6 @@ public partial class WorkToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeWorkGenres]
                     @Id,
                     @WorkGenres;
-
-                EXEC [dbo].[sp_Internal_MergeWorkToProductRelationships]
-                    @Id,
-                    @WorkToProductRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -274,12 +274,12 @@ public partial class WorkToProductRelationshipMigration : Migration
                 @SystemEntity BIT,
                 @Enabled BIT,
                 @WorkRelationships [dbo].[WorkRelationship] READONLY,
+                @WorkToProductRelationships [dbo].[WorkToProductRelationship] READONLY,
                 @WorkArtists [dbo].[WorkArtist] READONLY,
                 @WorkFeaturedArtists [dbo].[WorkFeaturedArtist] READONLY,
                 @WorkPerformers [dbo].[WorkPerformer] READONLY,
                 @WorkComposers [dbo].[WorkComposer] READONLY,
                 @WorkGenres [dbo].[WorkGenre] READONLY,
-                @WorkToProductRelationships [dbo].[WorkToProductRelationship] READONLY,
                 @ResultRowsUpdated INT OUTPUT
             )
             AS
@@ -302,6 +302,10 @@ public partial class WorkToProductRelationshipMigration : Migration
                     @Id,
                     @WorkRelationships;
 
+                EXEC [dbo].[sp_Internal_MergeWorkToProductRelationships]
+                    @Id,
+                    @WorkToProductRelationships;
+
                 EXEC [dbo].[sp_Internal_MergeWorkArtists]
                     @Id,
                     @WorkArtists;
@@ -321,10 +325,6 @@ public partial class WorkToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeWorkGenres]
                     @Id,
                     @WorkGenres;
-
-                EXEC [dbo].[sp_Internal_MergeWorkToProductRelationships]
-                    @Id,
-                    @WorkToProductRelationships;
 
                 COMMIT TRANSACTION;
             END;");

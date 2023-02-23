@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the product repository.
+/// Represents a SQL-Server-specific implementation of the product repository.
 /// </summary>
 public class SqlServerProductRepository : IProductRepository
 {
@@ -336,7 +336,7 @@ public class SqlServerProductRepository : IProductRepository
             .ToList();
     }
 
-    private static void SetProductRelationshipOrders(ICollection<ProductRelationshipDto> productRelationships)
+    private static void SetProductRelationshipOrders(IEnumerable<ProductRelationshipDto> productRelationships)
     {
         var i = 0;
         foreach (ProductRelationshipDto productRelationship in productRelationships)

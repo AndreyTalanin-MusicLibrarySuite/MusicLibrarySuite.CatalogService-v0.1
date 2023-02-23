@@ -166,16 +166,18 @@ Ref "FK_ProductRelationship_Product_DependentProductId" {
 // Tables:
 //     dbo.Work - Entity
 //     dbo.WorkRelationship - Relationship, Named, One-Directional Ordering
+//     dbo.WorkToProductRelationship - Relationship, Named, Two-Directional Ordering
 //     dbo.WorkArtist - Relationship, One-Directional Ordering
 //     dbo.WorkFeaturedArtist - Relationship, One-Directional Ordering
 //     dbo.WorkPerformer - Relationship, One-Directional Ordering
 //     dbo.WorkComposer - Relationship, One-Directional Ordering
 //     dbo.WorkGenre - Relationship, One-Directional Ordering
-//     dbo.WorkToProductRelationship - Relationship, Named, Two-Directional Ordering
 //
 // References:
 //     FK_WorkRelationship_Work_WorkId
 //     FK_WorkRelationship_Work_DependentWorkId
+//     FK_WorkToProductRelationship_Work_WorkId
+//     FK_WorkToProductRelationship_Product_ProductId
 //     FK_WorkArtist_Work_WorkId
 //     FK_WorkArtist_Artist_ArtistId
 //     FK_WorkFeaturedArtist_Work_WorkId
@@ -186,8 +188,6 @@ Ref "FK_ProductRelationship_Product_DependentProductId" {
 //     FK_WorkComposer_Artist_ArtistId
 //     FK_WorkGenre_Work_WorkId
 //     FK_WorkGenre_Genre_GenreId
-//     FK_WorkToProductRelationship_Work_WorkId
-//     FK_WorkToProductRelationship_Product_ProductId
 // ================================================================================
 
 Table "dbo"."Work" {
@@ -228,6 +228,30 @@ Ref "FK_WorkRelationship_Work_WorkId" {
 
 Ref "FK_WorkRelationship_Work_DependentWorkId" {
     "dbo"."WorkRelationship"."DependentWorkId" > "dbo"."Work"."Id"
+}
+
+Table "dbo"."WorkToProductRelationship" {
+    "WorkId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Name" nvarchar(256) [not null]
+    "Description" nvarchar(2048) [null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        "WorkId" [name: "IX_WorkToProductRelationship_WorkId"]
+        "ProductId" [name: "IX_WorkToProductRelationship_ProductId"]
+        ("WorkId", "Order") [name: "UIX_WorkToProductRelationship_WorkId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_WorkToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_WorkToProductRelationship_Work_WorkId" {
+    "dbo"."WorkToProductRelationship"."WorkId" > "dbo"."Work"."Id"
+}
+
+Ref "FK_WorkToProductRelationship_Product_ProductId" {
+    "dbo"."WorkToProductRelationship"."ProductId" > "dbo"."Product"."Id"
 }
 
 Table "dbo"."WorkArtist" {
@@ -330,30 +354,6 @@ Ref "FK_WorkGenre_Genre_GenreId" {
     "dbo"."WorkGenre"."GenreId" > "dbo"."Genre"."Id"
 }
 
-Table "dbo"."WorkToProductRelationship" {
-    "WorkId" uniqueidentifier [primary key, not null]
-    "ProductId" uniqueidentifier [primary key, not null]
-    "Name" nvarchar(256) [not null]
-    "Description" nvarchar(2048) [null]
-    "Order" int [not null]
-    "ReferenceOrder" int [not null]
-
-    Indexes {
-        "WorkId" [name: "IX_WorkToProductRelationship_WorkId"]
-        "ProductId" [name: "IX_WorkToProductRelationship_ProductId"]
-        ("WorkId", "Order") [name: "UIX_WorkToProductRelationship_WorkId_Order", unique]
-        ("ProductId", "ReferenceOrder") [name: "UIX_WorkToProductRelationship_ProductId_ReferenceOrder", unique]
-    }
-}
-
-Ref "FK_WorkToProductRelationship_Work_WorkId" {
-    "dbo"."WorkToProductRelationship"."WorkId" > "dbo"."Work"."Id"
-}
-
-Ref "FK_WorkToProductRelationship_Product_ProductId" {
-    "dbo"."WorkToProductRelationship"."ProductId" > "dbo"."Product"."Id"
-}
-
 
 // ================================================================================
 // ReleaseGroup
@@ -406,17 +406,21 @@ Ref "FK_ReleaseGroupRelationship_ReleaseGroup_DependentReleaseGroupId" {
 // Tables:
 //     dbo.Release - Entity
 //     dbo.ReleaseRelationship - Relationship, Named, One-Directional Ordering
+//     dbo.ReleaseToProductRelationship - Relationship, Named, Two-Directional Ordering
+//     dbo.ReleaseToReleaseGroupRelationship - Relationship, Named, Two-Directional Ordering
 //     dbo.ReleaseArtist - Relationship, One-Directional Ordering
 //     dbo.ReleaseFeaturedArtist - Relationship, One-Directional Ordering
 //     dbo.ReleasePerformer - Relationship, One-Directional Ordering
 //     dbo.ReleaseComposer - Relationship, One-Directional Ordering
 //     dbo.ReleaseGenre - Relationship, One-Directional Ordering
-//     dbo.ReleaseToProductRelationship - Relationship, Named, Two-Directional Ordering
-//     dbo.ReleaseToReleaseGroupRelationship - Relationship, Named, Two-Directional Ordering
 //
 // References:
 //     FK_ReleaseRelationship_Release_ReleaseId
 //     FK_ReleaseRelationship_Release_DependentReleaseId
+//     FK_ReleaseToProductRelationship_Release_ReleaseId
+//     FK_ReleaseToProductRelationship_Product_ProductId
+//     FK_ReleaseToReleaseGroupRelationship_Release_ReleaseId
+//     FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId
 //     FK_ReleaseArtist_Release_ReleaseId
 //     FK_ReleaseArtist_Artist_ArtistId
 //     FK_ReleaseFeaturedArtist_Release_ReleaseId
@@ -427,10 +431,6 @@ Ref "FK_ReleaseGroupRelationship_ReleaseGroup_DependentReleaseGroupId" {
 //     FK_ReleaseComposer_Artist_ArtistId
 //     FK_ReleaseGenre_Release_ReleaseId
 //     FK_ReleaseGenre_Genre_GenreId
-//     FK_ReleaseToProductRelationship_Release_ReleaseId
-//     FK_ReleaseToProductRelationship_Product_ProductId
-//     FK_ReleaseToReleaseGroupRelationship_Release_ReleaseId
-//     FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId
 // ================================================================================
 
 Table "dbo"."Release" {
@@ -474,6 +474,50 @@ Ref "FK_ReleaseRelationship_Release_ReleaseId" {
 
 Ref "FK_ReleaseRelationship_Release_DependentReleaseId" {
     "dbo"."ReleaseRelationship"."DependentReleaseId" > "dbo"."Release"."Id"
+}
+
+Table "dbo"."ReleaseToProductRelationship" {
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseToProductRelationship_ReleaseId"]
+        "ProductId" [name: "IX_ReleaseToProductRelationship_ProductId"]
+        ("ReleaseId", "Order") [name: "UIX_ReleaseToProductRelationship_ReleaseId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseToProductRelationship_Release_ReleaseId" {
+    "dbo"."ReleaseToProductRelationship"."ReleaseId" > "dbo"."Release"."Id"
+}
+
+Ref "FK_ReleaseToProductRelationship_Product_ProductId" {
+    "dbo"."ReleaseToProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
+
+Table "dbo"."ReleaseToReleaseGroupRelationship" {
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ReleaseGroupId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        "ReleaseId" [name: "IX_ReleaseToReleaseGroupRelationship_ReleaseId"]
+        "ReleaseGroupId" [name: "IX_ReleaseToReleaseGroupRelationship_ReleaseGroupId"]
+        ("ReleaseId", "Order") [name: "UIX_ReleaseToReleaseGroupRelationship_ReleaseId_Order", unique]
+        ("ReleaseGroupId", "ReferenceOrder") [name: "UIX_ReleaseToReleaseGroupRelationship_ReleaseGroupId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseToReleaseGroupRelationship_Release_ReleaseId" {
+    "dbo"."ReleaseToReleaseGroupRelationship"."ReleaseId" > "dbo"."Release"."Id"
+}
+
+Ref "FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId" {
+    "dbo"."ReleaseToReleaseGroupRelationship"."ReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
 }
 
 Table "dbo"."ReleaseArtist" {
@@ -576,50 +620,6 @@ Ref "FK_ReleaseGenre_Genre_GenreId" {
     "dbo"."ReleaseGenre"."GenreId" > "dbo"."Genre"."Id"
 }
 
-Table "dbo"."ReleaseToProductRelationship" {
-    "ReleaseId" uniqueidentifier [primary key, not null]
-    "ProductId" uniqueidentifier [primary key, not null]
-    "Order" int [not null]
-    "ReferenceOrder" int [not null]
-
-    Indexes {
-        "ReleaseId" [name: "IX_ReleaseToProductRelationship_ReleaseId"]
-        "ProductId" [name: "IX_ReleaseToProductRelationship_ProductId"]
-        ("ReleaseId", "Order") [name: "UIX_ReleaseToProductRelationship_ReleaseId_Order", unique]
-        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseToProductRelationship_ProductId_ReferenceOrder", unique]
-    }
-}
-
-Ref "FK_ReleaseToProductRelationship_Release_ReleaseId" {
-    "dbo"."ReleaseToProductRelationship"."ReleaseId" > "dbo"."Release"."Id"
-}
-
-Ref "FK_ReleaseToProductRelationship_Product_ProductId" {
-    "dbo"."ReleaseToProductRelationship"."ProductId" > "dbo"."Product"."Id"
-}
-
-Table "dbo"."ReleaseToReleaseGroupRelationship" {
-    "ReleaseId" uniqueidentifier [primary key, not null]
-    "ReleaseGroupId" uniqueidentifier [primary key, not null]
-    "Order" int [not null]
-    "ReferenceOrder" int [not null]
-
-    Indexes {
-        "ReleaseId" [name: "IX_ReleaseToReleaseGroupRelationship_ReleaseId"]
-        "ReleaseGroupId" [name: "IX_ReleaseToReleaseGroupRelationship_ReleaseGroupId"]
-        ("ReleaseId", "Order") [name: "UIX_ReleaseToReleaseGroupRelationship_ReleaseId_Order", unique]
-        ("ReleaseGroupId", "ReferenceOrder") [name: "UIX_ReleaseToReleaseGroupRelationship_ReleaseGroupId_ReferenceOrder", unique]
-    }
-}
-
-Ref "FK_ReleaseToReleaseGroupRelationship_Release_ReleaseId" {
-    "dbo"."ReleaseToReleaseGroupRelationship"."ReleaseId" > "dbo"."Release"."Id"
-}
-
-Ref "FK_ReleaseToReleaseGroupRelationship_ReleaseGroup_ReleaseGroupId" {
-    "dbo"."ReleaseToReleaseGroupRelationship"."ReleaseGroupId" > "dbo"."ReleaseGroup"."Id"
-}
-
 
 // ================================================================================
 // ReleaseMedia
@@ -686,16 +686,20 @@ Ref "FK_ReleaseMediaToProductRelationship_Product_ProductId" {
 //
 // Tables:
 //     dbo.ReleaseTrack - Entity
+//     dbo.ReleaseTrackToProductRelationship - Relationship, Named, Two-Directional Ordering
+//     dbo.ReleaseTrackToWorkRelationship - Relationship, Named, Two-Directional Ordering
 //     dbo.ReleaseTrackArtist - Relationship, One-Directional Ordering
 //     dbo.ReleaseTrackFeaturedArtist - Relationship, One-Directional Ordering
 //     dbo.ReleaseTrackPerformer - Relationship, One-Directional Ordering
 //     dbo.ReleaseTrackComposer - Relationship, One-Directional Ordering
 //     dbo.ReleaseTrackGenre - Relationship, One-Directional Ordering
-//     dbo.ReleaseTrackToProductRelationship - Relationship, Named, Two-Directional Ordering
-//     dbo.ReleaseTrackToWorkRelationship - Relationship, Named, Two-Directional Ordering
 //
 // References:
 //     FK_ReleaseTrack_ReleaseMedia_MediaNumber_ReleaseId
+//     FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackToProductRelationship_Product_ProductId
+//     FK_ReleaseTrackToWorkRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
+//     FK_ReleaseTrackToWorkRelationship_Work_WorkId
 //     FK_ReleaseTrackArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
 //     FK_ReleaseTrackArtist_Artist_ArtistId
 //     FK_ReleaseTrackFeaturedArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
@@ -706,10 +710,6 @@ Ref "FK_ReleaseMediaToProductRelationship_Product_ProductId" {
 //     FK_ReleaseTrackComposer_Artist_ArtistId
 //     FK_ReleaseTrackGenre_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
 //     FK_ReleaseTrackGenre_Genre_GenreId
-//     FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
-//     FK_ReleaseTrackToProductRelationship_Product_ProductId
-//     FK_ReleaseTrackToWorkRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId
-//     FK_ReleaseTrackToWorkRelationship_Work_WorkId
 // ================================================================================
 
 Table "dbo"."ReleaseTrack" {
@@ -730,6 +730,54 @@ Table "dbo"."ReleaseTrack" {
 
 Ref "FK_ReleaseTrack_ReleaseMedia_MediaNumber_ReleaseId" {
     "dbo"."ReleaseTrack".("MediaNumber", "ReleaseId") > "dbo"."ReleaseMedia".("MediaNumber", "ReleaseId")
+}
+
+Table "dbo"."ReleaseTrackToProductRelationship" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId"]
+        "ProductId" [name: "IX_ReleaseTrackToProductRelationship_ProductId"]
+        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseTrackToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrackToProductRelationship".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseTrackToProductRelationship_Product_ProductId" {
+    "dbo"."ReleaseTrackToProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
+
+Table "dbo"."ReleaseTrackToWorkRelationship" {
+    "TrackNumber" tinyint [primary key, not null]
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "WorkId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId"]
+        "WorkId" [name: "IX_ReleaseTrackToWorkRelationship_WorkId"]
+        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId_Order", unique]
+        ("WorkId", "ReferenceOrder") [name: "UIX_ReleaseTrackToWorkRelationship_WorkId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseTrackToWorkRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseTrackToWorkRelationship".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseTrackToWorkRelationship_Work_WorkId" {
+    "dbo"."ReleaseTrackToWorkRelationship"."WorkId" > "dbo"."Work"."Id"
 }
 
 Table "dbo"."ReleaseTrackArtist" {
@@ -840,52 +888,4 @@ Ref "FK_ReleaseTrackGenre_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
 
 Ref "FK_ReleaseTrackGenre_Genre_GenreId" {
     "dbo"."ReleaseTrackGenre"."GenreId" > "dbo"."Genre"."Id"
-}
-
-Table "dbo"."ReleaseTrackToProductRelationship" {
-    "TrackNumber" tinyint [primary key, not null]
-    "MediaNumber" tinyint [primary key, not null]
-    "ReleaseId" uniqueidentifier [primary key, not null]
-    "ProductId" uniqueidentifier [primary key, not null]
-    "Order" int [not null]
-    "ReferenceOrder" int [not null]
-
-    Indexes {
-        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId"]
-        "ProductId" [name: "IX_ReleaseTrackToProductRelationship_ProductId"]
-        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackToProductRelationship_TrackNumber_MediaNumber_ReleaseId_Order", unique]
-        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseTrackToProductRelationship_ProductId_ReferenceOrder", unique]
-    }
-}
-
-Ref "FK_ReleaseTrackToProductRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
-    "dbo"."ReleaseTrackToProductRelationship".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
-}
-
-Ref "FK_ReleaseTrackToProductRelationship_Product_ProductId" {
-    "dbo"."ReleaseTrackToProductRelationship"."ProductId" > "dbo"."Product"."Id"
-}
-
-Table "dbo"."ReleaseTrackToWorkRelationship" {
-    "TrackNumber" tinyint [primary key, not null]
-    "MediaNumber" tinyint [primary key, not null]
-    "ReleaseId" uniqueidentifier [primary key, not null]
-    "WorkId" uniqueidentifier [primary key, not null]
-    "Order" int [not null]
-    "ReferenceOrder" int [not null]
-
-    Indexes {
-        ("TrackNumber", "MediaNumber", "ReleaseId") [name: "IX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId"]
-        "WorkId" [name: "IX_ReleaseTrackToWorkRelationship_WorkId"]
-        ("TrackNumber", "MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseTrackToWorkRelationship_TrackNumber_MediaNumber_ReleaseId_Order", unique]
-        ("WorkId", "ReferenceOrder") [name: "UIX_ReleaseTrackToWorkRelationship_WorkId_ReferenceOrder", unique]
-    }
-}
-
-Ref "FK_ReleaseTrackToWorkRelationship_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId" {
-    "dbo"."ReleaseTrackToWorkRelationship".("TrackNumber", "MediaNumber", "ReleaseId") > "dbo"."ReleaseTrack".("TrackNumber", "MediaNumber", "ReleaseId")
-}
-
-Ref "FK_ReleaseTrackToWorkRelationship_Work_WorkId" {
-    "dbo"."ReleaseTrackToWorkRelationship"."WorkId" > "dbo"."Work"."Id"
 }

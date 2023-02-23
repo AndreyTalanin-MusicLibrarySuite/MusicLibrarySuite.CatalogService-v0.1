@@ -50,6 +50,18 @@ public class ReleaseTrackDto
     public string? InternationalStandardRecordingCode { get; set; }
 
     /// <summary>
+    /// Gets or sets a collection of release-track-to-product relationships associated to the current release track.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseTrackToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseTrackToProductRelationshipDto> ReleaseTrackToProductRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToProductRelationshipDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-track-to-work relationships associated to the current release track.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseTrackToWorkRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseTrackToWorkRelationshipDto> ReleaseTrackToWorkRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToWorkRelationshipDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track.
     /// </summary>
     public ICollection<ReleaseTrackArtistDto> ReleaseTrackArtists { get; set; } = Enumerable.Empty<ReleaseTrackArtistDto>().ToList();
@@ -73,16 +85,4 @@ public class ReleaseTrackDto
     /// Gets or sets a collection of release-track-to-genre relationships associated to the current release track.
     /// </summary>
     public ICollection<ReleaseTrackGenreDto> ReleaseTrackGenres { get; set; } = Enumerable.Empty<ReleaseTrackGenreDto>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of release-track-to-product relationships associated to the current release track.
-    /// </summary>
-    /// <remarks>An entity of the <see cref="ReleaseTrackToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseTrackToProductRelationshipDto> ReleaseTrackToProductRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToProductRelationshipDto>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of release-track-to-work relationships associated to the current release track.
-    /// </summary>
-    /// <remarks>An entity of the <see cref="ReleaseTrackToWorkRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseTrackToWorkRelationshipDto> ReleaseTrackToWorkRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToWorkRelationshipDto>().ToList();
 }

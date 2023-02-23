@@ -88,9 +88,26 @@ public class ReleaseDto
     public DateTimeOffset UpdatedOn { get; set; }
 
     /// <summary>
+    /// Gets or sets a collection of release media associated to the current release.
+    /// </summary>
+    public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release-to-release relationships where the current release is the principal entity.
     /// </summary>
     public ICollection<ReleaseRelationshipDto> ReleaseRelationships { get; set; } = Enumerable.Empty<ReleaseRelationshipDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-to-product relationships associated to the current release.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseToProductRelationshipDto> ReleaseToProductRelationships { get; set; } = Enumerable.Empty<ReleaseToProductRelationshipDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-to-release-group relationships associated to the current release.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseToReleaseGroupRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseToReleaseGroupRelationshipDto> ReleaseToReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseToReleaseGroupRelationshipDto>().ToList();
 
     /// <summary>
     /// Gets or sets a collection of release-to-artist relationships associated to the current release.
@@ -116,21 +133,4 @@ public class ReleaseDto
     /// Gets or sets a collection of release-to-genre relationships associated to the current release.
     /// </summary>
     public ICollection<ReleaseGenreDto> ReleaseGenres { get; set; } = Enumerable.Empty<ReleaseGenreDto>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of release-to-product relationships associated to the current release.
-    /// </summary>
-    /// <remarks>An entity of the <see cref="ReleaseToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseToProductRelationshipDto> ReleaseToProductRelationships { get; set; } = Enumerable.Empty<ReleaseToProductRelationshipDto>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of release-to-release-group relationships associated to the current release.
-    /// </summary>
-    /// <remarks>An entity of the <see cref="ReleaseToReleaseGroupRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseToReleaseGroupRelationshipDto> ReleaseToReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseToReleaseGroupRelationshipDto>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of release media associated to the current release.
-    /// </summary>
-    public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();
 }

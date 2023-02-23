@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the release group repository.
+/// Represents a SQL-Server-specific implementation of the release group repository.
 /// </summary>
 public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 {
@@ -323,7 +323,7 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
             .ToList();
     }
 
-    private static void SetReleaseGroupRelationshipOrders(ICollection<ReleaseGroupRelationshipDto> releaseGroupRelationships)
+    private static void SetReleaseGroupRelationshipOrders(IEnumerable<ReleaseGroupRelationshipDto> releaseGroupRelationships)
     {
         var i = 0;
         foreach (ReleaseGroupRelationshipDto releaseGroupRelationship in releaseGroupRelationships)

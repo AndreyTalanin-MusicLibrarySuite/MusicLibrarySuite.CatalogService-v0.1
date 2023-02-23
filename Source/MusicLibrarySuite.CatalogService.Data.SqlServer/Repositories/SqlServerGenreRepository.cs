@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the genre repository.
+/// Represents a SQL-Server-specific implementation of the genre repository.
 /// </summary>
 public class SqlServerGenreRepository : IGenreRepository
 {
@@ -324,7 +324,7 @@ public class SqlServerGenreRepository : IGenreRepository
             .ToList();
     }
 
-    private static void SetGenreRelationshipOrders(ICollection<GenreRelationshipDto> genreRelationships)
+    private static void SetGenreRelationshipOrders(IEnumerable<GenreRelationshipDto> genreRelationships)
     {
         var i = 0;
         foreach (GenreRelationshipDto genreRelationship in genreRelationships)

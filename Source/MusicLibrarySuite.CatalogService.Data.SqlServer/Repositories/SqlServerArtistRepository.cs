@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the artist repository.
+/// Represents a SQL-Server-specific implementation of the artist repository.
 /// </summary>
 public class SqlServerArtistRepository : IArtistRepository
 {
@@ -380,7 +380,7 @@ public class SqlServerArtistRepository : IArtistRepository
             .ToList();
     }
 
-    private static void SetArtistRelationshipOrders(ICollection<ArtistRelationshipDto> artistRelationships)
+    private static void SetArtistRelationshipOrders(IEnumerable<ArtistRelationshipDto> artistRelationships)
     {
         var i = 0;
         foreach (ArtistRelationshipDto artistRelationship in artistRelationships)
@@ -389,7 +389,7 @@ public class SqlServerArtistRepository : IArtistRepository
         }
     }
 
-    private static void SetArtistGenreOrders(ICollection<ArtistGenreDto> artistGenres)
+    private static void SetArtistGenreOrders(IEnumerable<ArtistGenreDto> artistGenres)
     {
         var i = 0;
         foreach (ArtistGenreDto artistGenre in artistGenres)

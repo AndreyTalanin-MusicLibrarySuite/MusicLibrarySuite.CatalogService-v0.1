@@ -209,23 +209,23 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
+                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
+                @ReleaseTrackToWorkRelationships [dbo].[ReleaseTrackToWorkRelationship] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
                 @ReleaseTrackPerformers [dbo].[ReleaseTrackPerformer] READONLY,
                 @ReleaseTrackComposers [dbo].[ReleaseTrackComposer] READONLY,
                 @ReleaseTrackGenres [dbo].[ReleaseTrackGenre] READONLY,
-                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
-                @ReleaseTrackToWorkRelationships [dbo].[ReleaseTrackToWorkRelationship] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
                 @ResultCreatedOn DATETIMEOFFSET OUTPUT,
                 @ResultUpdatedOn DATETIMEOFFSET OUTPUT
@@ -259,6 +259,14 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseRelationships;
 
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
+
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
                     @ReleaseArtists;
@@ -279,14 +287,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseGenres;
 
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
-
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
                     @ReleaseMediaCollection;
@@ -298,6 +298,14 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
                     @Id,
                     @ReleaseTrackCollection;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
+                    @Id,
+                    @ReleaseTrackToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackToWorkRelationships]
+                    @Id,
+                    @ReleaseTrackToWorkRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackArtists]
                     @Id,
@@ -318,14 +326,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackGenres]
                     @Id,
                     @ReleaseTrackGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
-                    @Id,
-                    @ReleaseTrackToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseTrackToWorkRelationships]
-                    @Id,
-                    @ReleaseTrackToWorkRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -352,23 +352,23 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
+                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
+                @ReleaseTrackToWorkRelationships [dbo].[ReleaseTrackToWorkRelationship] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
                 @ReleaseTrackPerformers [dbo].[ReleaseTrackPerformer] READONLY,
                 @ReleaseTrackComposers [dbo].[ReleaseTrackComposer] READONLY,
                 @ReleaseTrackGenres [dbo].[ReleaseTrackGenre] READONLY,
-                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
-                @ReleaseTrackToWorkRelationships [dbo].[ReleaseTrackToWorkRelationship] READONLY,
                 @ResultRowsUpdated INT OUTPUT
             )
             AS
@@ -393,6 +393,14 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseRelationships;
 
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
+
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
                     @ReleaseArtists;
@@ -413,14 +421,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseGenres;
 
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
-
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
                     @ReleaseMediaCollection;
@@ -432,6 +432,14 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
                     @Id,
                     @ReleaseTrackCollection;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
+                    @Id,
+                    @ReleaseTrackToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackToWorkRelationships]
+                    @Id,
+                    @ReleaseTrackToWorkRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackArtists]
                     @Id,
@@ -452,14 +460,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackGenres]
                     @Id,
                     @ReleaseTrackGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
-                    @Id,
-                    @ReleaseTrackToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseTrackToWorkRelationships]
-                    @Id,
-                    @ReleaseTrackToWorkRelationships;
 
                 COMMIT TRANSACTION;
             END;");
@@ -522,22 +522,22 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
+                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
                 @ReleaseTrackPerformers [dbo].[ReleaseTrackPerformer] READONLY,
                 @ReleaseTrackComposers [dbo].[ReleaseTrackComposer] READONLY,
                 @ReleaseTrackGenres [dbo].[ReleaseTrackGenre] READONLY,
-                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
                 @ResultCreatedOn DATETIMEOFFSET OUTPUT,
                 @ResultUpdatedOn DATETIMEOFFSET OUTPUT
@@ -571,6 +571,14 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseRelationships;
 
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
+
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
                     @ReleaseArtists;
@@ -591,14 +599,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseGenres;
 
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
-
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
                     @ReleaseMediaCollection;
@@ -610,6 +610,10 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
                     @Id,
                     @ReleaseTrackCollection;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
+                    @Id,
+                    @ReleaseTrackToProductRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackArtists]
                     @Id,
@@ -630,10 +634,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackGenres]
                     @Id,
                     @ReleaseTrackGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
-                    @Id,
-                    @ReleaseTrackToProductRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -660,22 +660,22 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
+                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
                 @ReleaseTrackPerformers [dbo].[ReleaseTrackPerformer] READONLY,
                 @ReleaseTrackComposers [dbo].[ReleaseTrackComposer] READONLY,
                 @ReleaseTrackGenres [dbo].[ReleaseTrackGenre] READONLY,
-                @ReleaseTrackToProductRelationships [dbo].[ReleaseTrackToProductRelationship] READONLY,
                 @ResultRowsUpdated INT OUTPUT
             )
             AS
@@ -700,6 +700,14 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseRelationships;
 
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
+
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
                     @ReleaseArtists;
@@ -720,14 +728,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     @Id,
                     @ReleaseGenres;
 
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
-
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
                     @ReleaseMediaCollection;
@@ -739,6 +739,10 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
                     @Id,
                     @ReleaseTrackCollection;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
+                    @Id,
+                    @ReleaseTrackToProductRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackArtists]
                     @Id,
@@ -759,10 +763,6 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseTrackGenres]
                     @Id,
                     @ReleaseTrackGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseTrackToProductRelationships]
-                    @Id,
-                    @ReleaseTrackToProductRelationships;
 
                 COMMIT TRANSACTION;
             END;");

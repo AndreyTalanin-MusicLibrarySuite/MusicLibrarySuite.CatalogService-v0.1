@@ -80,6 +80,12 @@ public class WorkDto
     public ICollection<WorkRelationshipDto> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationshipDto>().ToList();
 
     /// <summary>
+    /// Gets or sets a collection of work-to-product relationships associated to the current work.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="WorkToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<WorkToProductRelationshipDto> WorkToProductRelationships { get; set; } = Enumerable.Empty<WorkToProductRelationshipDto>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of work-to-artist relationships associated to the current work.
     /// </summary>
     public ICollection<WorkArtistDto> WorkArtists { get; set; } = Enumerable.Empty<WorkArtistDto>().ToList();
@@ -103,10 +109,4 @@ public class WorkDto
     /// Gets or sets a collection of work-to-genre relationships associated to the current work.
     /// </summary>
     public ICollection<WorkGenreDto> WorkGenres { get; set; } = Enumerable.Empty<WorkGenreDto>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-product relationships associated to the current work.
-    /// </summary>
-    /// <remarks>An entity of the <see cref="WorkToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<WorkToProductRelationshipDto> WorkToProductRelationships { get; set; } = Enumerable.Empty<WorkToProductRelationshipDto>().ToList();
 }
