@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -69,11 +68,11 @@ public class ReleaseMedia
     /// </summary>
     /// <remarks>An entity of the <see cref="ReleaseMediaToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
     [Required]
-    public ICollection<ReleaseMediaToProductRelationship> ReleaseMediaToProductRelationships { get; set; } = Enumerable.Empty<ReleaseMediaToProductRelationship>().ToList();
+    public ICollection<ReleaseMediaToProductRelationship> ReleaseMediaToProductRelationships { get; set; } = new List<ReleaseMediaToProductRelationship>();
 
     /// <summary>
     /// Gets or sets a collection of release tracks associated to the current release media.
     /// </summary>
     [Required]
-    public ICollection<ReleaseTrack> ReleaseTrackCollection { get; set; } = Enumerable.Empty<ReleaseTrack>().ToList();
+    public ICollection<ReleaseTrack> ReleaseTrackCollection { get; set; } = new List<ReleaseTrack>();
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -90,47 +89,47 @@ public class ReleaseDto
     /// <summary>
     /// Gets or sets a collection of release media associated to the current release.
     /// </summary>
-    public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = Enumerable.Empty<ReleaseMediaDto>().ToList();
+    public ICollection<ReleaseMediaDto> ReleaseMediaCollection { get; set; } = new List<ReleaseMediaDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-release relationships where the current release is the principal entity.
     /// </summary>
-    public ICollection<ReleaseRelationshipDto> ReleaseRelationships { get; set; } = Enumerable.Empty<ReleaseRelationshipDto>().ToList();
+    public ICollection<ReleaseRelationshipDto> ReleaseRelationships { get; set; } = new List<ReleaseRelationshipDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-product relationships associated to the current release.
     /// </summary>
     /// <remarks>An entity of the <see cref="ReleaseToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseToProductRelationshipDto> ReleaseToProductRelationships { get; set; } = Enumerable.Empty<ReleaseToProductRelationshipDto>().ToList();
+    public ICollection<ReleaseToProductRelationshipDto> ReleaseToProductRelationships { get; set; } = new List<ReleaseToProductRelationshipDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-release-group relationships associated to the current release.
     /// </summary>
     /// <remarks>An entity of the <see cref="ReleaseToReleaseGroupRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseToReleaseGroupRelationshipDto> ReleaseToReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseToReleaseGroupRelationshipDto>().ToList();
+    public ICollection<ReleaseToReleaseGroupRelationshipDto> ReleaseToReleaseGroupRelationships { get; set; } = new List<ReleaseToReleaseGroupRelationshipDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-artist relationships associated to the current release.
     /// </summary>
-    public ICollection<ReleaseArtistDto> ReleaseArtists { get; set; } = Enumerable.Empty<ReleaseArtistDto>().ToList();
+    public ICollection<ReleaseArtistDto> ReleaseArtists { get; set; } = new List<ReleaseArtistDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "featured artist" role.
     /// </summary>
-    public ICollection<ReleaseFeaturedArtistDto> ReleaseFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseFeaturedArtistDto>().ToList();
+    public ICollection<ReleaseFeaturedArtistDto> ReleaseFeaturedArtists { get; set; } = new List<ReleaseFeaturedArtistDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "performer" role.
     /// </summary>
-    public ICollection<ReleasePerformerDto> ReleasePerformers { get; set; } = Enumerable.Empty<ReleasePerformerDto>().ToList();
+    public ICollection<ReleasePerformerDto> ReleasePerformers { get; set; } = new List<ReleasePerformerDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-artist relationships associated to the current release where the artist has the "composer" role.
     /// </summary>
-    public ICollection<ReleaseComposerDto> ReleaseComposers { get; set; } = Enumerable.Empty<ReleaseComposerDto>().ToList();
+    public ICollection<ReleaseComposerDto> ReleaseComposers { get; set; } = new List<ReleaseComposerDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-to-genre relationships associated to the current release.
     /// </summary>
-    public ICollection<ReleaseGenreDto> ReleaseGenres { get; set; } = Enumerable.Empty<ReleaseGenreDto>().ToList();
+    public ICollection<ReleaseGenreDto> ReleaseGenres { get; set; } = new List<ReleaseGenreDto>();
 }

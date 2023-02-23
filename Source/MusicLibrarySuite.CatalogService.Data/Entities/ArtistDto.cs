@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -61,10 +60,10 @@ public class ArtistDto
     /// <summary>
     /// Gets or sets a collection of artist-to-artist relationships where the current artist is the principal entity.
     /// </summary>
-    public ICollection<ArtistRelationshipDto> ArtistRelationships { get; set; } = Enumerable.Empty<ArtistRelationshipDto>().ToList();
+    public ICollection<ArtistRelationshipDto> ArtistRelationships { get; set; } = new List<ArtistRelationshipDto>();
 
     /// <summary>
     /// Gets or sets a collection of artist-to-genre relationships associated to the current artist.
     /// </summary>
-    public ICollection<ArtistGenreDto> ArtistGenres { get; set; } = Enumerable.Empty<ArtistGenreDto>().ToList();
+    public ICollection<ArtistGenreDto> ArtistGenres { get; set; } = new List<ArtistGenreDto>();
 }

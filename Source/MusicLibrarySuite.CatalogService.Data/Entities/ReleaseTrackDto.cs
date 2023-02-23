@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -53,36 +52,36 @@ public class ReleaseTrackDto
     /// Gets or sets a collection of release-track-to-product relationships associated to the current release track.
     /// </summary>
     /// <remarks>An entity of the <see cref="ReleaseTrackToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseTrackToProductRelationshipDto> ReleaseTrackToProductRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToProductRelationshipDto>().ToList();
+    public ICollection<ReleaseTrackToProductRelationshipDto> ReleaseTrackToProductRelationships { get; set; } = new List<ReleaseTrackToProductRelationshipDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-track-to-work relationships associated to the current release track.
     /// </summary>
     /// <remarks>An entity of the <see cref="ReleaseTrackToWorkRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
-    public ICollection<ReleaseTrackToWorkRelationshipDto> ReleaseTrackToWorkRelationships { get; set; } = Enumerable.Empty<ReleaseTrackToWorkRelationshipDto>().ToList();
+    public ICollection<ReleaseTrackToWorkRelationshipDto> ReleaseTrackToWorkRelationships { get; set; } = new List<ReleaseTrackToWorkRelationshipDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track.
     /// </summary>
-    public ICollection<ReleaseTrackArtistDto> ReleaseTrackArtists { get; set; } = Enumerable.Empty<ReleaseTrackArtistDto>().ToList();
+    public ICollection<ReleaseTrackArtistDto> ReleaseTrackArtists { get; set; } = new List<ReleaseTrackArtistDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "featured artist" role.
     /// </summary>
-    public ICollection<ReleaseTrackFeaturedArtistDto> ReleaseTrackFeaturedArtists { get; set; } = Enumerable.Empty<ReleaseTrackFeaturedArtistDto>().ToList();
+    public ICollection<ReleaseTrackFeaturedArtistDto> ReleaseTrackFeaturedArtists { get; set; } = new List<ReleaseTrackFeaturedArtistDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "performer" role.
     /// </summary>
-    public ICollection<ReleaseTrackPerformerDto> ReleaseTrackPerformers { get; set; } = Enumerable.Empty<ReleaseTrackPerformerDto>().ToList();
+    public ICollection<ReleaseTrackPerformerDto> ReleaseTrackPerformers { get; set; } = new List<ReleaseTrackPerformerDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-track-to-artist relationships associated to the current release track where the artist has the "composer" role.
     /// </summary>
-    public ICollection<ReleaseTrackComposerDto> ReleaseTrackComposers { get; set; } = Enumerable.Empty<ReleaseTrackComposerDto>().ToList();
+    public ICollection<ReleaseTrackComposerDto> ReleaseTrackComposers { get; set; } = new List<ReleaseTrackComposerDto>();
 
     /// <summary>
     /// Gets or sets a collection of release-track-to-genre relationships associated to the current release track.
     /// </summary>
-    public ICollection<ReleaseTrackGenreDto> ReleaseTrackGenres { get; set; } = Enumerable.Empty<ReleaseTrackGenreDto>().ToList();
+    public ICollection<ReleaseTrackGenreDto> ReleaseTrackGenres { get; set; } = new List<ReleaseTrackGenreDto>();
 }

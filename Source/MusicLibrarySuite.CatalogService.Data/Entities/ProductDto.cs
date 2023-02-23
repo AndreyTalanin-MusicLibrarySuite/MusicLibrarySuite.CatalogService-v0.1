@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -71,5 +70,5 @@ public class ProductDto
     /// <summary>
     /// Gets or sets a collection of product-to-product relationships where the current product is the principal entity.
     /// </summary>
-    public ICollection<ProductRelationshipDto> ProductRelationships { get; set; } = Enumerable.Empty<ProductRelationshipDto>().ToList();
+    public ICollection<ProductRelationshipDto> ProductRelationships { get; set; } = new List<ProductRelationshipDto>();
 }

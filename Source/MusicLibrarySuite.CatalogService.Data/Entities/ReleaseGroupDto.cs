@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
@@ -56,5 +55,5 @@ public class ReleaseGroupDto
     /// <summary>
     /// Gets or sets a collection of release-group-to-release-group relationships where the current release group is the principal entity.
     /// </summary>
-    public ICollection<ReleaseGroupRelationshipDto> ReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseGroupRelationshipDto>().ToList();
+    public ICollection<ReleaseGroupRelationshipDto> ReleaseGroupRelationships { get; set; } = new List<ReleaseGroupRelationshipDto>();
 }

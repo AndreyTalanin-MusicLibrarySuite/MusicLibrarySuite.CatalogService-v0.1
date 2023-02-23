@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities.Base;
 
@@ -28,5 +27,5 @@ public class PageResponseDto<T>
     /// <summary>
     /// Gets or sets a collection of entities corresponding to the page configuration.
     /// </summary>
-    public ICollection<T> Items { get; set; } = Enumerable.Empty<T>().ToList();
+    public ICollection<T> Items { get; set; } = new List<T>();
 }
