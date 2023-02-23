@@ -12,8 +12,8 @@ using MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
 {
     [DbContext(typeof(SqlServerCatalogServiceDbContext))]
-    [Migration($"20230113182104_{nameof(ReleaseMediaMigration)}")]
-    partial class ReleaseMediaMigration
+    [Migration($"20221231113620_{nameof(WorkArtistMigration)}")]
+    partial class WorkArtistMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -300,231 +300,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.HasCheckConstraint("CK_ProductRelationship_Name", "LEN(TRIM([Name])) > 0");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Barcode")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<string>("CatalogNumber")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("DisambiguationText")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MediaFormat")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PublishFormat")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTime>("ReleasedOn")
-                        .HasColumnType("date");
-
-                    b.Property<bool>("ReleasedOnYearOnly")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Barcode")
-                        .HasDatabaseName("IX_Release_Barcode");
-
-                    b.HasIndex("CatalogNumber")
-                        .HasDatabaseName("IX_Release_CatalogNumber");
-
-                    b.ToTable("Release", "dbo");
-
-                    b.HasCheckConstraint("CK_Release_Barcode", "[Barcode] IS NULL OR LEN(TRIM([Barcode])) > 0");
-
-                    b.HasCheckConstraint("CK_Release_CatalogNumber", "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
-
-                    b.HasCheckConstraint("CK_Release_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-                    b.HasCheckConstraint("CK_Release_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
-
-                    b.HasCheckConstraint("CK_Release_MediaFormat", "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
-
-                    b.HasCheckConstraint("CK_Release_PublishFormat", "[PublishFormat] IS NULL OR LEN(TRIM([PublishFormat])) > 0");
-
-                    b.HasCheckConstraint("CK_Release_Title", "LEN(TRIM([Title])) > 0");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseGroupDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("DisambiguationText")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ReleaseGroup", "dbo");
-
-                    b.HasCheckConstraint("CK_ReleaseGroup_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseGroup_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseGroup_Title", "LEN(TRIM([Title])) > 0");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseGroupRelationshipDto", b =>
-                {
-                    b.Property<Guid>("ReleaseGroupId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DependentReleaseGroupId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("ReleaseGroupId", "DependentReleaseGroupId");
-
-                    b.HasIndex("DependentReleaseGroupId")
-                        .HasDatabaseName("IX_ReleaseGroupRelationship_DependentReleaseGroupId");
-
-                    b.HasIndex("ReleaseGroupId")
-                        .HasDatabaseName("IX_ReleaseGroupRelationship_ReleaseGroupId");
-
-                    b.HasIndex("ReleaseGroupId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_ReleaseGroupRelationship_ReleaseGroupId_Order");
-
-                    b.ToTable("ReleaseGroupRelationship", "dbo");
-
-                    b.HasCheckConstraint("CK_ReleaseGroupRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaDto", b =>
-                {
-                    b.Property<byte>("MediaNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CatalogNumber")
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("DisambiguationText")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("MediaFormat")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("TableOfContentsChecksum")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<string>("TableOfContentsChecksumLong")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("MediaNumber", "ReleaseId");
-
-                    b.HasIndex("CatalogNumber")
-                        .HasDatabaseName("IX_ReleaseMedia_CatalogNumber");
-
-                    b.HasIndex("ReleaseId")
-                        .HasDatabaseName("IX_ReleaseMedia_ReleaseId");
-
-                    b.HasIndex("TableOfContentsChecksum")
-                        .HasDatabaseName("IX_ReleaseMedia_TableOfContentsChecksum");
-
-                    b.HasIndex("TableOfContentsChecksumLong")
-                        .HasDatabaseName("IX_ReleaseMedia_TableOfContentsChecksumLong");
-
-                    b.ToTable("ReleaseMedia", "dbo");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_CatalogNumber", "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_MediaFormat", "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksum", "[TableOfContentsChecksum] IS NULL OR LEN(TRIM([TableOfContentsChecksum])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksumLong", "[TableOfContentsChecksumLong] IS NULL OR LEN(TRIM([TableOfContentsChecksumLong])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_Title", "LEN(TRIM([Title])) > 0");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkArtistDto", b =>
                 {
                     b.Property<Guid>("WorkId")
@@ -662,32 +437,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.ToTable("WorkFeaturedArtist", "dbo");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkGenreDto", b =>
-                {
-                    b.Property<Guid>("WorkId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("GenreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("WorkId", "GenreId");
-
-                    b.HasIndex("GenreId")
-                        .HasDatabaseName("IX_WorkGenre_GenreId");
-
-                    b.HasIndex("WorkId")
-                        .HasDatabaseName("IX_WorkGenre_WorkId");
-
-                    b.HasIndex("WorkId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_WorkGenre_WorkId_Order");
-
-                    b.ToTable("WorkGenre", "dbo");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkPerformerDto", b =>
                 {
                     b.Property<Guid>("WorkId")
@@ -751,52 +500,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.HasCheckConstraint("CK_WorkRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
                     b.HasCheckConstraint("CK_WorkRelationship_Name", "LEN(TRIM([Name])) > 0");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkToProductRelationshipDto", b =>
-                {
-                    b.Property<Guid>("WorkId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReferenceOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("WorkId", "ProductId");
-
-                    b.HasIndex("ProductId")
-                        .HasDatabaseName("IX_WorkToProductRelationship_ProductId");
-
-                    b.HasIndex("WorkId")
-                        .HasDatabaseName("IX_WorkToProductRelationship_WorkId");
-
-                    b.HasIndex("ProductId", "ReferenceOrder")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_WorkToProductRelationship_ProductId_ReferenceOrder");
-
-                    b.HasIndex("WorkId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_WorkToProductRelationship_WorkId_Order");
-
-                    b.ToTable("WorkToProductRelationship", "dbo");
-
-                    b.HasCheckConstraint("CK_WorkToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-                    b.HasCheckConstraint("CK_WorkToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
                 });
 
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ArtistGenreDto", b =>
@@ -875,34 +578,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseGroupRelationshipDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseGroupDto", "DependentReleaseGroup")
-                        .WithMany()
-                        .HasForeignKey("DependentReleaseGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseGroupDto", "ReleaseGroup")
-                        .WithMany("ReleaseGroupRelationships")
-                        .HasForeignKey("ReleaseGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DependentReleaseGroup");
-
-                    b.Navigation("ReleaseGroup");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseDto", null)
-                        .WithMany("ReleaseMediaCollection")
-                        .HasForeignKey("ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkArtistDto", b =>
                 {
                     b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
@@ -960,25 +635,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.Navigation("Work");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkGenreDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.GenreDto", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.WorkDto", "Work")
-                        .WithMany("WorkGenres")
-                        .HasForeignKey("WorkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Genre");
-
-                    b.Navigation("Work");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkPerformerDto", b =>
                 {
                     b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
@@ -1017,25 +673,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.Navigation("Work");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkToProductRelationshipDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ProductDto", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.WorkDto", "Work")
-                        .WithMany("WorkToProductRelationships")
-                        .HasForeignKey("WorkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Work");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", b =>
                 {
                     b.Navigation("ArtistGenres");
@@ -1053,16 +690,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.Navigation("ProductRelationships");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseDto", b =>
-                {
-                    b.Navigation("ReleaseMediaCollection");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseGroupDto", b =>
-                {
-                    b.Navigation("ReleaseGroupRelationships");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkDto", b =>
                 {
                     b.Navigation("WorkArtists");
@@ -1071,13 +698,9 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
 
                     b.Navigation("WorkFeaturedArtists");
 
-                    b.Navigation("WorkGenres");
-
                     b.Navigation("WorkPerformers");
 
                     b.Navigation("WorkRelationships");
-
-                    b.Navigation("WorkToProductRelationships");
                 });
 #pragma warning restore 612, 618
         }
