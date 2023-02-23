@@ -39,12 +39,12 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ArtistRelationshipDto>().ToTable("ArtistRelationship", "dbo");
         modelBuilder.Entity<ArtistRelationshipDto>().HasKey(entity => new { entity.ArtistId, entity.DependentArtistId });
         modelBuilder.Entity<ArtistRelationshipDto>()
-            .HasOne<ArtistDto>(entity => entity.Artist)
+            .HasOne(entity => entity.Artist)
             .WithMany(entity => entity.ArtistRelationships)
             .HasForeignKey(entity => entity.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ArtistRelationshipDto>()
-            .HasOne<ArtistDto>(entity => entity.DependentArtist)
+            .HasOne(entity => entity.DependentArtist)
             .WithMany()
             .HasForeignKey(entity => entity.DependentArtistId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -582,70 +582,6 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
         modelBuilder.Entity<ReleaseGroupRelationshipDto>().HasCheckConstraint("CK_ReleaseGroupRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
-        modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
-        modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
-        modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-        modelBuilder.Entity<GenreRelationshipDto>().ToTable("GenreRelationship", "dbo");
-        modelBuilder.Entity<GenreRelationshipDto>().HasKey(entity => new { entity.GenreId, entity.DependentGenreId });
-        modelBuilder.Entity<GenreRelationshipDto>()
-            .HasOne(entity => entity.Genre)
-            .WithMany(entity => entity.GenreRelationships)
-            .HasForeignKey(entity => entity.GenreId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<GenreRelationshipDto>()
-            .HasOne(entity => entity.DependentGenre)
-            .WithMany()
-            .HasForeignKey(entity => entity.DependentGenreId)
-            .OnDelete(DeleteBehavior.Restrict);
-        modelBuilder.Entity<GenreRelationshipDto>()
-            .HasIndex(entity => entity.GenreId)
-            .HasDatabaseName("IX_GenreRelationship_GenreId");
-        modelBuilder.Entity<GenreRelationshipDto>()
-            .HasIndex(entity => entity.DependentGenreId)
-            .HasDatabaseName("IX_GenreRelationship_DependentGenreId");
-        modelBuilder.Entity<GenreRelationshipDto>()
-            .HasIndex(entity => new { entity.GenreId, entity.Order })
-            .HasDatabaseName("UIX_GenreRelationship_GenreId_Order")
-            .IsUnique();
-        modelBuilder.Entity<GenreRelationshipDto>().HasCheckConstraint("CK_GenreRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<GenreRelationshipDto>().HasCheckConstraint("CK_GenreRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
-        modelBuilder.Entity<ProductDto>().ToTable("Product", "dbo");
-        modelBuilder.Entity<ProductDto>().HasKey(entity => entity.Id);
-        modelBuilder.Entity<ProductDto>().HasCheckConstraint("CK_Product_Title", "LEN(TRIM([Title])) > 0");
-        modelBuilder.Entity<ProductDto>().HasCheckConstraint("CK_Product_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-        modelBuilder.Entity<ProductDto>().HasCheckConstraint("CK_Product_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
-        modelBuilder.Entity<ProductDto>()
-            .Property(entity => entity.ReleasedOn)
-            .HasColumnType("date");
-
-        modelBuilder.Entity<ProductRelationshipDto>().ToTable("ProductRelationship", "dbo");
-        modelBuilder.Entity<ProductRelationshipDto>().HasKey(entity => new { entity.ProductId, entity.DependentProductId });
-        modelBuilder.Entity<ProductRelationshipDto>()
-            .HasOne(entity => entity.Product)
-            .WithMany(entity => entity.ProductRelationships)
-            .HasForeignKey(entity => entity.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<ProductRelationshipDto>()
-            .HasOne(entity => entity.DependentProduct)
-            .WithMany()
-            .HasForeignKey(entity => entity.DependentProductId)
-            .OnDelete(DeleteBehavior.Restrict);
-        modelBuilder.Entity<ProductRelationshipDto>()
-            .HasIndex(entity => entity.ProductId)
-            .HasDatabaseName("IX_ProductRelationship_ProductId");
-        modelBuilder.Entity<ProductRelationshipDto>()
-            .HasIndex(entity => entity.DependentProductId)
-            .HasDatabaseName("IX_ProductRelationship_DependentProductId");
-        modelBuilder.Entity<ProductRelationshipDto>()
-            .HasIndex(entity => new { entity.ProductId, entity.Order })
-            .HasDatabaseName("UIX_ProductRelationship_ProductId_Order")
-            .IsUnique();
-        modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Name", "LEN(TRIM([Name])) > 0");
-        modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
-
         modelBuilder.Entity<WorkDto>().ToTable("Work", "dbo");
         modelBuilder.Entity<WorkDto>().HasKey(entity => entity.Id);
         modelBuilder.Entity<WorkDto>()
@@ -827,6 +763,70 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
             .HasIndex(entity => new { entity.WorkId, entity.Order })
             .HasDatabaseName("UIX_WorkGenre_WorkId_Order")
             .IsUnique();
+
+        modelBuilder.Entity<ProductDto>().ToTable("Product", "dbo");
+        modelBuilder.Entity<ProductDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<ProductDto>().HasCheckConstraint("CK_Product_Title", "LEN(TRIM([Title])) > 0");
+        modelBuilder.Entity<ProductDto>().HasCheckConstraint("CK_Product_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+        modelBuilder.Entity<ProductDto>().HasCheckConstraint("CK_Product_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
+        modelBuilder.Entity<ProductDto>()
+            .Property(entity => entity.ReleasedOn)
+            .HasColumnType("date");
+
+        modelBuilder.Entity<ProductRelationshipDto>().ToTable("ProductRelationship", "dbo");
+        modelBuilder.Entity<ProductRelationshipDto>().HasKey(entity => new { entity.ProductId, entity.DependentProductId });
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasOne(entity => entity.Product)
+            .WithMany(entity => entity.ProductRelationships)
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasOne(entity => entity.DependentProduct)
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ProductRelationship_ProductId");
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasIndex(entity => entity.DependentProductId)
+            .HasDatabaseName("IX_ProductRelationship_DependentProductId");
+        modelBuilder.Entity<ProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.Order })
+            .HasDatabaseName("UIX_ProductRelationship_ProductId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ProductRelationshipDto>().HasCheckConstraint("CK_ProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
+        modelBuilder.Entity<GenreDto>().ToTable("Genre", "dbo");
+        modelBuilder.Entity<GenreDto>().HasKey(entity => entity.Id);
+        modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<GenreDto>().HasCheckConstraint("CK_Genre_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
+        modelBuilder.Entity<GenreRelationshipDto>().ToTable("GenreRelationship", "dbo");
+        modelBuilder.Entity<GenreRelationshipDto>().HasKey(entity => new { entity.GenreId, entity.DependentGenreId });
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasOne(entity => entity.Genre)
+            .WithMany(entity => entity.GenreRelationships)
+            .HasForeignKey(entity => entity.GenreId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasOne(entity => entity.DependentGenre)
+            .WithMany()
+            .HasForeignKey(entity => entity.DependentGenreId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasIndex(entity => entity.GenreId)
+            .HasDatabaseName("IX_GenreRelationship_GenreId");
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasIndex(entity => entity.DependentGenreId)
+            .HasDatabaseName("IX_GenreRelationship_DependentGenreId");
+        modelBuilder.Entity<GenreRelationshipDto>()
+            .HasIndex(entity => new { entity.GenreId, entity.Order })
+            .HasDatabaseName("UIX_GenreRelationship_GenreId_Order")
+            .IsUnique();
+        modelBuilder.Entity<GenreRelationshipDto>().HasCheckConstraint("CK_GenreRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<GenreRelationshipDto>().HasCheckConstraint("CK_GenreRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
 
         base.OnModelCreating(modelBuilder);
     }

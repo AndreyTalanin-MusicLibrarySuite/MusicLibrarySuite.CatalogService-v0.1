@@ -50,9 +50,9 @@ public class Startup
             options.AddProfile<ArtistDatabaseProfile>();
             options.AddProfile<ReleaseDatabaseProfile>();
             options.AddProfile<ReleaseGroupDatabaseProfile>();
-            options.AddProfile<GenreDatabaseProfile>();
-            options.AddProfile<ProductDatabaseProfile>();
             options.AddProfile<WorkDatabaseProfile>();
+            options.AddProfile<ProductDatabaseProfile>();
+            options.AddProfile<GenreDatabaseProfile>();
         });
 
         services.AddDbContextFactory<CatalogServiceDbContext, SqlServerCatalogServiceDbContext>(contextOptionsBuilder =>
@@ -110,16 +110,16 @@ public class Startup
         services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
         services.AddScoped<IReleaseRepository, SqlServerReleaseRepository>();
         services.AddScoped<IReleaseGroupRepository, SqlServerReleaseGroupRepository>();
-        services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
-        services.AddScoped<IProductRepository, SqlServerProductRepository>();
         services.AddScoped<IWorkRepository, SqlServerWorkRepository>();
+        services.AddScoped<IProductRepository, SqlServerProductRepository>();
+        services.AddScoped<IGenreRepository, SqlServerGenreRepository>();
 
         services.AddScoped<IArtistService, ArtistService>();
         services.AddScoped<IReleaseService, ReleaseService>();
         services.AddScoped<IReleaseGroupService, ReleaseGroupService>();
-        services.AddScoped<IGenreService, GenreService>();
-        services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IWorkService, WorkService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IGenreService, GenreService>();
     }
 
     /// <summary>

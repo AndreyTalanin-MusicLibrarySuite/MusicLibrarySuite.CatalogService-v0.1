@@ -130,26 +130,6 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<ReleaseGroupRelationshipDto> ReleaseGroupRelationships { get; }
 
     /// <summary>
-    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreDto" /> type.
-    /// </summary>
-    public DbSet<GenreDto> Genres { get; }
-
-    /// <summary>
-    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreRelationshipDto" /> type.
-    /// </summary>
-    public DbSet<GenreRelationshipDto> GenreRelationships { get; }
-
-    /// <summary>
-    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ProductDto" /> type.
-    /// </summary>
-    public DbSet<ProductDto> Products { get; }
-
-    /// <summary>
-    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ProductRelationshipDto" /> type.
-    /// </summary>
-    public DbSet<ProductRelationshipDto> ProductRelationships { get; }
-
-    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="WorkDto" /> type.
     /// </summary>
     public DbSet<WorkDto> Works { get; }
@@ -190,6 +170,26 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<WorkGenreDto> WorkGenres { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ProductDto" /> type.
+    /// </summary>
+    public DbSet<ProductDto> Products { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ProductRelationshipDto" /> type.
+    /// </summary>
+    public DbSet<ProductRelationshipDto> ProductRelationships { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreDto" /> type.
+    /// </summary>
+    public DbSet<GenreDto> Genres { get; }
+
+    /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="GenreRelationshipDto" /> type.
+    /// </summary>
+    public DbSet<GenreRelationshipDto> GenreRelationships { get; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CatalogServiceDbContext" /> type.
     /// </summary>
     protected CatalogServiceDbContext()
@@ -219,10 +219,6 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseTrackGenres = Set<ReleaseTrackGenreDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
         ReleaseGroupRelationships = Set<ReleaseGroupRelationshipDto>();
-        Genres = Set<GenreDto>();
-        GenreRelationships = Set<GenreRelationshipDto>();
-        Products = Set<ProductDto>();
-        ProductRelationships = Set<ProductRelationshipDto>();
         Works = Set<WorkDto>();
         WorkRelationships = Set<WorkRelationshipDto>();
         WorkToProductRelationships = Set<WorkToProductRelationshipDto>();
@@ -231,6 +227,10 @@ public abstract class CatalogServiceDbContext : DbContext
         WorkPerformers = Set<WorkPerformerDto>();
         WorkComposers = Set<WorkComposerDto>();
         WorkGenres = Set<WorkGenreDto>();
+        Products = Set<ProductDto>();
+        ProductRelationships = Set<ProductRelationshipDto>();
+        Genres = Set<GenreDto>();
+        GenreRelationships = Set<GenreRelationshipDto>();
     }
 
     /// <summary>
@@ -264,10 +264,6 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseTrackGenres = Set<ReleaseTrackGenreDto>();
         ReleaseGroups = Set<ReleaseGroupDto>();
         ReleaseGroupRelationships = Set<ReleaseGroupRelationshipDto>();
-        Genres = Set<GenreDto>();
-        GenreRelationships = Set<GenreRelationshipDto>();
-        Products = Set<ProductDto>();
-        ProductRelationships = Set<ProductRelationshipDto>();
         Works = Set<WorkDto>();
         WorkRelationships = Set<WorkRelationshipDto>();
         WorkToProductRelationships = Set<WorkToProductRelationshipDto>();
@@ -276,5 +272,9 @@ public abstract class CatalogServiceDbContext : DbContext
         WorkPerformers = Set<WorkPerformerDto>();
         WorkComposers = Set<WorkComposerDto>();
         WorkGenres = Set<WorkGenreDto>();
+        Products = Set<ProductDto>();
+        ProductRelationships = Set<ProductRelationshipDto>();
+        Genres = Set<GenreDto>();
+        GenreRelationships = Set<GenreRelationshipDto>();
     }
 }
