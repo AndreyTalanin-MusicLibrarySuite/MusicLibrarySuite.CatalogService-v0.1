@@ -31,7 +31,7 @@ public class WorkDto
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple works have the same name.
+    /// Gets or sets the work's disambiguation text.
     /// </summary>
     [StringLength(2048)]
     public string? DisambiguationText { get; set; }

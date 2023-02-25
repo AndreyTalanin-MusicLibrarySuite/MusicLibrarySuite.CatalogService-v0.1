@@ -28,7 +28,7 @@ public class Release
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple releases have the same name.
+    /// Gets or sets the release's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 

@@ -28,7 +28,7 @@ public class Work
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple works have the same name.
+    /// Gets or sets the work's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 

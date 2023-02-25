@@ -40,7 +40,7 @@ public class ReleaseMedia
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple release media have the same name.
+    /// Gets or sets the release media's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 

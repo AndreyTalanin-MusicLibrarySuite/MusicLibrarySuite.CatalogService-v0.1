@@ -38,7 +38,7 @@ public class ReleaseTrackDto
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple release tracks have the same name.
+    /// Gets or sets the release track's disambiguation text.
     /// </summary>
     [StringLength(2048)]
     public string? DisambiguationText { get; set; }

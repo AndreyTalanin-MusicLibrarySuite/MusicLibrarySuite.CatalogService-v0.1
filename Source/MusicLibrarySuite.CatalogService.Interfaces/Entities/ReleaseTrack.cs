@@ -52,7 +52,7 @@ public class ReleaseTrack
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple release tracks have the same name.
+    /// Gets or sets the release track's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 

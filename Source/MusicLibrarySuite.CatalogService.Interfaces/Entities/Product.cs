@@ -28,7 +28,7 @@ public class Product
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple products have the same name.
+    /// Gets or sets the product's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 
