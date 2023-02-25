@@ -579,7 +579,7 @@ public class SqlServerWorkRepository : IWorkRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />

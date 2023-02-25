@@ -1287,7 +1287,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />
@@ -1339,7 +1339,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />
@@ -1393,7 +1393,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />
@@ -1449,7 +1449,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />
@@ -1505,7 +1505,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />
