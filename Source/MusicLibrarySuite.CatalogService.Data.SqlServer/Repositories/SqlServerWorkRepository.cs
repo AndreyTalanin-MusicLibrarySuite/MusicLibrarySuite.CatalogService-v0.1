@@ -41,7 +41,8 @@ public class SqlServerWorkRepository : IWorkRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetWork] (@{workIdParameter.ParameterName})";
 
-        WorkDto? work = await context.Works.FromSqlRaw(query, workIdParameter).AsNoTracking()
+        WorkDto? work = await context.Works
+            .FromSqlRaw(query, workIdParameter)
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
             .Include(work => work.WorkToProductRelationships)
@@ -56,6 +57,8 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (work is not null)
@@ -77,33 +80,9 @@ public class SqlServerWorkRepository : IWorkRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        WorkDto[] works = await context.Works.AsNoTracking()
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
+        WorkDto[] works = await context.Works
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkToProductRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-        }
 
         return works;
     }
@@ -122,33 +101,10 @@ public class SqlServerWorkRepository : IWorkRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetWorks] (@{workIdsParameter.ParameterName})";
 
-        WorkDto[] works = await context.Works.FromSqlRaw(query, workIdsParameter).AsNoTracking()
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
+        WorkDto[] works = await context.Works
+            .FromSqlRaw(query, workIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkToProductRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-        }
 
         return works;
     }
@@ -158,33 +114,9 @@ public class SqlServerWorkRepository : IWorkRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        WorkDto[] works = await collectionProcessor(context.Works.AsNoTracking())
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
+        WorkDto[] works = await collectionProcessor(context.Works)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkToProductRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-        }
 
         return works;
     }
@@ -194,7 +126,7 @@ public class SqlServerWorkRepository : IWorkRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<WorkDto> baseCollection = context.Works.AsNoTracking();
+        IQueryable<WorkDto> baseCollection = context.Works;
 
         if (workPageRequest.Title is not null)
             baseCollection = baseCollection.Where(work => work.Title.Contains(workPageRequest.Title));
@@ -204,36 +136,12 @@ public class SqlServerWorkRepository : IWorkRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<WorkDto> works = await baseCollection
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
             .OrderByDescending(work => work.SystemEntity)
             .ThenBy(work => work.Title)
             .Skip(workPageRequest.PageSize * workPageRequest.PageIndex)
             .Take(workPageRequest.PageSize)
+            .AsNoTracking()
             .ToListAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkToProductRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-        }
 
         return new PageResponseDto<WorkDto>()
         {

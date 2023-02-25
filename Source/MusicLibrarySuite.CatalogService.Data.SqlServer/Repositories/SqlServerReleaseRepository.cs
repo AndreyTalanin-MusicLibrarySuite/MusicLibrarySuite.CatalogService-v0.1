@@ -41,7 +41,8 @@ public class SqlServerReleaseRepository : IReleaseRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetRelease] (@{releaseIdParameter.ParameterName})";
 
-        ReleaseDto? release = await context.Releases.FromSqlRaw(query, releaseIdParameter).AsNoTracking()
+        ReleaseDto? release = await context.Releases
+            .FromSqlRaw(query, releaseIdParameter)
             .Include(release => release.ReleaseRelationships)
             .ThenInclude(releaseRelationship => releaseRelationship.DependentRelease)
             .Include(release => release.ReleaseToProductRelationships)
@@ -75,18 +76,25 @@ public class SqlServerReleaseRepository : IReleaseRepository
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
+            .ThenInclude(releaseTrackArtist => releaseTrackArtist.Artist)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
+            .ThenInclude(releaseTrackFeaturedArtist => releaseTrackFeaturedArtist.Artist)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
+            .ThenInclude(releaseTrackPerformer => releaseTrackPerformer.Artist)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
+            .ThenInclude(releaseTrackComposer => releaseTrackComposer.Artist)
             .Include(release => release.ReleaseMediaCollection)
             .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
             .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackGenres)
+            .ThenInclude(releaseTrackGenre => releaseTrackGenre.Genre)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (release is not null)
@@ -127,83 +135,9 @@ public class SqlServerReleaseRepository : IReleaseRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ReleaseDto[] releases = await context.Releases.AsNoTracking()
-            .Include(release => release.ReleaseRelationships)
-            .ThenInclude(releaseRelationship => releaseRelationship.DependentRelease)
-            .Include(release => release.ReleaseToProductRelationships)
-            .ThenInclude(releaseToProductRelationship => releaseToProductRelationship.Product)
-            .Include(release => release.ReleaseToReleaseGroupRelationships)
-            .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
-            .Include(release => release.ReleaseArtists)
-            .ThenInclude(releaseArtist => releaseArtist.Artist)
-            .Include(release => release.ReleaseFeaturedArtists)
-            .ThenInclude(releaseFeaturedArtist => releaseFeaturedArtist.Artist)
-            .Include(release => release.ReleasePerformers)
-            .ThenInclude(releasePerformer => releasePerformer.Artist)
-            .Include(release => release.ReleaseComposers)
-            .ThenInclude(releaseComposer => releaseComposer.Artist)
-            .Include(release => release.ReleaseGenres)
-            .ThenInclude(releaseGenre => releaseGenre.Genre)
-            .Include(release => release.ReleaseMediaCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseMediaToProductRelationships)
-            .ThenInclude(releaseMediaToProductRelationship => releaseMediaToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
-            .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
-            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackGenres)
+        ReleaseDto[] releases = await context.Releases
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ReleaseDto release in releases)
-        {
-            OrderReleaseRelationships(release);
-            OrderReleaseToProductRelationships(release);
-            OrderReleaseToReleaseGroupRelationships(release);
-            OrderReleaseArtists(release);
-            OrderReleaseFeaturedArtists(release);
-            OrderReleasePerformers(release);
-            OrderReleaseComposers(release);
-            OrderReleaseGenres(release);
-
-            OrderReleaseMediaCollection(release);
-            foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
-            {
-                OrderReleaseMediaToProductRelationships(releaseMedia);
-
-                OrderReleaseTrackCollection(releaseMedia);
-                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
-                {
-                    OrderReleaseTrackToProductRelationships(releaseTrack);
-                    OrderReleaseTrackToWorkRelationships(releaseTrack);
-                    OrderReleaseTrackArtists(releaseTrack);
-                    OrderReleaseTrackFeaturedArtists(releaseTrack);
-                    OrderReleaseTrackPerformers(releaseTrack);
-                    OrderReleaseTrackComposers(releaseTrack);
-                    OrderReleaseTrackGenres(releaseTrack);
-                }
-            }
-        }
 
         return releases;
     }
@@ -222,83 +156,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetReleases] (@{releaseIdsParameter.ParameterName})";
 
-        ReleaseDto[] releases = await context.Releases.FromSqlRaw(query, releaseIdsParameter).AsNoTracking()
-            .Include(release => release.ReleaseRelationships)
-            .ThenInclude(releaseRelationship => releaseRelationship.DependentRelease)
-            .Include(release => release.ReleaseToProductRelationships)
-            .ThenInclude(releaseToProductRelationship => releaseToProductRelationship.Product)
-            .Include(release => release.ReleaseToReleaseGroupRelationships)
-            .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
-            .Include(release => release.ReleaseArtists)
-            .ThenInclude(releaseArtist => releaseArtist.Artist)
-            .Include(release => release.ReleaseFeaturedArtists)
-            .ThenInclude(releaseFeaturedArtist => releaseFeaturedArtist.Artist)
-            .Include(release => release.ReleasePerformers)
-            .ThenInclude(releasePerformer => releasePerformer.Artist)
-            .Include(release => release.ReleaseComposers)
-            .ThenInclude(releaseComposer => releaseComposer.Artist)
-            .Include(release => release.ReleaseGenres)
-            .ThenInclude(releaseGenre => releaseGenre.Genre)
-            .Include(release => release.ReleaseMediaCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseMediaToProductRelationships)
-            .ThenInclude(releaseMediaToProductRelationship => releaseMediaToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
-            .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
-            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackGenres)
+        ReleaseDto[] releases = await context.Releases
+            .FromSqlRaw(query, releaseIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ReleaseDto release in releases)
-        {
-            OrderReleaseRelationships(release);
-            OrderReleaseToProductRelationships(release);
-            OrderReleaseToReleaseGroupRelationships(release);
-            OrderReleaseArtists(release);
-            OrderReleaseFeaturedArtists(release);
-            OrderReleasePerformers(release);
-            OrderReleaseComposers(release);
-            OrderReleaseGenres(release);
-
-            OrderReleaseMediaCollection(release);
-            foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
-            {
-                OrderReleaseMediaToProductRelationships(releaseMedia);
-
-                OrderReleaseTrackCollection(releaseMedia);
-                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
-                {
-                    OrderReleaseTrackToProductRelationships(releaseTrack);
-                    OrderReleaseTrackToWorkRelationships(releaseTrack);
-                    OrderReleaseTrackArtists(releaseTrack);
-                    OrderReleaseTrackFeaturedArtists(releaseTrack);
-                    OrderReleaseTrackPerformers(releaseTrack);
-                    OrderReleaseTrackComposers(releaseTrack);
-                    OrderReleaseTrackGenres(releaseTrack);
-                }
-            }
-        }
 
         return releases;
     }
@@ -308,83 +169,9 @@ public class SqlServerReleaseRepository : IReleaseRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ReleaseDto[] releases = await collectionProcessor(context.Releases.AsNoTracking())
-            .Include(release => release.ReleaseRelationships)
-            .ThenInclude(releaseRelationship => releaseRelationship.DependentRelease)
-            .Include(release => release.ReleaseToProductRelationships)
-            .ThenInclude(releaseToProductRelationship => releaseToProductRelationship.Product)
-            .Include(release => release.ReleaseToReleaseGroupRelationships)
-            .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
-            .Include(release => release.ReleaseArtists)
-            .ThenInclude(releaseArtist => releaseArtist.Artist)
-            .Include(release => release.ReleaseFeaturedArtists)
-            .ThenInclude(releaseFeaturedArtist => releaseFeaturedArtist.Artist)
-            .Include(release => release.ReleasePerformers)
-            .ThenInclude(releasePerformer => releasePerformer.Artist)
-            .Include(release => release.ReleaseComposers)
-            .ThenInclude(releaseComposer => releaseComposer.Artist)
-            .Include(release => release.ReleaseGenres)
-            .ThenInclude(releaseGenre => releaseGenre.Genre)
-            .Include(release => release.ReleaseMediaCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseMediaToProductRelationships)
-            .ThenInclude(releaseMediaToProductRelationship => releaseMediaToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
-            .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
-            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackGenres)
+        ReleaseDto[] releases = await collectionProcessor(context.Releases)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ReleaseDto release in releases)
-        {
-            OrderReleaseRelationships(release);
-            OrderReleaseToProductRelationships(release);
-            OrderReleaseToReleaseGroupRelationships(release);
-            OrderReleaseArtists(release);
-            OrderReleaseFeaturedArtists(release);
-            OrderReleasePerformers(release);
-            OrderReleaseComposers(release);
-            OrderReleaseGenres(release);
-
-            OrderReleaseMediaCollection(release);
-            foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
-            {
-                OrderReleaseMediaToProductRelationships(releaseMedia);
-
-                OrderReleaseTrackCollection(releaseMedia);
-                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
-                {
-                    OrderReleaseTrackToProductRelationships(releaseTrack);
-                    OrderReleaseTrackToWorkRelationships(releaseTrack);
-                    OrderReleaseTrackArtists(releaseTrack);
-                    OrderReleaseTrackFeaturedArtists(releaseTrack);
-                    OrderReleaseTrackPerformers(releaseTrack);
-                    OrderReleaseTrackComposers(releaseTrack);
-                    OrderReleaseTrackGenres(releaseTrack);
-                }
-            }
-        }
 
         return releases;
     }
@@ -394,7 +181,7 @@ public class SqlServerReleaseRepository : IReleaseRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<ReleaseDto> baseCollection = context.Releases.AsNoTracking();
+        IQueryable<ReleaseDto> baseCollection = context.Releases;
 
         if (releasePageRequest.Title is not null)
             baseCollection = baseCollection.Where(release => release.Title.Contains(releasePageRequest.Title));
@@ -404,85 +191,11 @@ public class SqlServerReleaseRepository : IReleaseRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<ReleaseDto> releases = await baseCollection
-            .Include(release => release.ReleaseRelationships)
-            .ThenInclude(releaseRelationship => releaseRelationship.DependentRelease)
-            .Include(release => release.ReleaseToProductRelationships)
-            .ThenInclude(releaseToProductRelationship => releaseToProductRelationship.Product)
-            .Include(release => release.ReleaseToReleaseGroupRelationships)
-            .ThenInclude(releaseToReleaseGroupRelationship => releaseToReleaseGroupRelationship.ReleaseGroup)
-            .Include(release => release.ReleaseArtists)
-            .ThenInclude(releaseArtist => releaseArtist.Artist)
-            .Include(release => release.ReleaseFeaturedArtists)
-            .ThenInclude(releaseFeaturedArtist => releaseFeaturedArtist.Artist)
-            .Include(release => release.ReleasePerformers)
-            .ThenInclude(releasePerformer => releasePerformer.Artist)
-            .Include(release => release.ReleaseComposers)
-            .ThenInclude(releaseComposer => releaseComposer.Artist)
-            .Include(release => release.ReleaseGenres)
-            .ThenInclude(releaseGenre => releaseGenre.Genre)
-            .Include(release => release.ReleaseMediaCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseMediaToProductRelationships)
-            .ThenInclude(releaseMediaToProductRelationship => releaseMediaToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToProductRelationships)
-            .ThenInclude(releaseTrackToProductRelationship => releaseTrackToProductRelationship.Product)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackToWorkRelationships)
-            .ThenInclude(releaseTrackToWorkRelationship => releaseTrackToWorkRelationship.Work)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackFeaturedArtists)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackPerformers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackComposers)
-            .Include(release => release.ReleaseMediaCollection)
-            .ThenInclude(releaseMedia => releaseMedia.ReleaseTrackCollection)
-            .ThenInclude(releaseTrack => releaseTrack.ReleaseTrackGenres)
             .OrderBy(release => release.Title)
             .Skip(releasePageRequest.PageSize * releasePageRequest.PageIndex)
             .Take(releasePageRequest.PageSize)
+            .AsNoTracking()
             .ToListAsync();
-
-        foreach (ReleaseDto release in releases)
-        {
-            OrderReleaseRelationships(release);
-            OrderReleaseToProductRelationships(release);
-            OrderReleaseToReleaseGroupRelationships(release);
-            OrderReleaseArtists(release);
-            OrderReleaseFeaturedArtists(release);
-            OrderReleasePerformers(release);
-            OrderReleaseComposers(release);
-            OrderReleaseGenres(release);
-
-            OrderReleaseMediaCollection(release);
-            foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
-            {
-                OrderReleaseMediaToProductRelationships(releaseMedia);
-
-                OrderReleaseTrackCollection(releaseMedia);
-                foreach (ReleaseTrackDto releaseTrack in releaseMedia.ReleaseTrackCollection)
-                {
-                    OrderReleaseTrackToProductRelationships(releaseTrack);
-                    OrderReleaseTrackToWorkRelationships(releaseTrack);
-                    OrderReleaseTrackArtists(releaseTrack);
-                    OrderReleaseTrackFeaturedArtists(releaseTrack);
-                    OrderReleaseTrackPerformers(releaseTrack);
-                    OrderReleaseTrackComposers(releaseTrack);
-                    OrderReleaseTrackGenres(releaseTrack);
-                }
-            }
-        }
 
         return new PageResponseDto<ReleaseDto>()
         {

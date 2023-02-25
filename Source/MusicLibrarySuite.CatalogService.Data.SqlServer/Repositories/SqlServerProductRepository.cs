@@ -41,9 +41,12 @@ public class SqlServerProductRepository : IProductRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetProduct] (@{productIdParameter.ParameterName})";
 
-        ProductDto? product = await context.Products.FromSqlRaw(query, productIdParameter).AsNoTracking()
+        ProductDto? product = await context.Products
+            .FromSqlRaw(query, productIdParameter)
             .Include(product => product.ProductRelationships)
             .ThenInclude(productRelationship => productRelationship.DependentProduct)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (product is not null)
@@ -59,15 +62,9 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ProductDto[] products = await context.Products.AsNoTracking()
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
+        ProductDto[] products = await context.Products
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return products;
     }
@@ -86,15 +83,10 @@ public class SqlServerProductRepository : IProductRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetProducts] (@{productIdsParameter.ParameterName})";
 
-        ProductDto[] products = await context.Products.FromSqlRaw(query, productIdsParameter).AsNoTracking()
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
+        ProductDto[] products = await context.Products
+            .FromSqlRaw(query, productIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return products;
     }
@@ -104,15 +96,9 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ProductDto[] products = await collectionProcessor(context.Products.AsNoTracking())
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
+        ProductDto[] products = await collectionProcessor(context.Products)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return products;
     }
@@ -122,7 +108,7 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<ProductDto> baseCollection = context.Products.AsNoTracking();
+        IQueryable<ProductDto> baseCollection = context.Products;
 
         if (productPageRequest.Title is not null)
             baseCollection = baseCollection.Where(product => product.Title.Contains(productPageRequest.Title));
@@ -132,18 +118,13 @@ public class SqlServerProductRepository : IProductRepository
 
         var totalCount = await baseCollection.CountAsync();
         List<ProductDto> products = await baseCollection
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .OrderByDescending(product => product.SystemEntity)
             .ThenBy(product => product.Title)
             .Skip(productPageRequest.PageSize * productPageRequest.PageIndex)
             .Take(productPageRequest.PageSize)
+            .AsNoTracking()
+            .AsSplitQuery()
             .ToListAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return new PageResponseDto<ProductDto>()
         {
