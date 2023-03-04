@@ -139,6 +139,7 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                 @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
                 @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
+                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
@@ -444,6 +445,62 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                     [source].[MediaFormat],
                     [source].[TableOfContentsChecksum],
                     [source].[TableOfContentsChecksumLong]
+                );
+
+                WITH [SourceReleaseMediaToProductRelationship] AS
+                (
+                    SELECT
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        COALESCE([targetReleaseMediaToProductRelationship].[ReferenceOrder],
+                            MAX([productReleaseMediaToProductRelationship].[ReferenceOrder]) + 1,
+                            0) AS [ReferenceOrder]
+                    FROM @ReleaseMediaToProductRelationships AS [sourceReleaseMediaToProductRelationship]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [targetReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[MediaNumber] = [sourceReleaseMediaToProductRelationship].[MediaNumber]
+                        AND [targetReleaseMediaToProductRelationship].[ReleaseId] = [sourceReleaseMediaToProductRelationship].[ReleaseId]
+                        AND [targetReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [productReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[ReferenceOrder] IS NULL
+                        AND [productReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    WHERE [sourceReleaseMediaToProductRelationship].[ReleaseId] = @Id
+                    GROUP BY
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        [targetReleaseMediaToProductRelationship].[ReferenceOrder]
+                )
+                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
+                USING [SourceReleaseMediaToProductRelationship] AS [source]
+                ON [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[ProductId] = [source].[ProductId]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [MediaNumber],
+                    [ReleaseId],
+                    [ProductId],
+                    [Name],
+                    [Description],
+                    [Order],
+                    [ReferenceOrder]
+                )
+                VALUES
+                (
+                    [source].[MediaNumber],
+                    [source].[ReleaseId],
+                    [source].[ProductId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order],
+                    [source].[ReferenceOrder]
                 );
 
                 WITH [SourceReleaseTrack] AS
@@ -768,6 +825,7 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                 @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
                 @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
+                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
@@ -1113,6 +1171,70 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                     [source].[MediaFormat],
                     [source].[TableOfContentsChecksum],
                     [source].[TableOfContentsChecksumLong]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+
+                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+
+                WITH [SourceReleaseMediaToProductRelationship] AS
+                (
+                    SELECT
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        COALESCE([targetReleaseMediaToProductRelationship].[ReferenceOrder],
+                            MAX([productReleaseMediaToProductRelationship].[ReferenceOrder]) + 1,
+                            0) AS [ReferenceOrder]
+                    FROM @ReleaseMediaToProductRelationships AS [sourceReleaseMediaToProductRelationship]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [targetReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[MediaNumber] = [sourceReleaseMediaToProductRelationship].[MediaNumber]
+                        AND [targetReleaseMediaToProductRelationship].[ReleaseId] = [sourceReleaseMediaToProductRelationship].[ReleaseId]
+                        AND [targetReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [productReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[ReferenceOrder] IS NULL
+                        AND [productReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    WHERE [sourceReleaseMediaToProductRelationship].[ReleaseId] = @Id
+                    GROUP BY
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        [targetReleaseMediaToProductRelationship].[ReferenceOrder]
+                )
+                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
+                USING [SourceReleaseMediaToProductRelationship] AS [source]
+                ON [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[ProductId] = [source].[ProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Name] = [source].[Name],
+                    [target].[Description] = [source].[Description],
+                    [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [MediaNumber],
+                    [ReleaseId],
+                    [ProductId],
+                    [Name],
+                    [Description],
+                    [Order],
+                    [ReferenceOrder]
+                )
+                VALUES
+                (
+                    [source].[MediaNumber],
+                    [source].[ReleaseId],
+                    [source].[ProductId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order],
+                    [source].[ReferenceOrder]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
 
@@ -1544,6 +1666,7 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                 @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
                 @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
+                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
@@ -1850,6 +1973,62 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                     [source].[TableOfContentsChecksumLong]
                 );
 
+                WITH [SourceReleaseMediaToProductRelationship] AS
+                (
+                    SELECT
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        COALESCE([targetReleaseMediaToProductRelationship].[ReferenceOrder],
+                            MAX([productReleaseMediaToProductRelationship].[ReferenceOrder]) + 1,
+                            0) AS [ReferenceOrder]
+                    FROM @ReleaseMediaToProductRelationships AS [sourceReleaseMediaToProductRelationship]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [targetReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[MediaNumber] = [sourceReleaseMediaToProductRelationship].[MediaNumber]
+                        AND [targetReleaseMediaToProductRelationship].[ReleaseId] = [sourceReleaseMediaToProductRelationship].[ReleaseId]
+                        AND [targetReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [productReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[ReferenceOrder] IS NULL
+                        AND [productReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    WHERE [sourceReleaseMediaToProductRelationship].[ReleaseId] = @Id
+                    GROUP BY
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        [targetReleaseMediaToProductRelationship].[ReferenceOrder]
+                )
+                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
+                USING [SourceReleaseMediaToProductRelationship] AS [source]
+                ON [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[ProductId] = [source].[ProductId]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [MediaNumber],
+                    [ReleaseId],
+                    [ProductId],
+                    [Name],
+                    [Description],
+                    [Order],
+                    [ReferenceOrder]
+                )
+                VALUES
+                (
+                    [source].[MediaNumber],
+                    [source].[ReleaseId],
+                    [source].[ProductId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order],
+                    [source].[ReferenceOrder]
+                );
+
                 WITH [SourceReleaseTrack] AS
                 (
                     SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
@@ -2110,6 +2289,7 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                 @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
                 @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
+                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
                 @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
@@ -2454,6 +2634,70 @@ public partial class ReleaseTrackToWorkRelationshipsMigration : Migration
                     [source].[MediaFormat],
                     [source].[TableOfContentsChecksum],
                     [source].[TableOfContentsChecksumLong]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+
+                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+
+                WITH [SourceReleaseMediaToProductRelationship] AS
+                (
+                    SELECT
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        COALESCE([targetReleaseMediaToProductRelationship].[ReferenceOrder],
+                            MAX([productReleaseMediaToProductRelationship].[ReferenceOrder]) + 1,
+                            0) AS [ReferenceOrder]
+                    FROM @ReleaseMediaToProductRelationships AS [sourceReleaseMediaToProductRelationship]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [targetReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[MediaNumber] = [sourceReleaseMediaToProductRelationship].[MediaNumber]
+                        AND [targetReleaseMediaToProductRelationship].[ReleaseId] = [sourceReleaseMediaToProductRelationship].[ReleaseId]
+                        AND [targetReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [productReleaseMediaToProductRelationship]
+                        ON [targetReleaseMediaToProductRelationship].[ReferenceOrder] IS NULL
+                        AND [productReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
+                    WHERE [sourceReleaseMediaToProductRelationship].[ReleaseId] = @Id
+                    GROUP BY
+                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
+                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
+                        [sourceReleaseMediaToProductRelationship].[ProductId],
+                        [sourceReleaseMediaToProductRelationship].[Name],
+                        [sourceReleaseMediaToProductRelationship].[Description],
+                        [sourceReleaseMediaToProductRelationship].[Order],
+                        [targetReleaseMediaToProductRelationship].[ReferenceOrder]
+                )
+                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
+                USING [SourceReleaseMediaToProductRelationship] AS [source]
+                ON [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[ProductId] = [source].[ProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Name] = [source].[Name],
+                    [target].[Description] = [source].[Description],
+                    [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [MediaNumber],
+                    [ReleaseId],
+                    [ProductId],
+                    [Name],
+                    [Description],
+                    [Order],
+                    [ReferenceOrder]
+                )
+                VALUES
+                (
+                    [source].[MediaNumber],
+                    [source].[ReleaseId],
+                    [source].[ProductId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order],
+                    [source].[ReferenceOrder]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
 
