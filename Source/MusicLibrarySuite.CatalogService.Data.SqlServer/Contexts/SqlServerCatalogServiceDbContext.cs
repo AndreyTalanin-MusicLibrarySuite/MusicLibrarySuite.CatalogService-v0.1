@@ -328,6 +328,35 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksum", "[TableOfContentsChecksum] IS NULL OR LEN(TRIM([TableOfContentsChecksum])) > 0");
         modelBuilder.Entity<ReleaseMediaDto>().HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksumLong", "[TableOfContentsChecksumLong] IS NULL OR LEN(TRIM([TableOfContentsChecksumLong])) > 0");
 
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>().ToTable("ReleaseMediaToProductRelationship", "dbo");
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId, entity.ProductId });
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
+            .HasOne<ReleaseMediaDto>()
+            .WithMany()
+            .HasForeignKey(entity => new { entity.MediaNumber, entity.ReleaseId })
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
+            .HasOne<ProductDto>()
+            .WithMany()
+            .HasForeignKey(entity => entity.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.MediaNumber, entity.ReleaseId })
+            .HasDatabaseName("IX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId");
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
+            .HasIndex(entity => entity.ProductId)
+            .HasDatabaseName("IX_ReleaseMediaToProductRelationship_ProductId");
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.MediaNumber, entity.ReleaseId, entity.Order })
+            .HasDatabaseName("UIX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId_Order")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
+            .HasIndex(entity => new { entity.ProductId, entity.ReferenceOrder })
+            .HasDatabaseName("UIX_ReleaseMediaToProductRelationship_ProductId_ReferenceOrder")
+            .IsUnique();
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseMediaToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+        modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>().HasCheckConstraint("CK_ReleaseMediaToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
         modelBuilder.Entity<ReleaseTrackDto>().ToTable("ReleaseTrack", "dbo");
         modelBuilder.Entity<ReleaseTrackDto>().HasKey(entity => new { entity.TrackNumber, entity.MediaNumber, entity.ReleaseId });
         modelBuilder.Entity<ReleaseTrackDto>()

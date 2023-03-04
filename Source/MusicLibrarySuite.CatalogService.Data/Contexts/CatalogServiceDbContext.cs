@@ -75,6 +75,11 @@ public abstract class CatalogServiceDbContext : DbContext
     public DbSet<ReleaseMediaDto> ReleaseMediaCollection { get; }
 
     /// <summary>
+    /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseMediaToProductRelationshipDto" /> type.
+    /// </summary>
+    public DbSet<ReleaseMediaToProductRelationshipDto> ReleaseMediaToProductRelationships { get; }
+
+    /// <summary>
     /// Gets a <see cref="DbSet{TEntity}" /> object for entities of the <see cref="ReleaseTrackDto" /> type.
     /// </summary>
     public DbSet<ReleaseTrackDto> ReleaseTrackCollection { get; }
@@ -203,6 +208,7 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseToProductRelationships = Set<ReleaseToProductRelationshipDto>();
         ReleaseToReleaseGroupRelationships = Set<ReleaseToReleaseGroupRelationshipDto>();
         ReleaseMediaCollection = Set<ReleaseMediaDto>();
+        ReleaseMediaToProductRelationships = Set<ReleaseMediaToProductRelationshipDto>();
         ReleaseTrackCollection = Set<ReleaseTrackDto>();
         ReleaseTrackArtists = Set<ReleaseTrackArtistDto>();
         ReleaseTrackFeaturedArtists = Set<ReleaseTrackFeaturedArtistDto>();
@@ -247,6 +253,7 @@ public abstract class CatalogServiceDbContext : DbContext
         ReleaseToProductRelationships = Set<ReleaseToProductRelationshipDto>();
         ReleaseToReleaseGroupRelationships = Set<ReleaseToReleaseGroupRelationshipDto>();
         ReleaseMediaCollection = Set<ReleaseMediaDto>();
+        ReleaseMediaToProductRelationships = Set<ReleaseMediaToProductRelationshipDto>();
         ReleaseTrackCollection = Set<ReleaseTrackDto>();
         ReleaseTrackArtists = Set<ReleaseTrackArtistDto>();
         ReleaseTrackFeaturedArtists = Set<ReleaseTrackFeaturedArtistDto>();
