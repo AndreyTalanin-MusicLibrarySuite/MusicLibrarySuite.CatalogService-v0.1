@@ -113,6 +113,16 @@ public interface IReleaseRepository
     public Task<ReleaseToReleaseGroupRelationshipDto[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId);
 
     /// <summary>
+    /// Asynchronously gets all release-media-to-product relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-media-to-product relationships.
+    /// </returns>
+    public Task<ReleaseMediaToProductRelationshipDto[]> GetReleaseMediaToProductRelationshipsAsync(Guid releaseId);
+
+    /// <summary>
     /// Asynchronously gets all release-track-to-product relationships by a release's unique identifier.
     /// </summary>
     /// <param name="releaseId">The release's unique identifier.</param>

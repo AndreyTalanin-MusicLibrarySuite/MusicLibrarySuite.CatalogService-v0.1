@@ -147,6 +147,14 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseMediaToProductRelationship[]> GetReleaseMediaToProductRelationshipsAsync(Guid releaseId)
+    {
+        ReleaseMediaToProductRelationshipDto[] releaseMediaToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseMediaToProductRelationshipsAsync(releaseId);
+        ReleaseMediaToProductRelationship[] releaseMediaToProductRelationshipArray = m_mapper.Map<ReleaseMediaToProductRelationship[]>(releaseMediaToProductRelationshipDtoArray);
+        return releaseMediaToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<ReleaseTrackToProductRelationship[]> GetReleaseTrackToProductRelationshipsAsync(Guid releaseId)
     {
         ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseTrackToProductRelationshipsAsync(releaseId);
