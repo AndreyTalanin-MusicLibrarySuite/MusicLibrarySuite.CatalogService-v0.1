@@ -332,7 +332,7 @@ public class SqlServerCatalogServiceDbContext : CatalogServiceDbContext
         modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>().HasKey(entity => new { entity.MediaNumber, entity.ReleaseId, entity.ProductId });
         modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
             .HasOne<ReleaseMediaDto>()
-            .WithMany()
+            .WithMany(entity => entity.ReleaseMediaToProductRelationships)
             .HasForeignKey(entity => new { entity.MediaNumber, entity.ReleaseId })
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<ReleaseMediaToProductRelationshipDto>()
