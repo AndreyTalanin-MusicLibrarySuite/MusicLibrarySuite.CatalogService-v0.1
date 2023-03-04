@@ -215,6 +215,17 @@ public interface IReleaseRepository
     public Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationships, bool useReferenceOrder = false);
 
     /// <summary>
+    /// Asynchronously updates order of existing release-media-to-product relationships.
+    /// </summary>
+    /// <param name="releaseMediaToProductRelationships">A collection of release-media-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the <see cref="ReleaseMediaToProductRelationshipDto.ReferenceOrder" /> property should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any release-media-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateReleaseMediaToProductRelationshipsOrderAsync(ReleaseMediaToProductRelationshipDto[] releaseMediaToProductRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
     /// Asynchronously updates order of existing release-track-to-product relationships.
     /// </summary>
     /// <param name="releaseTrackToProductRelationships">A collection of release-track-to-product relationships to reorder.</param>

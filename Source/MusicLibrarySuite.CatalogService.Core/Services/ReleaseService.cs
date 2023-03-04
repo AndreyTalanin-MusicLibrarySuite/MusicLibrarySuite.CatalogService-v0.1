@@ -228,6 +228,14 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<bool> UpdateReleaseMediaToProductRelationshipsOrderAsync(ReleaseMediaToProductRelationship[] releaseMediaToProductRelationships, bool useReferenceOrder)
+    {
+        ReleaseMediaToProductRelationshipDto[] releaseMediaToProductRelationshipDtoArray = m_mapper.Map<ReleaseMediaToProductRelationshipDto[]>(releaseMediaToProductRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseMediaToProductRelationshipsOrderAsync(releaseMediaToProductRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> UpdateReleaseTrackToProductRelationshipsOrderAsync(ReleaseTrackToProductRelationship[] releaseTrackToProductRelationships, bool useReferenceOrder)
     {
         ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationshipDtoArray = m_mapper.Map<ReleaseTrackToProductRelationshipDto[]>(releaseTrackToProductRelationships);

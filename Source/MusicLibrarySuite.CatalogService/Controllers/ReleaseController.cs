@@ -359,6 +359,21 @@ public class ReleaseController : ControllerBase
     }
 
     /// <summary>
+    /// Asynchronously updates order of existing release-media-to-product relationships.
+    /// </summary>
+    /// <param name="releaseMediaToProductRelationships">A collection of release-media-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>The task object representing the asynchronous operation.</returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateReleaseMediaToProductRelationshipsOrderAsync([Required][FromBody] ReleaseMediaToProductRelationship[] releaseMediaToProductRelationships, [FromQuery] bool? useReferenceOrder)
+    {
+        var result = await m_releaseService.UpdateReleaseMediaToProductRelationshipsOrderAsync(releaseMediaToProductRelationships, useReferenceOrder == true);
+        return result ? Ok() : NotFound();
+    }
+
+    /// <summary>
     /// Asynchronously updates order of existing release-track-to-product relationships.
     /// </summary>
     /// <param name="releaseTrackToProductRelationships">A collection of release-track-to-product relationships to reorder.</param>
