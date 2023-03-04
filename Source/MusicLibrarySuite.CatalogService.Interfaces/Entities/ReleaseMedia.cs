@@ -65,6 +65,13 @@ public class ReleaseMedia
     public string? TableOfContentsChecksumLong { get; set; }
 
     /// <summary>
+    /// Gets or sets a collection of release-media-to-product relationships associated to the current release media.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseMediaToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
+    [Required]
+    public ICollection<ReleaseMediaToProductRelationship> ReleaseMediaToProductRelationships { get; set; } = Enumerable.Empty<ReleaseMediaToProductRelationship>().ToList();
+
+    /// <summary>
     /// Gets or sets a collection of release tracks associated to the current release media.
     /// </summary>
     [Required]
