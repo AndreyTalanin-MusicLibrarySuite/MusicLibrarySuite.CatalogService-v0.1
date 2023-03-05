@@ -626,6 +626,55 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.HasCheckConstraint("CK_ReleaseMedia_Title", "LEN(TRIM([Title])) > 0");
                 });
 
+            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaToProductRelationshipDto", b =>
+                {
+                    b.Property<byte>("MediaNumber")
+                        .HasColumnType("tinyint");
+
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReferenceOrder")
+                        .HasColumnType("int");
+
+                    b.HasKey("MediaNumber", "ReleaseId", "ProductId");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_ReleaseMediaToProductRelationship_ProductId");
+
+                    b.HasIndex("MediaNumber", "ReleaseId")
+                        .HasDatabaseName("IX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId");
+
+                    b.HasIndex("ProductId", "ReferenceOrder")
+                        .IsUnique()
+                        .HasDatabaseName("UIX_ReleaseMediaToProductRelationship_ProductId_ReferenceOrder");
+
+                    b.HasIndex("MediaNumber", "ReleaseId", "Order")
+                        .IsUnique()
+                        .HasDatabaseName("UIX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId_Order");
+
+                    b.ToTable("ReleaseMediaToProductRelationship", "dbo");
+
+                    b.HasCheckConstraint("CK_ReleaseMediaToProductRelationship_Description", "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
+
+                    b.HasCheckConstraint("CK_ReleaseMediaToProductRelationship_Name", "LEN(TRIM([Name])) > 0");
+                });
+
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleasePerformerDto", b =>
                 {
                     b.Property<Guid>("ReleaseId")
@@ -1551,6 +1600,25 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaToProductRelationshipDto", b =>
+                {
+                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ProductDto", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaDto", "ReleaseMedia")
+                        .WithMany("ReleaseMediaToProductRelationships")
+                        .HasForeignKey("MediaNumber", "ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ReleaseMedia");
+                });
+
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleasePerformerDto", b =>
                 {
                     b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
@@ -1947,6 +2015,8 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
 
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaDto", b =>
                 {
+                    b.Navigation("ReleaseMediaToProductRelationships");
+
                     b.Navigation("ReleaseTrackCollection");
                 });
 

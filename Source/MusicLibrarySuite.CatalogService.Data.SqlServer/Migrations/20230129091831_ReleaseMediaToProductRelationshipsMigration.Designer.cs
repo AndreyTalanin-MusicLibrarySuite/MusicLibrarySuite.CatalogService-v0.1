@@ -12,8 +12,8 @@ using MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
 {
     [DbContext(typeof(SqlServerCatalogServiceDbContext))]
-    [Migration("20230129140753_ReleaseTrackArtistsMigration")]
-    partial class ReleaseTrackArtistsMigration
+    [Migration("20230129091831_ReleaseMediaToProductRelationshipsMigration")]
+    partial class ReleaseMediaToProductRelationshipsMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -835,70 +835,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.HasCheckConstraint("CK_ReleaseToReleaseGroupRelationship_Name", "LEN(TRIM([Name])) > 0");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackArtistDto", b =>
-                {
-                    b.Property<byte>("TrackNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("MediaNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("TrackNumber", "MediaNumber", "ReleaseId", "ArtistId");
-
-                    b.HasIndex("ArtistId")
-                        .HasDatabaseName("IX_ReleaseTrackArtist_ArtistId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId")
-                        .HasDatabaseName("IX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId_Order");
-
-                    b.ToTable("ReleaseTrackArtist", "dbo");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackComposerDto", b =>
-                {
-                    b.Property<byte>("TrackNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("MediaNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("TrackNumber", "MediaNumber", "ReleaseId", "ArtistId");
-
-                    b.HasIndex("ArtistId")
-                        .HasDatabaseName("IX_ReleaseTrackComposer_ArtistId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId")
-                        .HasDatabaseName("IX_ReleaseTrackComposer_TrackNumber_MediaNumber_ReleaseId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_ReleaseTrackComposer_TrackNumber_MediaNumber_ReleaseId_Order");
-
-                    b.ToTable("ReleaseTrackComposer", "dbo");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", b =>
                 {
                     b.Property<byte>("TrackNumber")
@@ -947,70 +883,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.HasCheckConstraint("CK_ReleaseTrack_InternationalStandardRecordingCode", "[InternationalStandardRecordingCode] IS NULL OR LEN(TRIM([InternationalStandardRecordingCode])) > 0");
 
                     b.HasCheckConstraint("CK_ReleaseTrack_Title", "LEN(TRIM([Title])) > 0");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackFeaturedArtistDto", b =>
-                {
-                    b.Property<byte>("TrackNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("MediaNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("TrackNumber", "MediaNumber", "ReleaseId", "ArtistId");
-
-                    b.HasIndex("ArtistId")
-                        .HasDatabaseName("IX_ReleaseTrackFeaturedArtist_ArtistId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId")
-                        .HasDatabaseName("IX_ReleaseTrackFeaturedArtist_TrackNumber_MediaNumber_ReleaseId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_ReleaseTrackFeaturedArtist_TrackNumber_MediaNumber_ReleaseId_Order");
-
-                    b.ToTable("ReleaseTrackFeaturedArtist", "dbo");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackPerformerDto", b =>
-                {
-                    b.Property<byte>("TrackNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<byte>("MediaNumber")
-                        .HasColumnType("tinyint");
-
-                    b.Property<Guid>("ReleaseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("TrackNumber", "MediaNumber", "ReleaseId", "ArtistId");
-
-                    b.HasIndex("ArtistId")
-                        .HasDatabaseName("IX_ReleaseTrackPerformer_ArtistId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId")
-                        .HasDatabaseName("IX_ReleaseTrackPerformer_TrackNumber_MediaNumber_ReleaseId");
-
-                    b.HasIndex("TrackNumber", "MediaNumber", "ReleaseId", "Order")
-                        .IsUnique()
-                        .HasDatabaseName("UIX_ReleaseTrackPerformer_TrackNumber_MediaNumber_ReleaseId_Order");
-
-                    b.ToTable("ReleaseTrackPerformer", "dbo");
                 });
 
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkArtistDto", b =>
@@ -1562,44 +1434,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.Navigation("ReleaseGroup");
                 });
 
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackArtistDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", "ReleaseTrack")
-                        .WithMany("ReleaseTrackArtists")
-                        .HasForeignKey("TrackNumber", "MediaNumber", "ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Artist");
-
-                    b.Navigation("ReleaseTrack");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackComposerDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", "ReleaseTrack")
-                        .WithMany("ReleaseTrackComposers")
-                        .HasForeignKey("TrackNumber", "MediaNumber", "ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Artist");
-
-                    b.Navigation("ReleaseTrack");
-                });
-
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", b =>
                 {
                     b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseMediaDto", null)
@@ -1607,44 +1441,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                         .HasForeignKey("MediaNumber", "ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackFeaturedArtistDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", "ReleaseTrack")
-                        .WithMany("ReleaseTrackFeaturedArtists")
-                        .HasForeignKey("TrackNumber", "MediaNumber", "ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Artist");
-
-                    b.Navigation("ReleaseTrack");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackPerformerDto", b =>
-                {
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ArtistDto", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", "ReleaseTrack")
-                        .WithMany("ReleaseTrackPerformers")
-                        .HasForeignKey("TrackNumber", "MediaNumber", "ReleaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Artist");
-
-                    b.Navigation("ReleaseTrack");
                 });
 
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkArtistDto", b =>
@@ -1828,17 +1624,6 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.Navigation("ReleaseMediaToProductRelationships");
 
                     b.Navigation("ReleaseTrackCollection");
-                });
-
-            modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.ReleaseTrackDto", b =>
-                {
-                    b.Navigation("ReleaseTrackArtists");
-
-                    b.Navigation("ReleaseTrackComposers");
-
-                    b.Navigation("ReleaseTrackFeaturedArtists");
-
-                    b.Navigation("ReleaseTrackPerformers");
                 });
 
             modelBuilder.Entity("MusicLibrarySuite.CatalogService.Data.Entities.WorkDto", b =>

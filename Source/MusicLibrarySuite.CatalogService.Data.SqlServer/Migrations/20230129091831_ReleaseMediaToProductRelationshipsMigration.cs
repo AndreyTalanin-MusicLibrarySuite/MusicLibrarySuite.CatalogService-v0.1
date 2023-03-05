@@ -7,213 +7,76 @@ using MusicLibrarySuite.CatalogService.Data.Entities;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations;
 
 /// <summary>
-/// Represents a database migration adding the <see cref="ReleaseTrackArtistDto" />, <see cref="ReleaseTrackFeaturedArtistDto" />,
-/// <see cref="ReleaseTrackPerformerDto" /> and <see cref="ReleaseTrackComposerDto" /> entities.
+/// Represents a database migration adding the <see cref="ReleaseMediaToProductRelationshipDto" /> entity.
 /// </summary>
-public partial class ReleaseTrackArtistsMigration : Migration
+public partial class ReleaseMediaToProductRelationshipsMigration : Migration
 {
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.CreateTable(
-            name: "ReleaseTrackArtist",
+            name: "ReleaseMediaToProductRelationship",
             schema: "dbo",
             columns: table => new
             {
-                TrackNumber = table.Column<byte>(type: "tinyint", nullable: false),
                 MediaNumber = table.Column<byte>(type: "tinyint", nullable: false),
                 ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Order = table.Column<int>(type: "int", nullable: false)
+                ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
+                Order = table.Column<int>(type: "int", nullable: false),
+                ReferenceOrder = table.Column<int>(type: "int", nullable: false)
             },
             constraints: table =>
             {
-                table.PrimaryKey(name: "PK_ReleaseTrackArtist", columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId, x.ArtistId });
+                table.PrimaryKey(name: "PK_ReleaseMediaToProductRelationship", columns: x => new { x.MediaNumber, x.ReleaseId, x.ProductId });
                 table.ForeignKey(
-                    name: "FK_ReleaseTrackArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId",
-                    columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId },
+                    name: "FK_ReleaseMediaToProductRelationship_ReleaseMedia_MediaNumber_ReleaseId",
+                    columns: x => new { x.MediaNumber, x.ReleaseId },
                     principalSchema: "dbo",
-                    principalTable: "ReleaseTrack",
-                    principalColumns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" },
+                    principalTable: "ReleaseMedia",
+                    principalColumns: new[] { "MediaNumber", "ReleaseId" },
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
-                    name: "FK_ReleaseTrackArtist_Artist_ArtistId",
-                    column: x => x.ArtistId,
+                    name: "FK_ReleaseMediaToProductRelationship_Product_ProductId",
+                    column: x => x.ProductId,
                     principalSchema: "dbo",
-                    principalTable: "Artist",
+                    principalTable: "Product",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
-            });
-
-        migrationBuilder.CreateTable(
-            name: "ReleaseTrackFeaturedArtist",
-            schema: "dbo",
-            columns: table => new
-            {
-                TrackNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                MediaNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Order = table.Column<int>(type: "int", nullable: false)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey(name: "PK_ReleaseTrackFeaturedArtist", columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId, x.ArtistId });
-                table.ForeignKey(
-                    name: "FK_ReleaseTrackFeaturedArtist_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId",
-                    columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId },
-                    principalSchema: "dbo",
-                    principalTable: "ReleaseTrack",
-                    principalColumns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" },
-                    onDelete: ReferentialAction.Cascade);
-                table.ForeignKey(
-                    name: "FK_ReleaseTrackFeaturedArtist_Artist_ArtistId",
-                    column: x => x.ArtistId,
-                    principalSchema: "dbo",
-                    principalTable: "Artist",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
-
-        migrationBuilder.CreateTable(
-            name: "ReleaseTrackPerformer",
-            schema: "dbo",
-            columns: table => new
-            {
-                TrackNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                MediaNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Order = table.Column<int>(type: "int", nullable: false)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey(name: "PK_ReleaseTrackPerformer", columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId, x.ArtistId });
-                table.ForeignKey(
-                    name: "FK_ReleaseTrackPerformer_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId",
-                    columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId },
-                    principalSchema: "dbo",
-                    principalTable: "ReleaseTrack",
-                    principalColumns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" },
-                    onDelete: ReferentialAction.Cascade);
-                table.ForeignKey(
-                    name: "FK_ReleaseTrackPerformer_Artist_ArtistId",
-                    column: x => x.ArtistId,
-                    principalSchema: "dbo",
-                    principalTable: "Artist",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
-            });
-
-        migrationBuilder.CreateTable(
-            name: "ReleaseTrackComposer",
-            schema: "dbo",
-            columns: table => new
-            {
-                TrackNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                MediaNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                ArtistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                Order = table.Column<int>(type: "int", nullable: false)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey(name: "PK_ReleaseTrackComposer", columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId, x.ArtistId });
-                table.ForeignKey(
-                    name: "FK_ReleaseTrackComposer_ReleaseTrack_TrackNumber_MediaNumber_ReleaseId",
-                    columns: x => new { x.TrackNumber, x.MediaNumber, x.ReleaseId },
-                    principalSchema: "dbo",
-                    principalTable: "ReleaseTrack",
-                    principalColumns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" },
-                    onDelete: ReferentialAction.Cascade);
-                table.ForeignKey(
-                    name: "FK_ReleaseTrackComposer_Artist_ArtistId",
-                    column: x => x.ArtistId,
-                    principalSchema: "dbo",
-                    principalTable: "Artist",
-                    principalColumn: "Id",
-                    onDelete: ReferentialAction.Cascade);
+                table.CheckConstraint(name: "CK_ReleaseMediaToProductRelationship_Name", sql: "LEN(TRIM([Name])) > 0");
+                table.CheckConstraint(name: "CK_ReleaseMediaToProductRelationship_Description", sql: "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
             });
 
         migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId",
+            name: "IX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId",
             schema: "dbo",
-            table: "ReleaseTrackArtist",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" });
+            table: "ReleaseMediaToProductRelationship",
+            columns: new[] { "MediaNumber", "ReleaseId" });
 
         migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackArtist_ArtistId",
+            name: "IX_ReleaseMediaToProductRelationship_ProductId",
             schema: "dbo",
-            table: "ReleaseTrackArtist",
-            column: "ArtistId");
+            table: "ReleaseMediaToProductRelationship",
+            column: "ProductId");
 
         migrationBuilder.CreateIndex(
-            name: "UIX_ReleaseTrackArtist_TrackNumber_MediaNumber_ReleaseId_Order",
+            name: "UIX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId_Order",
             schema: "dbo",
-            table: "ReleaseTrackArtist",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId", "Order" },
+            table: "ReleaseMediaToProductRelationship",
+            columns: new[] { "MediaNumber", "ReleaseId", "Order" },
             unique: true);
 
         migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackFeaturedArtist_TrackNumber_MediaNumber_ReleaseId",
+            name: "UIX_ReleaseMediaToProductRelationship_ProductId_ReferenceOrder",
             schema: "dbo",
-            table: "ReleaseTrackFeaturedArtist",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" });
-
-        migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackFeaturedArtist_ArtistId",
-            schema: "dbo",
-            table: "ReleaseTrackFeaturedArtist",
-            column: "ArtistId");
-
-        migrationBuilder.CreateIndex(
-            name: "UIX_ReleaseTrackFeaturedArtist_TrackNumber_MediaNumber_ReleaseId_Order",
-            schema: "dbo",
-            table: "ReleaseTrackFeaturedArtist",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId", "Order" },
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackPerformer_TrackNumber_MediaNumber_ReleaseId",
-            schema: "dbo",
-            table: "ReleaseTrackPerformer",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" });
-
-        migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackPerformer_ArtistId",
-            schema: "dbo",
-            table: "ReleaseTrackPerformer",
-            column: "ArtistId");
-
-        migrationBuilder.CreateIndex(
-            name: "UIX_ReleaseTrackPerformer_TrackNumber_MediaNumber_ReleaseId_Order",
-            schema: "dbo",
-            table: "ReleaseTrackPerformer",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId", "Order" },
-            unique: true);
-
-        migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackComposer_TrackNumber_MediaNumber_ReleaseId",
-            schema: "dbo",
-            table: "ReleaseTrackComposer",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId" });
-
-        migrationBuilder.CreateIndex(
-            name: "IX_ReleaseTrackComposer_ArtistId",
-            schema: "dbo",
-            table: "ReleaseTrackComposer",
-            column: "ArtistId");
-
-        migrationBuilder.CreateIndex(
-            name: "UIX_ReleaseTrackComposer_TrackNumber_MediaNumber_ReleaseId_Order",
-            schema: "dbo",
-            table: "ReleaseTrackComposer",
-            columns: new[] { "TrackNumber", "MediaNumber", "ReleaseId", "Order" },
+            table: "ReleaseMediaToProductRelationship",
+            columns: new[] { "ProductId", "ReferenceOrder" },
             unique: true);
 
         migrationBuilder.Sql(@"
-            CREATE TRIGGER [dbo].[TR_ReleaseTrackArtist_AfterInsertUpdateDelete_SetReleaseUpdatedOn]
-            ON [dbo].[ReleaseTrackArtist]
+            CREATE TRIGGER [dbo].[TR_ReleaseMediaToProductRelationship_AfterInsertUpdateDelete_SetReleaseUpdatedOn]
+            ON [dbo].[ReleaseMediaToProductRelationship]
             AFTER INSERT, UPDATE, DELETE
             AS
             BEGIN
@@ -221,11 +84,11 @@ public partial class ReleaseTrackArtistsMigration : Migration
 
                 WITH [UpdatedRelease] AS
                 (
-                    SELECT [insertedReleaseTrackArtist].[ReleaseId] AS [Id]
-                    FROM [inserted] AS [insertedReleaseTrackArtist]
+                    SELECT [insertedReleaseMediaToProductRelationship].[ReleaseId] AS [Id]
+                    FROM [inserted] AS [insertedReleaseMediaToProductRelationship]
                     UNION
-                    SELECT [deletedReleaseTrackArtist].[ReleaseId] AS [Id]
-                    FROM [deleted] AS [deletedReleaseTrackArtist]
+                    SELECT [deletedReleaseMediaToProductRelationship].[ReleaseId] AS [Id]
+                    FROM [deleted] AS [deletedReleaseMediaToProductRelationship]
                 )
                 UPDATE [dbo].[Release]
                 SET [UpdatedOn] = SYSDATETIMEOFFSET()
@@ -234,109 +97,15 @@ public partial class ReleaseTrackArtistsMigration : Migration
             END;");
 
         migrationBuilder.Sql(@"
-            CREATE TRIGGER [dbo].[TR_ReleaseTrackFeaturedArtist_AfterInsertUpdateDelete_SetReleaseUpdatedOn]
-            ON [dbo].[ReleaseTrackFeaturedArtist]
-            AFTER INSERT, UPDATE, DELETE
-            AS
-            BEGIN
-                SET NOCOUNT ON;
-
-                WITH [UpdatedRelease] AS
-                (
-                    SELECT [insertedReleaseTrackFeaturedArtist].[ReleaseId] AS [Id]
-                    FROM [inserted] AS [insertedReleaseTrackFeaturedArtist]
-                    UNION
-                    SELECT [deletedReleaseTrackFeaturedArtist].[ReleaseId] AS [Id]
-                    FROM [deleted] AS [deletedReleaseTrackFeaturedArtist]
-                )
-                UPDATE [dbo].[Release]
-                SET [UpdatedOn] = SYSDATETIMEOFFSET()
-                FROM [dbo].[Release] AS [release]
-                INNER JOIN [UpdatedRelease] AS [updatedRelease] ON [updatedRelease].[Id] = [release].[Id];
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE TRIGGER [dbo].[TR_ReleaseTrackPerformer_AfterInsertUpdateDelete_SetReleaseUpdatedOn]
-            ON [dbo].[ReleaseTrackPerformer]
-            AFTER INSERT, UPDATE, DELETE
-            AS
-            BEGIN
-                SET NOCOUNT ON;
-
-                WITH [UpdatedRelease] AS
-                (
-                    SELECT [insertedReleaseTrackPerformer].[ReleaseId] AS [Id]
-                    FROM [inserted] AS [insertedReleaseTrackPerformer]
-                    UNION
-                    SELECT [deletedReleaseTrackPerformer].[ReleaseId] AS [Id]
-                    FROM [deleted] AS [deletedReleaseTrackPerformer]
-                )
-                UPDATE [dbo].[Release]
-                SET [UpdatedOn] = SYSDATETIMEOFFSET()
-                FROM [dbo].[Release] AS [release]
-                INNER JOIN [UpdatedRelease] AS [updatedRelease] ON [updatedRelease].[Id] = [release].[Id];
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE TRIGGER [dbo].[TR_ReleaseTrackComposer_AfterInsertUpdateDelete_SetReleaseUpdatedOn]
-            ON [dbo].[ReleaseTrackComposer]
-            AFTER INSERT, UPDATE, DELETE
-            AS
-            BEGIN
-                SET NOCOUNT ON;
-
-                WITH [UpdatedRelease] AS
-                (
-                    SELECT [insertedReleaseTrackComposer].[ReleaseId] AS [Id]
-                    FROM [inserted] AS [insertedReleaseTrackComposer]
-                    UNION
-                    SELECT [deletedReleaseTrackComposer].[ReleaseId] AS [Id]
-                    FROM [deleted] AS [deletedReleaseTrackComposer]
-                )
-                UPDATE [dbo].[Release]
-                SET [UpdatedOn] = SYSDATETIMEOFFSET()
-                FROM [dbo].[Release] AS [release]
-                INNER JOIN [UpdatedRelease] AS [updatedRelease] ON [updatedRelease].[Id] = [release].[Id];
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE TYPE [dbo].[ReleaseTrackArtist] AS TABLE
+            CREATE TYPE [dbo].[ReleaseMediaToProductRelationship] AS TABLE
             (
-                [TrackNumber] TINYINT NOT NULL,
                 [MediaNumber] TINYINT NOT NULL,
                 [ReleaseId] UNIQUEIDENTIFIER NOT NULL,
-                [ArtistId] UNIQUEIDENTIFIER NOT NULL,
-                [Order] INT NOT NULL
-            );");
-
-        migrationBuilder.Sql(@"
-            CREATE TYPE [dbo].[ReleaseTrackFeaturedArtist] AS TABLE
-            (
-                [TrackNumber] TINYINT NOT NULL,
-                [MediaNumber] TINYINT NOT NULL,
-                [ReleaseId] UNIQUEIDENTIFIER NOT NULL,
-                [ArtistId] UNIQUEIDENTIFIER NOT NULL,
-                [Order] INT NOT NULL
-            );");
-
-        migrationBuilder.Sql(@"
-            CREATE TYPE [dbo].[ReleaseTrackPerformer] AS TABLE
-            (
-                [TrackNumber] TINYINT NOT NULL,
-                [MediaNumber] TINYINT NOT NULL,
-                [ReleaseId] UNIQUEIDENTIFIER NOT NULL,
-                [ArtistId] UNIQUEIDENTIFIER NOT NULL,
-                [Order] INT NOT NULL
-            );");
-
-        migrationBuilder.Sql(@"
-            CREATE TYPE [dbo].[ReleaseTrackComposer] AS TABLE
-            (
-                [TrackNumber] TINYINT NOT NULL,
-                [MediaNumber] TINYINT NOT NULL,
-                [ReleaseId] UNIQUEIDENTIFIER NOT NULL,
-                [ArtistId] UNIQUEIDENTIFIER NOT NULL,
-                [Order] INT NOT NULL
+                [ProductId] UNIQUEIDENTIFIER NOT NULL,
+                [Name] NVARCHAR(256) NOT NULL,
+                [Description] NVARCHAR(2048) NULL,
+                [Order] INT NOT NULL,
+                [ReferenceOrder] INT NOT NULL
             );");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
@@ -370,10 +139,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
-                @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
-                @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
-                @ReleaseTrackPerformers [dbo].[ReleaseTrackPerformer] READONLY,
-                @ReleaseTrackComposers [dbo].[ReleaseTrackComposer] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
                 @ResultCreatedOn DATETIMEOFFSET OUTPUT,
                 @ResultUpdatedOn DATETIMEOFFSET OUTPUT
@@ -759,114 +524,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                     [source].[InternationalStandardRecordingCode]
                 );
 
-                WITH [SourceReleaseTrackArtist] AS
-                (
-                    SELECT * FROM @ReleaseTrackArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackArtist] AS [target]
-                USING [SourceReleaseTrackArtist] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
-
-                WITH [SourceReleaseTrackFeaturedArtist] AS
-                (
-                    SELECT * FROM @ReleaseTrackFeaturedArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackFeaturedArtist] AS [target]
-                USING [SourceReleaseTrackFeaturedArtist] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
-
-                WITH [SourceReleaseTrackPerformer] AS
-                (
-                    SELECT * FROM @ReleaseTrackPerformers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackPerformer] AS [target]
-                USING [SourceReleaseTrackPerformer] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
-
-                WITH [SourceReleaseTrackComposer] AS
-                (
-                    SELECT * FROM @ReleaseTrackComposers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackComposer] AS [target]
-                USING [SourceReleaseTrackComposer] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
-
                 COMMIT TRANSACTION;
 
                 SELECT TOP (1)
@@ -902,10 +559,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
-                @ReleaseTrackArtists [dbo].[ReleaseTrackArtist] READONLY,
-                @ReleaseTrackFeaturedArtists [dbo].[ReleaseTrackFeaturedArtist] READONLY,
-                @ReleaseTrackPerformers [dbo].[ReleaseTrackPerformer] READONLY,
-                @ReleaseTrackComposers [dbo].[ReleaseTrackComposer] READONLY,
                 @ResultRowsUpdated INT OUTPUT
             )
             AS
@@ -1351,139 +1004,33 @@ public partial class ReleaseTrackArtistsMigration : Migration
 
                 SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
 
-                WITH [SourceReleaseTrackArtist] AS
-                (
-                    SELECT * FROM @ReleaseTrackArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackArtist] AS [target]
-                USING [SourceReleaseTrackArtist] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseTrackFeaturedArtist] AS
-                (
-                    SELECT * FROM @ReleaseTrackFeaturedArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackFeaturedArtist] AS [target]
-                USING [SourceReleaseTrackFeaturedArtist] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseTrackPerformer] AS
-                (
-                    SELECT * FROM @ReleaseTrackPerformers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackPerformer] AS [target]
-                USING [SourceReleaseTrackPerformer] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseTrackComposer] AS
-                (
-                    SELECT * FROM @ReleaseTrackComposers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrackComposer] AS [target]
-                USING [SourceReleaseTrackComposer] AS [source]
-                ON [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
                 COMMIT TRANSACTION;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateReleaseMediaToProductRelationshipsOrder]
+            (
+                @UseReferenceOrder BIT,
+                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceReleaseMediaToProductRelationship] AS
+                (
+                    SELECT * FROM @ReleaseMediaToProductRelationships
+                )
+                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
+                USING [SourceReleaseMediaToProductRelationship] AS [source]
+                ON [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                    AND [target].[ProductId] = [source].[ProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Order] = CASE WHEN @UseReferenceOrder = 0 THEN [source].[Order] ELSE [target].[Order] END,
+                    [target].[ReferenceOrder] = CASE WHEN @UseReferenceOrder = 1 THEN [source].[ReferenceOrder] ELSE [target].[ReferenceOrder] END;
+
+                SET @ResultRowsUpdated = @@ROWCOUNT;
             END;");
 
         migrationBuilder.Sql(@"
@@ -1507,23 +1054,13 @@ public partial class ReleaseTrackArtistsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
 
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseMediaToProductRelationshipsOrder];");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
 
-        migrationBuilder.DropTable(name: "ReleaseTrackArtist", schema: "dbo");
+        migrationBuilder.DropTable(name: "ReleaseMediaToProductRelationship", schema: "dbo");
 
-        migrationBuilder.DropTable(name: "ReleaseTrackComposer", schema: "dbo");
-
-        migrationBuilder.DropTable(name: "ReleaseTrackFeaturedArtist", schema: "dbo");
-
-        migrationBuilder.DropTable(name: "ReleaseTrackPerformer", schema: "dbo");
-
-        migrationBuilder.Sql("DROP TYPE [dbo].[ReleaseTrackArtist];");
-
-        migrationBuilder.Sql("DROP TYPE [dbo].[ReleaseTrackFeaturedArtist];");
-
-        migrationBuilder.Sql("DROP TYPE [dbo].[ReleaseTrackPerformer];");
-
-        migrationBuilder.Sql("DROP TYPE [dbo].[ReleaseTrackComposer];");
+        migrationBuilder.Sql("DROP TYPE [dbo].[ReleaseMediaToProductRelationship];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateRelease]
@@ -1548,7 +1085,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                 @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
                 @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
-                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
                 @ResultCreatedOn DATETIMEOFFSET OUTPUT,
@@ -1849,62 +1385,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                     [source].[TableOfContentsChecksumLong]
                 );
 
-                WITH [SourceReleaseMediaToProductRelationship] AS
-                (
-                    SELECT
-                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
-                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
-                        [sourceReleaseMediaToProductRelationship].[ProductId],
-                        [sourceReleaseMediaToProductRelationship].[Name],
-                        [sourceReleaseMediaToProductRelationship].[Description],
-                        [sourceReleaseMediaToProductRelationship].[Order],
-                        COALESCE([targetReleaseMediaToProductRelationship].[ReferenceOrder],
-                            MAX([productReleaseMediaToProductRelationship].[ReferenceOrder]) + 1,
-                            0) AS [ReferenceOrder]
-                    FROM @ReleaseMediaToProductRelationships AS [sourceReleaseMediaToProductRelationship]
-                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [targetReleaseMediaToProductRelationship]
-                        ON [targetReleaseMediaToProductRelationship].[MediaNumber] = [sourceReleaseMediaToProductRelationship].[MediaNumber]
-                        AND [targetReleaseMediaToProductRelationship].[ReleaseId] = [sourceReleaseMediaToProductRelationship].[ReleaseId]
-                        AND [targetReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
-                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [productReleaseMediaToProductRelationship]
-                        ON [targetReleaseMediaToProductRelationship].[ReferenceOrder] IS NULL
-                        AND [productReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
-                    WHERE [sourceReleaseMediaToProductRelationship].[ReleaseId] = @Id
-                    GROUP BY
-                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
-                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
-                        [sourceReleaseMediaToProductRelationship].[ProductId],
-                        [sourceReleaseMediaToProductRelationship].[Name],
-                        [sourceReleaseMediaToProductRelationship].[Description],
-                        [sourceReleaseMediaToProductRelationship].[Order],
-                        [targetReleaseMediaToProductRelationship].[ReferenceOrder]
-                )
-                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
-                USING [SourceReleaseMediaToProductRelationship] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ProductId] = [source].[ProductId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ProductId],
-                    [Name],
-                    [Description],
-                    [Order],
-                    [ReferenceOrder]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ProductId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order],
-                    [source].[ReferenceOrder]
-                );
-
                 WITH [SourceReleaseTrack] AS
                 (
                     SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
@@ -1968,7 +1448,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                 @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
                 @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
-                @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ResultRowsUpdated INT OUTPUT
             )
@@ -2307,70 +1786,6 @@ public partial class ReleaseTrackArtistsMigration : Migration
                     [source].[MediaFormat],
                     [source].[TableOfContentsChecksum],
                     [source].[TableOfContentsChecksumLong]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseMediaToProductRelationship] AS
-                (
-                    SELECT
-                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
-                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
-                        [sourceReleaseMediaToProductRelationship].[ProductId],
-                        [sourceReleaseMediaToProductRelationship].[Name],
-                        [sourceReleaseMediaToProductRelationship].[Description],
-                        [sourceReleaseMediaToProductRelationship].[Order],
-                        COALESCE([targetReleaseMediaToProductRelationship].[ReferenceOrder],
-                            MAX([productReleaseMediaToProductRelationship].[ReferenceOrder]) + 1,
-                            0) AS [ReferenceOrder]
-                    FROM @ReleaseMediaToProductRelationships AS [sourceReleaseMediaToProductRelationship]
-                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [targetReleaseMediaToProductRelationship]
-                        ON [targetReleaseMediaToProductRelationship].[MediaNumber] = [sourceReleaseMediaToProductRelationship].[MediaNumber]
-                        AND [targetReleaseMediaToProductRelationship].[ReleaseId] = [sourceReleaseMediaToProductRelationship].[ReleaseId]
-                        AND [targetReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
-                    LEFT JOIN [dbo].[ReleaseMediaToProductRelationship] AS [productReleaseMediaToProductRelationship]
-                        ON [targetReleaseMediaToProductRelationship].[ReferenceOrder] IS NULL
-                        AND [productReleaseMediaToProductRelationship].[ProductId] = [sourceReleaseMediaToProductRelationship].[ProductId]
-                    WHERE [sourceReleaseMediaToProductRelationship].[ReleaseId] = @Id
-                    GROUP BY
-                        [sourceReleaseMediaToProductRelationship].[MediaNumber],
-                        [sourceReleaseMediaToProductRelationship].[ReleaseId],
-                        [sourceReleaseMediaToProductRelationship].[ProductId],
-                        [sourceReleaseMediaToProductRelationship].[Name],
-                        [sourceReleaseMediaToProductRelationship].[Description],
-                        [sourceReleaseMediaToProductRelationship].[Order],
-                        [targetReleaseMediaToProductRelationship].[ReferenceOrder]
-                )
-                MERGE INTO [dbo].[ReleaseMediaToProductRelationship] AS [target]
-                USING [SourceReleaseMediaToProductRelationship] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber]
-                    AND [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[ProductId] = [source].[ProductId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [ProductId],
-                    [Name],
-                    [Description],
-                    [Order],
-                    [ReferenceOrder]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[ProductId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order],
-                    [source].[ReferenceOrder]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
 

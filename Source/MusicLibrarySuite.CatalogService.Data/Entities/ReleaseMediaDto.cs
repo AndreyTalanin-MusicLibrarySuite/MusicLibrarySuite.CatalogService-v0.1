@@ -66,4 +66,10 @@ public class ReleaseMediaDto
     /// Gets or sets a collection of release tracks associated to the current release media.
     /// </summary>
     public ICollection<ReleaseTrackDto> ReleaseTrackCollection { get; set; } = Enumerable.Empty<ReleaseTrackDto>().ToList();
+
+    /// <summary>
+    /// Gets or sets a collection of release-media-to-product relationships associated to the current release media.
+    /// </summary>
+    /// <remarks>An entity of the <see cref="ReleaseMediaToProductRelationshipDto" /> type has a display order on each end of the relationship.</remarks>
+    public ICollection<ReleaseMediaToProductRelationshipDto> ReleaseMediaToProductRelationships { get; set; } = Enumerable.Empty<ReleaseMediaToProductRelationshipDto>().ToList();
 }

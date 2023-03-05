@@ -530,6 +530,29 @@ Ref "FK_ReleaseMedia_Release_ReleaseId" {
     "dbo"."ReleaseMedia"."ReleaseId" > "dbo"."Release"."Id"
 }
 
+Table "dbo"."ReleaseMediaToProductRelationship" {
+    "MediaNumber" tinyint [primary key, not null]
+    "ReleaseId" uniqueidentifier [primary key, not null]
+    "ProductId" uniqueidentifier [primary key, not null]
+    "Order" int [not null]
+    "ReferenceOrder" int [not null]
+
+    Indexes {
+        ("MediaNumber", "ReleaseId") [name: "IX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId"]
+        "ProductId" [name: "IX_ReleaseMediaToProductRelationship_ProductId"]
+        ("MediaNumber", "ReleaseId", "Order") [name: "UIX_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId_Order", unique]
+        ("ProductId", "ReferenceOrder") [name: "UIX_ReleaseMediaToProductRelationship_ProductId_ReferenceOrder", unique]
+    }
+}
+
+Ref "FK_ReleaseMediaToProductRelationship_MediaNumber_ReleaseId" {
+    "dbo"."ReleaseMediaToProductRelationship".("MediaNumber", "ReleaseId") > "dbo"."ReleaseMedia".("MediaNumber", "ReleaseId")
+}
+
+Ref "FK_ReleaseMediaToProductRelationship_Product_ProductId" {
+    "dbo"."ReleaseMediaToProductRelationship"."ProductId" > "dbo"."Product"."Id"
+}
+
 
 Table "dbo"."ReleaseTrack" {
     "TrackNumber" tinyint [primary key, not null]

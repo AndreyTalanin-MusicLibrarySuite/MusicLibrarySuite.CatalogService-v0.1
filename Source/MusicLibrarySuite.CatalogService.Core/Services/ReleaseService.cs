@@ -147,6 +147,22 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
+    public async Task<ReleaseMediaToProductRelationship[]> GetReleaseMediaToProductRelationshipsAsync(Guid releaseId)
+    {
+        ReleaseMediaToProductRelationshipDto[] releaseMediaToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseMediaToProductRelationshipsAsync(releaseId);
+        ReleaseMediaToProductRelationship[] releaseMediaToProductRelationshipArray = m_mapper.Map<ReleaseMediaToProductRelationship[]>(releaseMediaToProductRelationshipDtoArray);
+        return releaseMediaToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
+    public async Task<ReleaseMediaToProductRelationship[]> GetReleaseMediaToProductRelationshipsByProductAsync(Guid productId)
+    {
+        ReleaseMediaToProductRelationshipDto[] releaseMediaToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseMediaToProductRelationshipsByProductAsync(productId);
+        ReleaseMediaToProductRelationship[] releaseMediaToProductRelationshipArray = m_mapper.Map<ReleaseMediaToProductRelationship[]>(releaseMediaToProductRelationshipDtoArray);
+        return releaseMediaToProductRelationshipArray;
+    }
+
+    /// <inheritdoc />
     public async Task<ReleaseTrackToProductRelationship[]> GetReleaseTrackToProductRelationshipsAsync(Guid releaseId)
     {
         ReleaseTrackToProductRelationshipDto[] releaseTrackToProductRelationshipDtoArray = await m_releaseRepository.GetReleaseTrackToProductRelationshipsAsync(releaseId);
@@ -208,6 +224,14 @@ public class ReleaseService : IReleaseService
     {
         ReleaseToReleaseGroupRelationshipDto[] releaseToReleaseGroupRelationshipDtoArray = m_mapper.Map<ReleaseToReleaseGroupRelationshipDto[]>(releaseToReleaseGroupRelationships);
         var updated = await m_releaseRepository.UpdateReleaseToReleaseGroupRelationshipsOrderAsync(releaseToReleaseGroupRelationshipDtoArray, useReferenceOrder);
+        return updated;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> UpdateReleaseMediaToProductRelationshipsOrderAsync(ReleaseMediaToProductRelationship[] releaseMediaToProductRelationships, bool useReferenceOrder)
+    {
+        ReleaseMediaToProductRelationshipDto[] releaseMediaToProductRelationshipDtoArray = m_mapper.Map<ReleaseMediaToProductRelationshipDto[]>(releaseMediaToProductRelationships);
+        var updated = await m_releaseRepository.UpdateReleaseMediaToProductRelationshipsOrderAsync(releaseMediaToProductRelationshipDtoArray, useReferenceOrder);
         return updated;
     }
 

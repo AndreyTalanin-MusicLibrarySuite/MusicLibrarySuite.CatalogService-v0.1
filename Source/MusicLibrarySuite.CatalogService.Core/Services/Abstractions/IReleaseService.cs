@@ -102,6 +102,26 @@ public interface IReleaseService
     public Task<ReleaseToReleaseGroupRelationship[]> GetReleaseToReleaseGroupRelationshipsByReleaseGroupAsync(Guid releaseGroupId);
 
     /// <summary>
+    /// Asynchronously gets all release-media-to-product relationships by a release's unique identifier.
+    /// </summary>
+    /// <param name="releaseId">The release's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-media-to-product relationships.
+    /// </returns>
+    public Task<ReleaseMediaToProductRelationship[]> GetReleaseMediaToProductRelationshipsAsync(Guid releaseId);
+
+    /// <summary>
+    /// Asynchronously gets all release-media-to-product relationships by a product's unique identifier.
+    /// </summary>
+    /// <param name="productId">The product's unique identifier.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be an array containing all release-media-to-product relationships.
+    /// </returns>
+    public Task<ReleaseMediaToProductRelationship[]> GetReleaseMediaToProductRelationshipsByProductAsync(Guid productId);
+
+    /// <summary>
     /// Asynchronously gets all release-track-to-product relationships by a release's unique identifier.
     /// </summary>
     /// <param name="releaseId">The release's unique identifier.</param>
@@ -182,6 +202,17 @@ public interface IReleaseService
     /// The task's result will be a value indicating whether any release-to-release-group relationship was found and updated.
     /// </returns>
     public Task<bool> UpdateReleaseToReleaseGroupRelationshipsOrderAsync(ReleaseToReleaseGroupRelationship[] releaseToReleaseGroupRelationships, bool useReferenceOrder = false);
+
+    /// <summary>
+    /// Asynchronously updates order of existing release-media-to-product relationships.
+    /// </summary>
+    /// <param name="releaseMediaToProductRelationships">A collection of release-media-to-product relationships to reorder.</param>
+    /// <param name="useReferenceOrder">A value indicating whether the reference order should be used.</param>
+    /// <returns>
+    /// The task object representing the asynchronous operation.
+    /// The task's result will be a value indicating whether any release-media-to-product relationship was found and updated.
+    /// </returns>
+    public Task<bool> UpdateReleaseMediaToProductRelationshipsOrderAsync(ReleaseMediaToProductRelationship[] releaseMediaToProductRelationships, bool useReferenceOrder = false);
 
     /// <summary>
     /// Asynchronously updates order of existing release-track-to-product relationships.
