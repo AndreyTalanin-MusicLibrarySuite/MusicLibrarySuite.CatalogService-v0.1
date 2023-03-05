@@ -97,11 +97,58 @@ public partial class ArtistRelationshipsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeArtistRelationships]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ArtistRelationships [dbo].[ArtistRelationship] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceArtistRelationship] AS
+                (
+                    SELECT
+                        @Id AS [ArtistId],
+                        [DependentArtistId],
+                        [Name],
+                        [Description],
+                        [Order]
+                    FROM @ArtistRelationships
+                    WHERE [ArtistId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ArtistId] = @Id
+                )
+                MERGE INTO [dbo].[ArtistRelationship] AS [target]
+                USING [SourceArtistRelationship] AS [source]
+                ON [target].[ArtistId] = [source].[ArtistId] AND [target].[DependentArtistId] = [source].[DependentArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Name] = [source].[Name],
+                    [target].[Description] = [source].[Description],
+                    [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [ArtistId],
+                    [DependentArtistId],
+                    [Name],
+                    [Description],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[ArtistId],
+                    [source].[DependentArtistId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ArtistId] = @Id THEN DELETE;
+            END;");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateArtist];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateArtist];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteArtist];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateArtist]
@@ -128,48 +175,18 @@ public partial class ArtistRelationshipsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Artist]
-                (
-                    [Id],
-                    [Name],
-                    [Description],
-                    [DisambiguationText],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeArtist]
                     @Id,
                     @Name,
                     @Description,
                     @DisambiguationText,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceArtistRelationship] AS
-                (
-                    SELECT * FROM @ArtistRelationships WHERE [ArtistId] = @Id
-                )
-                MERGE INTO [dbo].[ArtistRelationship] AS [target]
-                USING [SourceArtistRelationship] AS [source]
-                ON [target].[ArtistId] = [source].[ArtistId] AND [target].[DependentArtistId] = [source].[DependentArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ArtistId],
-                    [DependentArtistId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ArtistId],
-                    [source].[DependentArtistId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeArtistRelationships]
+                    @Id,
+                    @ArtistRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -197,63 +214,20 @@ public partial class ArtistRelationshipsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Artist]
-                SET
-                    [Name] = @Name,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeArtist]
+                    @Id,
+                    @Name,
+                    @Description,
+                    @DisambiguationText,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceArtistRelationship] AS
-                (
-                    SELECT * FROM @ArtistRelationships WHERE [ArtistId] = @Id
-                )
-                MERGE INTO [dbo].[ArtistRelationship] AS [target]
-                USING [SourceArtistRelationship] AS [source]
-                ON [target].[ArtistId] = [source].[ArtistId] AND [target].[DependentArtistId] = [source].[DependentArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ArtistId],
-                    [DependentArtistId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ArtistId],
-                    [source].[DependentArtistId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ArtistId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeArtistRelationships]
+                    @Id,
+                    @ArtistRelationships;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteArtist]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Artist] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 
@@ -264,7 +238,7 @@ public partial class ArtistRelationshipsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateArtist];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteArtist];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeArtistRelationships];");
 
         migrationBuilder.DropTable(name: "ArtistRelationship", schema: "dbo");
 
@@ -292,24 +266,14 @@ public partial class ArtistRelationshipsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Artist]
-                (
-                    [Id],
-                    [Name],
-                    [Description],
-                    [DisambiguationText],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeArtist]
                     @Id,
                     @Name,
                     @Description,
                     @DisambiguationText,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -332,29 +296,14 @@ public partial class ArtistRelationshipsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Artist]
-                SET
-                    [Name] = @Name,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteArtist]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Artist] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeArtist]
+                    @Id,
+                    @Name,
+                    @Description,
+                    @DisambiguationText,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
     }
 }

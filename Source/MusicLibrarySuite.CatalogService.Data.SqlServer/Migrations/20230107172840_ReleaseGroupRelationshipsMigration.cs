@@ -97,115 +97,27 @@ public partial class ReleaseGroupRelationshipsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateReleaseGroup];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseGroup];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteReleaseGroup];");
-
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_CreateReleaseGroup]
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseGroupRelationships]
             (
                 @Id UNIQUEIDENTIFIER,
-                @Title NVARCHAR(256),
-                @Description NVARCHAR(2048),
-                @DisambiguationText NVARCHAR(2048),
-                @Enabled BIT,
-                @ReleaseGroupRelationships [dbo].[ReleaseGroupRelationship] READONLY,
-                @ResultId UNIQUEIDENTIFIER OUTPUT,
-                @ResultCreatedOn DATETIMEOFFSET OUTPUT,
-                @ResultUpdatedOn DATETIMEOFFSET OUTPUT
+                @ReleaseGroupRelationships [dbo].[ReleaseGroupRelationship] READONLY
             )
             AS
             BEGIN
                 SET NOCOUNT ON;
 
-                IF (@Id = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER))
-                BEGIN
-                    SET @Id = NEWID();
-                END;
-
-                BEGIN TRANSACTION;
-
-                INSERT INTO [dbo].[ReleaseGroup]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Enabled]
-                )
-                VALUES
-                (
-                    @Id,
-                    @Title,
-                    @Description,
-                    @DisambiguationText,
-                    @Enabled
-                );
-
                 WITH [SourceReleaseGroupRelationship] AS
                 (
-                    SELECT * FROM @ReleaseGroupRelationships WHERE [ReleaseGroupId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseGroupRelationship] AS [target]
-                USING [SourceReleaseGroupRelationship] AS [source]
-                ON [target].[ReleaseGroupId] = [source].[ReleaseGroupId] AND [target].[DependentReleaseGroupId] = [source].[DependentReleaseGroupId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseGroupId],
-                    [DependentReleaseGroupId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseGroupId],
-                    [source].[DependentReleaseGroupId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
-
-                COMMIT TRANSACTION;
-
-                SELECT TOP (1)
-                    @ResultId = @Id,
-                    @ResultCreatedOn = [releaseGroup].[CreatedOn],
-                    @ResultUpdatedOn = [releaseGroup].[UpdatedOn]
-                FROM [dbo].[ReleaseGroup] AS [releaseGroup]
-                WHERE [releaseGroup].[Id] = @Id;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_UpdateReleaseGroup]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @Title NVARCHAR(256),
-                @Description NVARCHAR(2048),
-                @DisambiguationText NVARCHAR(2048),
-                @Enabled BIT,
-                @ReleaseGroupRelationships [dbo].[ReleaseGroupRelationship] READONLY,
-                @ResultRowsUpdated INT OUTPUT
-            )
-            AS
-            BEGIN
-                BEGIN TRANSACTION;
-
-                UPDATE [dbo].[ReleaseGroup]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceReleaseGroupRelationship] AS
-                (
-                    SELECT * FROM @ReleaseGroupRelationships WHERE [ReleaseGroupId] = @Id
+                    SELECT
+                        @Id AS [ReleaseGroupId],
+                        [DependentReleaseGroupId],
+                        [Name],
+                        [Description],
+                        [Order]
+                    FROM @ReleaseGroupRelationships
+                    WHERE [ReleaseGroupId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseGroupId] = @Id
                 )
                 MERGE INTO [dbo].[ReleaseGroupRelationship] AS [target]
                 USING [SourceReleaseGroupRelationship] AS [source]
@@ -232,23 +144,86 @@ public partial class ReleaseGroupRelationshipsMigration : Migration
                     [source].[Order]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseGroupId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                COMMIT TRANSACTION;
             END;");
 
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateReleaseGroup];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseGroup];");
+
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteReleaseGroup]
+            CREATE PROCEDURE [dbo].[sp_CreateReleaseGroup]
             (
                 @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @Enabled BIT,
+                @ReleaseGroupRelationships [dbo].[ReleaseGroupRelationship] READONLY,
+                @ResultId UNIQUEIDENTIFIER OUTPUT,
+                @ResultCreatedOn DATETIMEOFFSET OUTPUT,
+                @ResultUpdatedOn DATETIMEOFFSET OUTPUT
             )
             AS
             BEGIN
-                DELETE FROM [dbo].[ReleaseGroup] WHERE [Id] = @Id;
+                SET NOCOUNT ON;
 
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                IF (@Id = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER))
+                BEGIN
+                    SET @Id = NEWID();
+                END;
+
+                BEGIN TRANSACTION;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseGroup]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Enabled,
+                    NULL;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseGroupRelationships;
+
+                COMMIT TRANSACTION;
+
+                SELECT TOP (1)
+                    @ResultId = @Id,
+                    @ResultCreatedOn = [releaseGroup].[CreatedOn],
+                    @ResultUpdatedOn = [releaseGroup].[UpdatedOn]
+                FROM [dbo].[ReleaseGroup] AS [releaseGroup]
+                WHERE [releaseGroup].[Id] = @Id;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateReleaseGroup]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @Enabled BIT,
+                @ReleaseGroupRelationships [dbo].[ReleaseGroupRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                BEGIN TRANSACTION;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseGroup]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseGroupRelationships;
+
+                COMMIT TRANSACTION;
             END;");
     }
 
@@ -259,7 +234,7 @@ public partial class ReleaseGroupRelationshipsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseGroup];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteReleaseGroup];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseGroupRelationships];");
 
         migrationBuilder.DropTable(name: "ReleaseGroupRelationship", schema: "dbo");
 
@@ -286,22 +261,13 @@ public partial class ReleaseGroupRelationshipsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[ReleaseGroup]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeReleaseGroup]
                     @Id,
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -323,28 +289,13 @@ public partial class ReleaseGroupRelationshipsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[ReleaseGroup]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteReleaseGroup]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[ReleaseGroup] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseGroup]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
     }
 }

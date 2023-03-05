@@ -323,11 +323,169 @@ public partial class ReleaseArtistsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseArtists]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ReleaseArtists [dbo].[ReleaseArtist] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceReleaseArtist] AS
+                (
+                    SELECT
+                        @Id AS [ReleaseId],
+                        [ArtistId],
+                        [Order]
+                    FROM @ReleaseArtists
+                    WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseId] = @Id
+                )
+                MERGE INTO [dbo].[ReleaseArtist] AS [target]
+                USING [SourceReleaseArtist] AS [source]
+                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [ReleaseId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[ReleaseId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseFeaturedArtists]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceReleaseFeaturedArtist] AS
+                (
+                    SELECT
+                        @Id AS [ReleaseId],
+                        [ArtistId],
+                        [Order]
+                    FROM @ReleaseFeaturedArtists
+                    WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseId] = @Id
+                )
+                MERGE INTO [dbo].[ReleaseFeaturedArtist] AS [target]
+                USING [SourceReleaseFeaturedArtist] AS [source]
+                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [ReleaseId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[ReleaseId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleasePerformers]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ReleasePerformers [dbo].[ReleasePerformer] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceReleasePerformer] AS
+                (
+                    SELECT
+                        @Id AS [ReleaseId],
+                        [ArtistId],
+                        [Order]
+                    FROM @ReleasePerformers
+                    WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseId] = @Id
+                )
+                MERGE INTO [dbo].[ReleasePerformer] AS [target]
+                USING [SourceReleasePerformer] AS [source]
+                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [ReleaseId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[ReleaseId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseComposers]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ReleaseComposers [dbo].[ReleaseComposer] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceReleaseComposer] AS
+                (
+                    SELECT
+                        @Id AS [ReleaseId],
+                        [ArtistId],
+                        [Order]
+                    FROM @ReleaseComposers
+                    WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseId] = @Id
+                )
+                MERGE INTO [dbo].[ReleaseComposer] AS [target]
+                USING [SourceReleaseComposer] AS [source]
+                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [ReleaseId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[ReleaseId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+            END;");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateRelease]
@@ -365,22 +523,7 @@ public partial class ReleaseArtistsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeRelease]
                     @Id,
                     @Title,
                     @Description,
@@ -391,175 +534,36 @@ public partial class ReleaseArtistsMigration : Migration
                     @PublishFormat,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceReleaseRelationship] AS
-                (
-                    SELECT * FROM @ReleaseRelationships WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseRelationship] AS [target]
-                USING [SourceReleaseRelationship] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[DependentReleaseId] = [source].[DependentReleaseId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [DependentReleaseId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[DependentReleaseId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
+                    @Id,
+                    @ReleaseRelationships;
 
-                WITH [SourceReleaseArtist] AS
-                (
-                    SELECT * FROM @ReleaseArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseArtist] AS [target]
-                USING [SourceReleaseArtist] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseArtists]
+                    @Id,
+                    @ReleaseArtists;
 
-                WITH [SourceReleaseFeaturedArtist] AS
-                (
-                    SELECT * FROM @ReleaseFeaturedArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseFeaturedArtist] AS [target]
-                USING [SourceReleaseFeaturedArtist] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseFeaturedArtists]
+                    @Id,
+                    @ReleaseFeaturedArtists;
 
-                WITH [SourceReleasePerformer] AS
-                (
-                    SELECT * FROM @ReleasePerformers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleasePerformer] AS [target]
-                USING [SourceReleasePerformer] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleasePerformers]
+                    @Id,
+                    @ReleasePerformers;
 
-                WITH [SourceReleaseComposer] AS
-                (
-                    SELECT * FROM @ReleaseComposers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseComposer] AS [target]
-                USING [SourceReleaseComposer] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseComposers]
+                    @Id,
+                    @ReleaseComposers;
 
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
-                WITH [SourceReleaseTrack] AS
-                (
-                    SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrack] AS [target]
-                USING [SourceReleaseTrack] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardRecordingCode]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[InternationalStandardRecordingCode]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
+                    @Id,
+                    @ReleaseTrackCollection;
 
                 COMMIT TRANSACTION;
 
@@ -598,255 +602,49 @@ public partial class ReleaseArtistsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
+                    @Id,
+                    @ReleaseRelationships;
 
-                WITH [SourceReleaseRelationship] AS
-                (
-                    SELECT * FROM @ReleaseRelationships WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseRelationship] AS [target]
-                USING [SourceReleaseRelationship] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[DependentReleaseId] = [source].[DependentReleaseId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [DependentReleaseId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[DependentReleaseId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+                EXEC [dbo].[sp_Internal_MergeReleaseArtists]
+                    @Id,
+                    @ReleaseArtists;
 
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseFeaturedArtists]
+                    @Id,
+                    @ReleaseFeaturedArtists;
 
-                WITH [SourceReleaseArtist] AS
-                (
-                    SELECT * FROM @ReleaseArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseArtist] AS [target]
-                USING [SourceReleaseArtist] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+                EXEC [dbo].[sp_Internal_MergeReleasePerformers]
+                    @Id,
+                    @ReleasePerformers;
 
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseComposers]
+                    @Id,
+                    @ReleaseComposers;
 
-                WITH [SourceReleaseFeaturedArtist] AS
-                (
-                    SELECT * FROM @ReleaseFeaturedArtists WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseFeaturedArtist] AS [target]
-                USING [SourceReleaseFeaturedArtist] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleasePerformer] AS
-                (
-                    SELECT * FROM @ReleasePerformers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleasePerformer] AS [target]
-                USING [SourceReleasePerformer] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseComposer] AS
-                (
-                    SELECT * FROM @ReleaseComposers WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseComposer] AS [target]
-                USING [SourceReleaseComposer] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[CatalogNumber] = [source].[CatalogNumber],
-                    [target].[MediaFormat] = [source].[MediaFormat],
-                    [target].[TableOfContentsChecksum] = [source].[TableOfContentsChecksum],
-                    [target].[TableOfContentsChecksumLong] = [source].[TableOfContentsChecksumLong]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseTrack] AS
-                (
-                    SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrack] AS [target]
-                USING [SourceReleaseTrack] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[InternationalStandardRecordingCode] = [source].[InternationalStandardRecordingCode]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardRecordingCode]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[InternationalStandardRecordingCode]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
+                    @Id,
+                    @ReleaseTrackCollection;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteRelease]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Release] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 
@@ -857,7 +655,13 @@ public partial class ReleaseArtistsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseArtists];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseFeaturedArtists];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleasePerformers];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseComposers];");
 
         migrationBuilder.DropTable(name: "ReleaseArtist", schema: "dbo");
 
@@ -907,22 +711,7 @@ public partial class ReleaseArtistsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeRelease]
                     @Id,
                     @Title,
                     @Description,
@@ -933,95 +722,20 @@ public partial class ReleaseArtistsMigration : Migration
                     @PublishFormat,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceReleaseRelationship] AS
-                (
-                    SELECT * FROM @ReleaseRelationships WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseRelationship] AS [target]
-                USING [SourceReleaseRelationship] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[DependentReleaseId] = [source].[DependentReleaseId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [DependentReleaseId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[DependentReleaseId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
+                    @Id,
+                    @ReleaseRelationships;
 
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
-                WITH [SourceReleaseTrack] AS
-                (
-                    SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrack] AS [target]
-                USING [SourceReleaseTrack] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardRecordingCode]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[InternationalStandardRecordingCode]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
+                    @Id,
+                    @ReleaseTrackCollection;
 
                 COMMIT TRANSACTION;
 
@@ -1056,151 +770,33 @@ public partial class ReleaseArtistsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
+                    @Id,
+                    @ReleaseRelationships;
 
-                WITH [SourceReleaseRelationship] AS
-                (
-                    SELECT * FROM @ReleaseRelationships WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseRelationship] AS [target]
-                USING [SourceReleaseRelationship] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId] AND [target].[DependentReleaseId] = [source].[DependentReleaseId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ReleaseId],
-                    [DependentReleaseId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ReleaseId],
-                    [source].[DependentReleaseId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[CatalogNumber] = [source].[CatalogNumber],
-                    [target].[MediaFormat] = [source].[MediaFormat],
-                    [target].[TableOfContentsChecksum] = [source].[TableOfContentsChecksum],
-                    [target].[TableOfContentsChecksumLong] = [source].[TableOfContentsChecksumLong]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseTrack] AS
-                (
-                    SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrack] AS [target]
-                USING [SourceReleaseTrack] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[InternationalStandardRecordingCode] = [source].[InternationalStandardRecordingCode]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardRecordingCode]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[InternationalStandardRecordingCode]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
+                    @Id,
+                    @ReleaseTrackCollection;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteRelease]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Release] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 }

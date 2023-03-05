@@ -120,6 +120,86 @@ public partial class ReleasesMigration : Migration
             );");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeRelease]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @Barcode NVARCHAR(32),
+                @CatalogNumber NVARCHAR(32),
+                @MediaFormat NVARCHAR(256),
+                @PublishFormat NVARCHAR(256),
+                @ReleasedOn DATE,
+                @ReleasedOnYearOnly BIT,
+                @Enabled BIT,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceRelease] AS
+                (
+                    SELECT
+                        @Id AS [Id],
+                        @Title AS [Title],
+                        @Description AS [Description],
+                        @DisambiguationText AS [DisambiguationText],
+                        @Barcode AS [Barcode],
+                        @CatalogNumber AS [CatalogNumber],
+                        @MediaFormat AS [MediaFormat],
+                        @PublishFormat AS [PublishFormat],
+                        @ReleasedOn AS [ReleasedOn],
+                        @ReleasedOnYearOnly AS [ReleasedOnYearOnly],
+                        @Enabled AS [Enabled]
+                )
+                MERGE INTO [dbo].[Release] AS [target]
+                USING [SourceRelease] AS [source]
+                ON [target].[Id] = [source].[Id]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Title] = [source].[Title],
+                    [target].[Description] = [source].[Description],
+                    [target].[DisambiguationText] = [source].[DisambiguationText],
+                    [target].[Barcode] = [source].[Barcode],
+                    [target].[CatalogNumber] = [source].[CatalogNumber],
+                    [target].[MediaFormat] = [source].[MediaFormat],
+                    [target].[PublishFormat] = [source].[PublishFormat],
+                    [target].[ReleasedOn] = [source].[ReleasedOn],
+                    [target].[ReleasedOnYearOnly] = [source].[ReleasedOnYearOnly],
+                    [target].[Enabled] = [source].[Enabled]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [Id],
+                    [Title],
+                    [Description],
+                    [DisambiguationText],
+                    [Barcode],
+                    [CatalogNumber],
+                    [MediaFormat],
+                    [PublishFormat],
+                    [ReleasedOn],
+                    [ReleasedOnYearOnly],
+                    [Enabled]
+                )
+                VALUES
+                (
+                    [source].[Id],
+                    [source].[Title],
+                    [source].[Description],
+                    [source].[DisambiguationText],
+                    [source].[Barcode],
+                    [source].[CatalogNumber],
+                    [source].[MediaFormat],
+                    [source].[PublishFormat],
+                    [source].[ReleasedOn],
+                    [source].[ReleasedOnYearOnly],
+                    [source].[Enabled]
+                );
+
+                SET @ResultRowsUpdated = COALESCE(@ResultRowsUpdated, 0) + @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateRelease]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -146,22 +226,7 @@ public partial class ReleasesMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeRelease]
                     @Id,
                     @Title,
                     @Description,
@@ -172,8 +237,8 @@ public partial class ReleasesMigration : Migration
                     @PublishFormat,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -201,21 +266,19 @@ public partial class ReleasesMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
 
         migrationBuilder.Sql(@"
@@ -244,6 +307,8 @@ public partial class ReleasesMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeRelease];");
 
         migrationBuilder.DropTable(name: "Release", schema: "dbo");
 

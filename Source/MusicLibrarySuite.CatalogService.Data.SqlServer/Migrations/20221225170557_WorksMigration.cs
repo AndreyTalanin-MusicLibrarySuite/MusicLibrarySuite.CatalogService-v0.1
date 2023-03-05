@@ -107,6 +107,76 @@ public partial class WorksMigration : Migration
             );");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeWork]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @InternationalStandardMusicalWorkCode NVARCHAR(32),
+                @ReleasedOn DATE,
+                @ReleasedOnYearOnly BIT,
+                @SystemEntity BIT,
+                @Enabled BIT,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceWork] AS
+                (
+                    SELECT
+                        @Id AS [Id],
+                        @Title AS [Title],
+                        @Description AS [Description],
+                        @DisambiguationText AS [DisambiguationText],
+                        @InternationalStandardMusicalWorkCode AS [InternationalStandardMusicalWorkCode],
+                        @ReleasedOn AS [ReleasedOn],
+                        @ReleasedOnYearOnly AS [ReleasedOnYearOnly],
+                        @SystemEntity AS [SystemEntity],
+                        @Enabled AS [Enabled]
+                )
+                MERGE INTO [dbo].[Work] AS [target]
+                USING [SourceWork] AS [source]
+                ON [target].[Id] = [source].[Id]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Title] = [source].[Title],
+                    [target].[Description] = [source].[Description],
+                    [target].[DisambiguationText] = [source].[DisambiguationText],
+                    [target].[InternationalStandardMusicalWorkCode] = [source].[InternationalStandardMusicalWorkCode],
+                    [target].[ReleasedOn] = [source].[ReleasedOn],
+                    [target].[ReleasedOnYearOnly] = [source].[ReleasedOnYearOnly],
+                    [target].[SystemEntity] = [source].[SystemEntity],
+                    [target].[Enabled] = [source].[Enabled]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [Id],
+                    [Title],
+                    [Description],
+                    [DisambiguationText],
+                    [InternationalStandardMusicalWorkCode],
+                    [ReleasedOn],
+                    [ReleasedOnYearOnly],
+                    [SystemEntity],
+                    [Enabled]
+                )
+                VALUES
+                (
+                    [source].[Id],
+                    [source].[Title],
+                    [source].[Description],
+                    [source].[DisambiguationText],
+                    [source].[InternationalStandardMusicalWorkCode],
+                    [source].[ReleasedOn],
+                    [source].[ReleasedOnYearOnly],
+                    [source].[SystemEntity],
+                    [source].[Enabled]
+                );
+
+                SET @ResultRowsUpdated = COALESCE(@ResultRowsUpdated, 0) + @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateWork]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -131,20 +201,7 @@ public partial class WorksMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Work]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardMusicalWorkCode],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeWork]
                     @Id,
                     @Title,
                     @Description,
@@ -153,8 +210,8 @@ public partial class WorksMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -180,19 +237,17 @@ public partial class WorksMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Work]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [InternationalStandardMusicalWorkCode] = @InternationalStandardMusicalWorkCode,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWork]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @InternationalStandardMusicalWorkCode,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
 
         migrationBuilder.Sql(@"
@@ -221,6 +276,8 @@ public partial class WorksMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWork];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteWork];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeWork];");
 
         migrationBuilder.DropTable(name: "Work", schema: "dbo");
 

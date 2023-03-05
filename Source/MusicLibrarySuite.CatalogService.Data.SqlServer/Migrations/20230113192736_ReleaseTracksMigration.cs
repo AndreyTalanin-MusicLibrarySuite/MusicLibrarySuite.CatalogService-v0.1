@@ -95,11 +95,67 @@ public partial class ReleaseTracksMigration : Migration
                 [InternationalStandardRecordingCode] NVARCHAR(32) NULL
             );");
 
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseTrackCollection]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceReleaseTrack] AS
+                (
+                    SELECT
+                        [TrackNumber],
+                        [MediaNumber],
+                        @Id AS [ReleaseId],
+                        [Title],
+                        [Description],
+                        [DisambiguationText],
+                        [InternationalStandardRecordingCode]
+                    FROM @ReleaseTrackCollection
+                    WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseId] = @Id
+                )
+                MERGE INTO [dbo].[ReleaseTrack] AS [target]
+                USING [SourceReleaseTrack] AS [source]
+                ON [target].[TrackNumber] = [source].[TrackNumber]
+                    AND [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Title] = [source].[Title],
+                    [target].[Description] = [source].[Description],
+                    [target].[DisambiguationText] = [source].[DisambiguationText],
+                    [target].[InternationalStandardRecordingCode] = [source].[InternationalStandardRecordingCode]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [TrackNumber],
+                    [MediaNumber],
+                    [ReleaseId],
+                    [Title],
+                    [Description],
+                    [DisambiguationText],
+                    [InternationalStandardRecordingCode]
+                )
+                VALUES
+                (
+                    [source].[TrackNumber],
+                    [source].[MediaNumber],
+                    [source].[ReleaseId],
+                    [source].[Title],
+                    [source].[Description],
+                    [source].[DisambiguationText],
+                    [source].[InternationalStandardRecordingCode]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+            END;");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateRelease]
@@ -132,22 +188,7 @@ public partial class ReleaseTracksMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeRelease]
                     @Id,
                     @Title,
                     @Description,
@@ -158,71 +199,16 @@ public partial class ReleaseTracksMigration : Migration
                     @PublishFormat,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
-                WITH [SourceReleaseTrack] AS
-                (
-                    SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrack] AS [target]
-                USING [SourceReleaseTrack] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardRecordingCode]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[InternationalStandardRecordingCode]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
+                    @Id,
+                    @ReleaseTrackCollection;
 
                 COMMIT TRANSACTION;
 
@@ -256,119 +242,29 @@ public partial class ReleaseTracksMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[CatalogNumber] = [source].[CatalogNumber],
-                    [target].[MediaFormat] = [source].[MediaFormat],
-                    [target].[TableOfContentsChecksum] = [source].[TableOfContentsChecksum],
-                    [target].[TableOfContentsChecksumLong] = [source].[TableOfContentsChecksumLong]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceReleaseTrack] AS
-                (
-                    SELECT * FROM @ReleaseTrackCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseTrack] AS [target]
-                USING [SourceReleaseTrack] AS [source]
-                ON [target].[ReleaseId] = [source].[ReleaseId]
-                    AND [target].[TrackNumber] = [source].[TrackNumber]
-                    AND [target].[MediaNumber] = [source].[MediaNumber]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[InternationalStandardRecordingCode] = [source].[InternationalStandardRecordingCode]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [TrackNumber],
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardRecordingCode]
-                )
-                VALUES
-                (
-                    [source].[TrackNumber],
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[InternationalStandardRecordingCode]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseTrackCollection]
+                    @Id,
+                    @ReleaseTrackCollection;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteRelease]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Release] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 
@@ -379,7 +275,7 @@ public partial class ReleaseTracksMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseTrackCollection];");
 
         migrationBuilder.DropTable(name: "ReleaseTrack", schema: "dbo");
 
@@ -415,22 +311,7 @@ public partial class ReleaseTracksMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeRelease]
                     @Id,
                     @Title,
                     @Description,
@@ -441,40 +322,12 @@ public partial class ReleaseTracksMigration : Migration
                     @PublishFormat,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                );
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
                 COMMIT TRANSACTION;
 
@@ -507,80 +360,25 @@ public partial class ReleaseTracksMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Title] = [source].[Title],
-                    [target].[Description] = [source].[Description],
-                    [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[CatalogNumber] = [source].[CatalogNumber],
-                    [target].[MediaFormat] = [source].[MediaFormat],
-                    [target].[TableOfContentsChecksum] = [source].[TableOfContentsChecksum],
-                    [target].[TableOfContentsChecksumLong] = [source].[TableOfContentsChecksumLong]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteRelease]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Release] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 }

@@ -323,11 +323,169 @@ public partial class WorkArtistsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeWorkArtists]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @WorkArtists [dbo].[WorkArtist] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceWorkArtist] AS
+                (
+                    SELECT
+                        @Id AS [WorkId],
+                        [ArtistId],
+                        [Order]
+                    FROM @WorkArtists
+                    WHERE [WorkId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [WorkId] = @Id
+                )
+                MERGE INTO [dbo].[WorkArtist] AS [target]
+                USING [SourceWorkArtist] AS [source]
+                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [WorkId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[WorkId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeWorkFeaturedArtists]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @WorkFeaturedArtists [dbo].[WorkFeaturedArtist] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceWorkFeaturedArtist] AS
+                (
+                    SELECT
+                        @Id AS [WorkId],
+                        [ArtistId],
+                        [Order]
+                    FROM @WorkFeaturedArtists
+                    WHERE [WorkId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [WorkId] = @Id
+                )
+                MERGE INTO [dbo].[WorkFeaturedArtist] AS [target]
+                USING [SourceWorkFeaturedArtist] AS [source]
+                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [WorkId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[WorkId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeWorkPerformers]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @WorkPerformers [dbo].[WorkPerformer] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceWorkPerformer] AS
+                (
+                    SELECT
+                        @Id AS [WorkId],
+                        [ArtistId],
+                        [Order]
+                    FROM @WorkPerformers
+                    WHERE [WorkId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [WorkId] = @Id
+                )
+                MERGE INTO [dbo].[WorkPerformer] AS [target]
+                USING [SourceWorkPerformer] AS [source]
+                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [WorkId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[WorkId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeWorkComposers]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @WorkComposers [dbo].[WorkComposer] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceWorkComposer] AS
+                (
+                    SELECT
+                        @Id AS [WorkId],
+                        [ArtistId],
+                        [Order]
+                    FROM @WorkComposers
+                    WHERE [WorkId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [WorkId] = @Id
+                )
+                MERGE INTO [dbo].[WorkComposer] AS [target]
+                USING [SourceWorkComposer] AS [source]
+                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
+                WHEN MATCHED THEN UPDATE
+                SET [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [WorkId],
+                    [ArtistId],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[WorkId],
+                    [source].[ArtistId],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+            END;");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateWork];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWork];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteWork];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateWork]
@@ -361,20 +519,7 @@ public partial class WorkArtistsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Work]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardMusicalWorkCode],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeWork]
                     @Id,
                     @Title,
                     @Description,
@@ -383,112 +528,28 @@ public partial class WorkArtistsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceWorkRelationship] AS
-                (
-                    SELECT * FROM @WorkRelationships WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkRelationship] AS [target]
-                USING [SourceWorkRelationship] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [DependentWorkId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[DependentWorkId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkRelationships]
+                    @Id,
+                    @WorkRelationships;
 
-                WITH [SourceWorkArtist] AS
-                (
-                    SELECT * FROM @WorkArtists WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkArtist] AS [target]
-                USING [SourceWorkArtist] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkArtists]
+                    @Id,
+                    @WorkArtists;
 
-                WITH [SourceWorkFeaturedArtist] AS
-                (
-                    SELECT * FROM @WorkFeaturedArtists WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkFeaturedArtist] AS [target]
-                USING [SourceWorkFeaturedArtist] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkFeaturedArtists]
+                    @Id,
+                    @WorkFeaturedArtists;
 
-                WITH [SourceWorkPerformer] AS
-                (
-                    SELECT * FROM @WorkPerformers WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkPerformer] AS [target]
-                USING [SourceWorkPerformer] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkPerformers]
+                    @Id,
+                    @WorkPerformers;
 
-                WITH [SourceWorkComposer] AS
-                (
-                    SELECT * FROM @WorkComposers WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkComposer] AS [target]
-                USING [SourceWorkComposer] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkComposers]
+                    @Id,
+                    @WorkComposers;
 
                 COMMIT TRANSACTION;
 
@@ -523,170 +584,39 @@ public partial class WorkArtistsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Work]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [InternationalStandardMusicalWorkCode] = @InternationalStandardMusicalWorkCode,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeWork]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @InternationalStandardMusicalWorkCode,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWorkRelationships]
+                    @Id,
+                    @WorkRelationships;
 
-                WITH [SourceWorkRelationship] AS
-                (
-                    SELECT * FROM @WorkRelationships WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkRelationship] AS [target]
-                USING [SourceWorkRelationship] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [DependentWorkId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[DependentWorkId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+                EXEC [dbo].[sp_Internal_MergeWorkArtists]
+                    @Id,
+                    @WorkArtists;
 
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWorkFeaturedArtists]
+                    @Id,
+                    @WorkFeaturedArtists;
 
-                WITH [SourceWorkArtist] AS
-                (
-                    SELECT * FROM @WorkArtists WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkArtist] AS [target]
-                USING [SourceWorkArtist] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+                EXEC [dbo].[sp_Internal_MergeWorkPerformers]
+                    @Id,
+                    @WorkPerformers;
 
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceWorkFeaturedArtist] AS
-                (
-                    SELECT * FROM @WorkFeaturedArtists WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkFeaturedArtist] AS [target]
-                USING [SourceWorkFeaturedArtist] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceWorkPerformer] AS
-                (
-                    SELECT * FROM @WorkPerformers WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkPerformer] AS [target]
-                USING [SourceWorkPerformer] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                WITH [SourceWorkComposer] AS
-                (
-                    SELECT * FROM @WorkComposers WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkComposer] AS [target]
-                USING [SourceWorkComposer] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[ArtistId] = [source].[ArtistId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [ArtistId],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[ArtistId],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWorkComposers]
+                    @Id,
+                    @WorkComposers;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteWork]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Work] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 
@@ -697,7 +627,13 @@ public partial class WorkArtistsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWork];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteWork];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeWorkArtists];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeWorkFeaturedArtists];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeWorkPerformers];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeWorkComposers];");
 
         migrationBuilder.DropTable(name: "WorkArtist", schema: "dbo");
 
@@ -743,20 +679,7 @@ public partial class WorkArtistsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Work]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardMusicalWorkCode],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeWork]
                     @Id,
                     @Title,
                     @Description,
@@ -765,32 +688,12 @@ public partial class WorkArtistsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceWorkRelationship] AS
-                (
-                    SELECT * FROM @WorkRelationships WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkRelationship] AS [target]
-                USING [SourceWorkRelationship] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [DependentWorkId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[DependentWorkId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkRelationships]
+                    @Id,
+                    @WorkRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -821,66 +724,23 @@ public partial class WorkArtistsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Work]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [InternationalStandardMusicalWorkCode] = @InternationalStandardMusicalWorkCode,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeWork]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @InternationalStandardMusicalWorkCode,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceWorkRelationship] AS
-                (
-                    SELECT * FROM @WorkRelationships WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkRelationship] AS [target]
-                USING [SourceWorkRelationship] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [DependentWorkId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[DependentWorkId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWorkRelationships]
+                    @Id,
+                    @WorkRelationships;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteWork]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Work] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 }

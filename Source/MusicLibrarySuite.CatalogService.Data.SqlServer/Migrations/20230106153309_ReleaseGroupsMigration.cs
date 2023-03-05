@@ -96,6 +96,56 @@ public partial class ReleaseGroupsMigration : Migration
             );");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseGroup]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @Enabled BIT,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceReleaseGroup] AS
+                (
+                    SELECT
+                        @Id AS [Id],
+                        @Title AS [Title],
+                        @Description AS [Description],
+                        @DisambiguationText AS [DisambiguationText],
+                        @Enabled AS [Enabled]
+                )
+                MERGE INTO [dbo].[ReleaseGroup] AS [target]
+                USING [SourceReleaseGroup] AS [source]
+                ON [target].[Id] = [source].[Id]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Title] = [source].[Title],
+                    [target].[Description] = [source].[Description],
+                    [target].[DisambiguationText] = [source].[DisambiguationText],
+                    [target].[Enabled] = [source].[Enabled]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [Id],
+                    [Title],
+                    [Description],
+                    [DisambiguationText],
+                    [Enabled]
+                )
+                VALUES
+                (
+                    [source].[Id],
+                    [source].[Title],
+                    [source].[Description],
+                    [source].[DisambiguationText],
+                    [source].[Enabled]
+                );
+
+                SET @ResultRowsUpdated = COALESCE(@ResultRowsUpdated, 0) + @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateReleaseGroup]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -116,22 +166,13 @@ public partial class ReleaseGroupsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[ReleaseGroup]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeReleaseGroup]
                     @Id,
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -153,15 +194,13 @@ public partial class ReleaseGroupsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[ReleaseGroup]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeReleaseGroup]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
 
         migrationBuilder.Sql(@"
@@ -190,6 +229,8 @@ public partial class ReleaseGroupsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateReleaseGroup];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteReleaseGroup];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseGroup];");
 
         migrationBuilder.DropTable(name: "ReleaseGroup", schema: "dbo");
 

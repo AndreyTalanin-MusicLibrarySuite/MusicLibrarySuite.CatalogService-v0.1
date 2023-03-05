@@ -108,157 +108,36 @@ public partial class ReleaseMediaMigration : Migration
                 [TableOfContentsChecksumLong] NVARCHAR(64) NULL
             );");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
-
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_CreateRelease]
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeReleaseMediaCollection]
             (
                 @Id UNIQUEIDENTIFIER,
-                @Title NVARCHAR(256),
-                @Description NVARCHAR(2048),
-                @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
-                @MediaFormat NVARCHAR(256),
-                @PublishFormat NVARCHAR(256),
-                @ReleasedOn DATE,
-                @ReleasedOnYearOnly BIT,
-                @Enabled BIT,
-                @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
-                @ResultId UNIQUEIDENTIFIER OUTPUT,
-                @ResultCreatedOn DATETIMEOFFSET OUTPUT,
-                @ResultUpdatedOn DATETIMEOFFSET OUTPUT
+                @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY
             )
             AS
             BEGIN
                 SET NOCOUNT ON;
 
-                IF (@Id = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER))
-                BEGIN
-                    SET @Id = NEWID();
-                END;
-
-                BEGIN TRANSACTION;
-
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
-                    @Id,
-                    @Title,
-                    @Description,
-                    @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
-                    @MediaFormat,
-                    @PublishFormat,
-                    @ReleasedOn,
-                    @ReleasedOnYearOnly,
-                    @Enabled
-                );
-
                 WITH [SourceReleaseMedia] AS
                 (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
+                    SELECT
+                        [MediaNumber],
+                        @Id AS [ReleaseId],
+                        [Title],
+                        [Description],
+                        [DisambiguationText],
+                        [CatalogNumber],
+                        [MediaFormat],
+                        [TableOfContentsChecksum],
+                        [TableOfContentsChecksumLong]
+                    FROM @ReleaseMediaCollection
+                    WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ReleaseId] = @Id
                 )
                 MERGE INTO [dbo].[ReleaseMedia] AS [target]
                 USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [MediaNumber],
-                    [ReleaseId],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
-                )
-                VALUES
-                (
-                    [source].[MediaNumber],
-                    [source].[ReleaseId],
-                    [source].[Title],
-                    [source].[Description],
-                    [source].[DisambiguationText],
-                    [source].[CatalogNumber],
-                    [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
-                );
-
-                COMMIT TRANSACTION;
-
-                SELECT TOP (1)
-                    @ResultId = @Id,
-                    @ResultCreatedOn = [release].[CreatedOn],
-                    @ResultUpdatedOn = [release].[UpdatedOn]
-                FROM [dbo].[Release] AS [release]
-                WHERE [release].[Id] = @Id;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_UpdateRelease]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @Title NVARCHAR(256),
-                @Description NVARCHAR(2048),
-                @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
-                @MediaFormat NVARCHAR(256),
-                @PublishFormat NVARCHAR(256),
-                @ReleasedOn DATE,
-                @ReleasedOnYearOnly BIT,
-                @Enabled BIT,
-                @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
-                @ResultRowsUpdated INT OUTPUT
-            )
-            AS
-            BEGIN
-                BEGIN TRANSACTION;
-
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceReleaseMedia] AS
-                (
-                    SELECT * FROM @ReleaseMediaCollection WHERE [ReleaseId] = @Id
-                )
-                MERGE INTO [dbo].[ReleaseMedia] AS [target]
-                USING [SourceReleaseMedia] AS [source]
-                ON [target].[MediaNumber] = [source].[MediaNumber] AND [target].[ReleaseId] = [source].[ReleaseId]
+                ON [target].[MediaNumber] = [source].[MediaNumber]
+                    AND [target].[ReleaseId] = [source].[ReleaseId]
                 WHEN MATCHED THEN UPDATE
                 SET
                     [target].[Title] = [source].[Title],
@@ -293,23 +172,110 @@ public partial class ReleaseMediaMigration : Migration
                     [source].[TableOfContentsChecksumLong]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                COMMIT TRANSACTION;
             END;");
 
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
+
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteRelease]
+            CREATE PROCEDURE [dbo].[sp_CreateRelease]
             (
                 @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @Barcode NVARCHAR(32),
+                @CatalogNumber NVARCHAR(32),
+                @MediaFormat NVARCHAR(256),
+                @PublishFormat NVARCHAR(256),
+                @ReleasedOn DATE,
+                @ReleasedOnYearOnly BIT,
+                @Enabled BIT,
+                @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
+                @ResultId UNIQUEIDENTIFIER OUTPUT,
+                @ResultCreatedOn DATETIMEOFFSET OUTPUT,
+                @ResultUpdatedOn DATETIMEOFFSET OUTPUT
             )
             AS
             BEGIN
-                DELETE FROM [dbo].[Release] WHERE [Id] = @Id;
+                SET NOCOUNT ON;
 
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                IF (@Id = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER))
+                BEGIN
+                    SET @Id = NEWID();
+                END;
+
+                BEGIN TRANSACTION;
+
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    NULL;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
+
+                COMMIT TRANSACTION;
+
+                SELECT TOP (1)
+                    @ResultId = @Id,
+                    @ResultCreatedOn = [release].[CreatedOn],
+                    @ResultUpdatedOn = [release].[UpdatedOn]
+                FROM [dbo].[Release] AS [release]
+                WHERE [release].[Id] = @Id;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateRelease]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @Barcode NVARCHAR(32),
+                @CatalogNumber NVARCHAR(32),
+                @MediaFormat NVARCHAR(256),
+                @PublishFormat NVARCHAR(256),
+                @ReleasedOn DATE,
+                @ReleasedOnYearOnly BIT,
+                @Enabled BIT,
+                @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                BEGIN TRANSACTION;
+
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
+                    @Id,
+                    @ReleaseMediaCollection;
+
+                COMMIT TRANSACTION;
             END;");
     }
 
@@ -320,7 +286,7 @@ public partial class ReleaseMediaMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateRelease];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteRelease];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeReleaseMediaCollection];");
 
         migrationBuilder.DropTable(name: "ReleaseMedia", schema: "dbo");
 
@@ -353,22 +319,7 @@ public partial class ReleaseMediaMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Release]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
-                    [MediaFormat],
-                    [PublishFormat],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeRelease]
                     @Id,
                     @Title,
                     @Description,
@@ -379,8 +330,8 @@ public partial class ReleaseMediaMigration : Migration
                     @PublishFormat,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -408,34 +359,19 @@ public partial class ReleaseMediaMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Release]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [Barcode] = @Barcode,
-                    [CatalogNumber] = @CatalogNumber,
-                    [MediaFormat] = @MediaFormat,
-                    [PublishFormat] = @PublishFormat,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteRelease]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Release] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeRelease]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @Barcode,
+                    @CatalogNumber,
+                    @MediaFormat,
+                    @PublishFormat,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
     }
 }

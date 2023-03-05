@@ -97,11 +97,58 @@ public partial class WorkRelationshipsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeWorkRelationships]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @WorkRelationships [dbo].[WorkRelationship] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceWorkRelationship] AS
+                (
+                    SELECT
+                        @Id AS [WorkId],
+                        [DependentWorkId],
+                        [Name],
+                        [Description],
+                        [Order]
+                    FROM @WorkRelationships
+                    WHERE [WorkId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [WorkId] = @Id
+                )
+                MERGE INTO [dbo].[WorkRelationship] AS [target]
+                USING [SourceWorkRelationship] AS [source]
+                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Name] = [source].[Name],
+                    [target].[Description] = [source].[Description],
+                    [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [WorkId],
+                    [DependentWorkId],
+                    [Name],
+                    [Description],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[WorkId],
+                    [source].[DependentWorkId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+            END;");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateWork];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWork];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteWork];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateWork]
@@ -131,20 +178,7 @@ public partial class WorkRelationshipsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Work]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardMusicalWorkCode],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeWork]
                     @Id,
                     @Title,
                     @Description,
@@ -153,32 +187,12 @@ public partial class WorkRelationshipsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceWorkRelationship] AS
-                (
-                    SELECT * FROM @WorkRelationships WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkRelationship] AS [target]
-                USING [SourceWorkRelationship] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [DependentWorkId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[DependentWorkId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeWorkRelationships]
+                    @Id,
+                    @WorkRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -209,66 +223,23 @@ public partial class WorkRelationshipsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Work]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [InternationalStandardMusicalWorkCode] = @InternationalStandardMusicalWorkCode,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeWork]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @InternationalStandardMusicalWorkCode,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceWorkRelationship] AS
-                (
-                    SELECT * FROM @WorkRelationships WHERE [WorkId] = @Id
-                )
-                MERGE INTO [dbo].[WorkRelationship] AS [target]
-                USING [SourceWorkRelationship] AS [source]
-                ON [target].[WorkId] = [source].[WorkId] AND [target].[DependentWorkId] = [source].[DependentWorkId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [WorkId],
-                    [DependentWorkId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[WorkId],
-                    [source].[DependentWorkId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWorkRelationships]
+                    @Id,
+                    @WorkRelationships;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteWork]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Work] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 
@@ -279,7 +250,7 @@ public partial class WorkRelationshipsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateWork];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteWork];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeWorkRelationships];");
 
         migrationBuilder.DropTable(name: "WorkRelationship", schema: "dbo");
 
@@ -310,20 +281,7 @@ public partial class WorkRelationshipsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Work]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [InternationalStandardMusicalWorkCode],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeWork]
                     @Id,
                     @Title,
                     @Description,
@@ -332,8 +290,8 @@ public partial class WorkRelationshipsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -359,32 +317,17 @@ public partial class WorkRelationshipsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Work]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [InternationalStandardMusicalWorkCode] = @InternationalStandardMusicalWorkCode,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteWork]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Work] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeWork]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @InternationalStandardMusicalWorkCode,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
     }
 }

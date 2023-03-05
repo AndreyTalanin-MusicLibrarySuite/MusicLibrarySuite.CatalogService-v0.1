@@ -94,6 +94,61 @@ public partial class ArtistsMigration : Migration
             );");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeArtist]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Name NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @SystemEntity BIT,
+                @Enabled BIT,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceArtist] AS
+                (
+                    SELECT
+                        @Id AS [Id],
+                        @Name AS [Name],
+                        @Description AS [Description],
+                        @DisambiguationText AS [DisambiguationText],
+                        @SystemEntity AS [SystemEntity],
+                        @Enabled AS [Enabled]
+                )
+                MERGE INTO [dbo].[Artist] AS [target]
+                USING [SourceArtist] AS [source]
+                ON [target].[Id] = [source].[Id]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Name] = [source].[Name],
+                    [target].[Description] = [source].[Description],
+                    [target].[DisambiguationText] = [source].[DisambiguationText],
+                    [target].[SystemEntity] = [source].[SystemEntity],
+                    [target].[Enabled] = [source].[Enabled]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [Id],
+                    [Name],
+                    [Description],
+                    [DisambiguationText],
+                    [SystemEntity],
+                    [Enabled]
+                )
+                VALUES
+                (
+                    [source].[Id],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[DisambiguationText],
+                    [source].[SystemEntity],
+                    [source].[Enabled]
+                );
+
+                SET @ResultRowsUpdated = COALESCE(@ResultRowsUpdated, 0) + @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateArtist]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -115,24 +170,14 @@ public partial class ArtistsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Artist]
-                (
-                    [Id],
-                    [Name],
-                    [Description],
-                    [DisambiguationText],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeArtist]
                     @Id,
                     @Name,
                     @Description,
                     @DisambiguationText,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -155,16 +200,14 @@ public partial class ArtistsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Artist]
-                SET
-                    [Name] = @Name,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeArtist]
+                    @Id,
+                    @Name,
+                    @Description,
+                    @DisambiguationText,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
 
         migrationBuilder.Sql(@"
@@ -193,6 +236,8 @@ public partial class ArtistsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateArtist];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteArtist];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeArtist];");
 
         migrationBuilder.DropTable(name: "Artist", schema: "dbo");
 

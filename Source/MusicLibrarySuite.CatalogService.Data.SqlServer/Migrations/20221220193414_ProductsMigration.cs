@@ -98,6 +98,71 @@ public partial class ProductsMigration : Migration
             );");
 
         migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeProduct]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Title NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @DisambiguationText NVARCHAR(2048),
+                @ReleasedOn DATE,
+                @ReleasedOnYearOnly BIT,
+                @SystemEntity BIT,
+                @Enabled BIT,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                WITH [SourceProduct] AS
+                (
+                    SELECT
+                        @Id AS [Id],
+                        @Title AS [Title],
+                        @Description AS [Description],
+                        @DisambiguationText AS [DisambiguationText],
+                        @ReleasedOn AS [ReleasedOn],
+                        @ReleasedOnYearOnly AS [ReleasedOnYearOnly],
+                        @SystemEntity AS [SystemEntity],
+                        @Enabled AS [Enabled]
+                )
+                MERGE INTO [dbo].[Product] AS [target]
+                USING [SourceProduct] AS [source]
+                ON [target].[Id] = [source].[Id]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Title] = [source].[Title],
+                    [target].[Description] = [source].[Description],
+                    [target].[DisambiguationText] = [source].[DisambiguationText],
+                    [target].[ReleasedOn] = [source].[ReleasedOn],
+                    [target].[ReleasedOnYearOnly] = [source].[ReleasedOnYearOnly],
+                    [target].[SystemEntity] = [source].[SystemEntity],
+                    [target].[Enabled] = [source].[Enabled]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [Id],
+                    [Title],
+                    [Description],
+                    [DisambiguationText],
+                    [ReleasedOn],
+                    [ReleasedOnYearOnly],
+                    [SystemEntity],
+                    [Enabled]
+                )
+                VALUES
+                (
+                    [source].[Id],
+                    [source].[Title],
+                    [source].[Description],
+                    [source].[DisambiguationText],
+                    [source].[ReleasedOn],
+                    [source].[ReleasedOnYearOnly],
+                    [source].[SystemEntity],
+                    [source].[Enabled]
+                );
+
+                SET @ResultRowsUpdated = COALESCE(@ResultRowsUpdated, 0) + @@ROWCOUNT;
+            END;");
+
+        migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateProduct]
             (
                 @Id UNIQUEIDENTIFIER,
@@ -121,19 +186,7 @@ public partial class ProductsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Product]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeProduct]
                     @Id,
                     @Title,
                     @Description,
@@ -141,8 +194,8 @@ public partial class ProductsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -167,18 +220,16 @@ public partial class ProductsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Product]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeProduct]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
 
         migrationBuilder.Sql(@"
@@ -207,6 +258,8 @@ public partial class ProductsMigration : Migration
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateProduct];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteProduct];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeProduct];");
 
         migrationBuilder.DropTable(name: "Product", schema: "dbo");
 

@@ -97,115 +97,27 @@ public partial class GenreRelationshipsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateGenre];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateGenre];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteGenre];");
-
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_CreateGenre]
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeGenreRelationships]
             (
                 @Id UNIQUEIDENTIFIER,
-                @Name NVARCHAR(256),
-                @Description NVARCHAR(2048),
-                @SystemEntity BIT,
-                @Enabled BIT,
-                @GenreRelationships [dbo].[GenreRelationship] READONLY,
-                @ResultId UNIQUEIDENTIFIER OUTPUT,
-                @ResultCreatedOn DATETIMEOFFSET OUTPUT,
-                @ResultUpdatedOn DATETIMEOFFSET OUTPUT
+                @GenreRelationships [dbo].[GenreRelationship] READONLY
             )
             AS
             BEGIN
                 SET NOCOUNT ON;
 
-                IF (@Id = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER))
-                BEGIN
-                    SET @Id = NEWID();
-                END;
-
-                BEGIN TRANSACTION;
-
-                INSERT INTO [dbo].[Genre]
-                (
-                    [Id],
-                    [Name],
-                    [Description],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
-                    @Id,
-                    @Name,
-                    @Description,
-                    @SystemEntity,
-                    @Enabled
-                );
-
                 WITH [SourceGenreRelationship] AS
                 (
-                    SELECT * FROM @GenreRelationships WHERE [GenreId] = @Id
-                )
-                MERGE INTO [dbo].[GenreRelationship] AS [target]
-                USING [SourceGenreRelationship] AS [source]
-                ON [target].[GenreId] = [source].[GenreId] AND [target].[DependentGenreId] = [source].[DependentGenreId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [GenreId],
-                    [DependentGenreId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[GenreId],
-                    [source].[DependentGenreId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
-
-                COMMIT TRANSACTION;
-
-                SELECT TOP (1)
-                    @ResultId = @Id,
-                    @ResultCreatedOn = [genre].[CreatedOn],
-                    @ResultUpdatedOn = [genre].[UpdatedOn]
-                FROM [dbo].[Genre] AS [genre]
-                WHERE [genre].[Id] = @Id;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_UpdateGenre]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @Name NVARCHAR(256),
-                @Description NVARCHAR(2048),
-                @SystemEntity BIT,
-                @Enabled BIT,
-                @GenreRelationships [dbo].[GenreRelationship] READONLY,
-                @ResultRowsUpdated INT OUTPUT
-            )
-            AS
-            BEGIN
-                BEGIN TRANSACTION;
-
-                UPDATE [dbo].[Genre]
-                SET
-                    [Name] = @Name,
-                    [Description] = @Description,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceGenreRelationship] AS
-                (
-                    SELECT * FROM @GenreRelationships WHERE [GenreId] = @Id
+                    SELECT
+                        @Id AS [GenreId],
+                        [DependentGenreId],
+                        [Name],
+                        [Description],
+                        [Order]
+                    FROM @GenreRelationships
+                    WHERE [GenreId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [GenreId] = @Id
                 )
                 MERGE INTO [dbo].[GenreRelationship] AS [target]
                 USING [SourceGenreRelationship] AS [source]
@@ -232,23 +144,86 @@ public partial class GenreRelationshipsMigration : Migration
                     [source].[Order]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[GenreId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
-
-                COMMIT TRANSACTION;
             END;");
 
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateGenre];");
+
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateGenre];");
+
         migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteGenre]
+            CREATE PROCEDURE [dbo].[sp_CreateGenre]
             (
                 @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
+                @Name NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @SystemEntity BIT,
+                @Enabled BIT,
+                @GenreRelationships [dbo].[GenreRelationship] READONLY,
+                @ResultId UNIQUEIDENTIFIER OUTPUT,
+                @ResultCreatedOn DATETIMEOFFSET OUTPUT,
+                @ResultUpdatedOn DATETIMEOFFSET OUTPUT
             )
             AS
             BEGIN
-                DELETE FROM [dbo].[Genre] WHERE [Id] = @Id;
+                SET NOCOUNT ON;
 
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                IF (@Id = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER))
+                BEGIN
+                    SET @Id = NEWID();
+                END;
+
+                BEGIN TRANSACTION;
+
+                EXEC [dbo].[sp_Internal_MergeGenre]
+                    @Id,
+                    @Name,
+                    @Description,
+                    @SystemEntity,
+                    @Enabled,
+                    NULL;
+
+                EXEC [dbo].[sp_Internal_MergeGenreRelationships]
+                    @Id,
+                    @GenreRelationships;
+
+                COMMIT TRANSACTION;
+
+                SELECT TOP (1)
+                    @ResultId = @Id,
+                    @ResultCreatedOn = [genre].[CreatedOn],
+                    @ResultUpdatedOn = [genre].[UpdatedOn]
+                FROM [dbo].[Genre] AS [genre]
+                WHERE [genre].[Id] = @Id;
+            END;");
+
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_UpdateGenre]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @Name NVARCHAR(256),
+                @Description NVARCHAR(2048),
+                @SystemEntity BIT,
+                @Enabled BIT,
+                @GenreRelationships [dbo].[GenreRelationship] READONLY,
+                @ResultRowsUpdated INT OUTPUT
+            )
+            AS
+            BEGIN
+                BEGIN TRANSACTION;
+
+                EXEC [dbo].[sp_Internal_MergeGenre]
+                    @Id,
+                    @Name,
+                    @Description,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
+
+                EXEC [dbo].[sp_Internal_MergeGenreRelationships]
+                    @Id,
+                    @GenreRelationships;
+
+                COMMIT TRANSACTION;
             END;");
     }
 
@@ -259,7 +234,7 @@ public partial class GenreRelationshipsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateGenre];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteGenre];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeGenreRelationships];");
 
         migrationBuilder.DropTable(name: "GenreRelationship", schema: "dbo");
 
@@ -286,22 +261,13 @@ public partial class GenreRelationshipsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Genre]
-                (
-                    [Id],
-                    [Name],
-                    [Description],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeGenre]
                     @Id,
                     @Name,
                     @Description,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -323,28 +289,13 @@ public partial class GenreRelationshipsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Genre]
-                SET
-                    [Name] = @Name,
-                    [Description] = @Description,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteGenre]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Genre] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeGenre]
+                    @Id,
+                    @Name,
+                    @Description,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
     }
 }

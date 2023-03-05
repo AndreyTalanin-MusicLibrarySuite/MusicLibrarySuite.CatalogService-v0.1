@@ -97,11 +97,58 @@ public partial class ProductRelationshipsMigration : Migration
                 [Order] INT NOT NULL
             );");
 
+        migrationBuilder.Sql(@"
+            CREATE PROCEDURE [dbo].[sp_Internal_MergeProductRelationships]
+            (
+                @Id UNIQUEIDENTIFIER,
+                @ProductRelationships [dbo].[ProductRelationship] READONLY
+            )
+            AS
+            BEGIN
+                SET NOCOUNT ON;
+
+                WITH [SourceProductRelationship] AS
+                (
+                    SELECT
+                        @Id AS [ProductId],
+                        [DependentProductId],
+                        [Name],
+                        [Description],
+                        [Order]
+                    FROM @ProductRelationships
+                    WHERE [ProductId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
+                        OR [ProductId] = @Id
+                )
+                MERGE INTO [dbo].[ProductRelationship] AS [target]
+                USING [SourceProductRelationship] AS [source]
+                ON [target].[ProductId] = [source].[ProductId] AND [target].[DependentProductId] = [source].[DependentProductId]
+                WHEN MATCHED THEN UPDATE
+                SET
+                    [target].[Name] = [source].[Name],
+                    [target].[Description] = [source].[Description],
+                    [target].[Order] = [source].[Order]
+                WHEN NOT MATCHED THEN INSERT
+                (
+                    [ProductId],
+                    [DependentProductId],
+                    [Name],
+                    [Description],
+                    [Order]
+                )
+                VALUES
+                (
+                    [source].[ProductId],
+                    [source].[DependentProductId],
+                    [source].[Name],
+                    [source].[Description],
+                    [source].[Order]
+                )
+                WHEN NOT MATCHED BY SOURCE AND [target].[ProductId] = @Id THEN DELETE;
+            END;");
+
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateProduct];");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateProduct];");
-
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteProduct];");
 
         migrationBuilder.Sql(@"
             CREATE PROCEDURE [dbo].[sp_CreateProduct]
@@ -130,19 +177,7 @@ public partial class ProductRelationshipsMigration : Migration
 
                 BEGIN TRANSACTION;
 
-                INSERT INTO [dbo].[Product]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeProduct]
                     @Id,
                     @Title,
                     @Description,
@@ -150,32 +185,12 @@ public partial class ProductRelationshipsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
-                WITH [SourceProductRelationship] AS
-                (
-                    SELECT * FROM @ProductRelationships WHERE [ProductId] = @Id
-                )
-                MERGE INTO [dbo].[ProductRelationship] AS [target]
-                USING [SourceProductRelationship] AS [source]
-                ON [target].[ProductId] = [source].[ProductId] AND [target].[DependentProductId] = [source].[DependentProductId]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ProductId],
-                    [DependentProductId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ProductId],
-                    [source].[DependentProductId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                );
+                EXEC [dbo].[sp_Internal_MergeProductRelationships]
+                    @Id,
+                    @ProductRelationships;
 
                 COMMIT TRANSACTION;
 
@@ -205,65 +220,22 @@ public partial class ProductRelationshipsMigration : Migration
             BEGIN
                 BEGIN TRANSACTION;
 
-                UPDATE [dbo].[Product]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
+                EXEC [dbo].[sp_Internal_MergeProduct]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
 
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-
-                WITH [SourceProductRelationship] AS
-                (
-                    SELECT * FROM @ProductRelationships WHERE [ProductId] = @Id
-                )
-                MERGE INTO [dbo].[ProductRelationship] AS [target]
-                USING [SourceProductRelationship] AS [source]
-                ON [target].[ProductId] = [source].[ProductId] AND [target].[DependentProductId] = [source].[DependentProductId]
-                WHEN MATCHED THEN UPDATE
-                SET
-                    [target].[Name] = [source].[Name],
-                    [target].[Description] = [source].[Description],
-                    [target].[Order] = [source].[Order]
-                WHEN NOT MATCHED THEN INSERT
-                (
-                    [ProductId],
-                    [DependentProductId],
-                    [Name],
-                    [Description],
-                    [Order]
-                )
-                VALUES
-                (
-                    [source].[ProductId],
-                    [source].[DependentProductId],
-                    [source].[Name],
-                    [source].[Description],
-                    [source].[Order]
-                )
-                WHEN NOT MATCHED BY SOURCE AND [target].[ProductId] = @Id THEN DELETE;
-
-                SET @ResultRowsUpdated = @ResultRowsUpdated + @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeProductRelationships]
+                    @Id,
+                    @ProductRelationships;
 
                 COMMIT TRANSACTION;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteProduct]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Product] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
             END;");
     }
 
@@ -274,7 +246,7 @@ public partial class ProductRelationshipsMigration : Migration
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_UpdateProduct];");
 
-        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_DeleteProduct];");
+        migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_Internal_MergeProductRelationships];");
 
         migrationBuilder.DropTable(name: "ProductRelationship", schema: "dbo");
 
@@ -304,19 +276,7 @@ public partial class ProductRelationshipsMigration : Migration
                     SET @Id = NEWID();
                 END;
 
-                INSERT INTO [dbo].[Product]
-                (
-                    [Id],
-                    [Title],
-                    [Description],
-                    [DisambiguationText],
-                    [ReleasedOn],
-                    [ReleasedOnYearOnly],
-                    [SystemEntity],
-                    [Enabled]
-                )
-                VALUES
-                (
+                EXEC [dbo].[sp_Internal_MergeProduct]
                     @Id,
                     @Title,
                     @Description,
@@ -324,8 +284,8 @@ public partial class ProductRelationshipsMigration : Migration
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @SystemEntity,
-                    @Enabled
-                );
+                    @Enabled,
+                    NULL;
 
                 SELECT TOP (1)
                     @ResultId = @Id,
@@ -350,31 +310,16 @@ public partial class ProductRelationshipsMigration : Migration
             )
             AS
             BEGIN
-                UPDATE [dbo].[Product]
-                SET
-                    [Title] = @Title,
-                    [Description] = @Description,
-                    [DisambiguationText] = @DisambiguationText,
-                    [ReleasedOn] = @ReleasedOn,
-                    [ReleasedOnYearOnly] = @ReleasedOnYearOnly,
-                    [SystemEntity] = @SystemEntity,
-                    [Enabled] = @Enabled
-                WHERE [Id] = @Id;
-
-                SET @ResultRowsUpdated = @@ROWCOUNT;
-            END;");
-
-        migrationBuilder.Sql(@"
-            CREATE PROCEDURE [dbo].[sp_DeleteProduct]
-            (
-                @Id UNIQUEIDENTIFIER,
-                @ResultRowsDeleted INT OUTPUT
-            )
-            AS
-            BEGIN
-                DELETE FROM [dbo].[Product] WHERE [Id] = @Id;
-
-                SET @ResultRowsDeleted = @@ROWCOUNT;
+                EXEC [dbo].[sp_Internal_MergeProduct]
+                    @Id,
+                    @Title,
+                    @Description,
+                    @DisambiguationText,
+                    @ReleasedOn,
+                    @ReleasedOnYearOnly,
+                    @SystemEntity,
+                    @Enabled,
+                    @ResultRowsUpdated OUTPUT;
             END;");
     }
 }
