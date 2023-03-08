@@ -97,11 +97,12 @@ public class Startup
                 Url = new Uri("https://github.com/AndreyTalanin-MusicLibrarySuite/MusicLibrarySuite.CatalogService/blob/main/LICENSE.md"),
             };
 
+            var version = "v0.9.0-rc1";
             options.SwaggerDoc("MusicLibrarySuite.CatalogService", new OpenApiInfo()
             {
-                Title = "Music Library Suite - Catalog Service API v0.9.0-rc1",
+                Title = $"Music Library Suite - Catalog Service API {version}",
                 Description = "Initial pre-release (unstable) API version.",
-                Version = "v0.9.0-rc1",
+                Version = version,
                 Contact = contact,
                 License = license,
             });
