@@ -54,12 +54,12 @@ public interface IReleaseGroupRepository
     /// <summary>
     /// Asynchronously gets release groups by a release group page request.
     /// </summary>
-    /// <param name="releaseGroupRequest">The release group page request configuration.</param>
+    /// <param name="releaseGroupPageRequest">The release group page request configuration.</param>
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// The task's result will be an array containing all release groups corresponding to the request configuration.
     /// </returns>
-    public Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupRequestDto releaseGroupRequest);
+    public Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupPageRequestDto releaseGroupPageRequest);
 
     /// <summary>
     /// Asynchronously gets all release group relationships by a release group's unique identifier.

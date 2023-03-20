@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the release group repository.
+/// Represents a SQL-Server-specific implementation of the release group repository.
 /// </summary>
 public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 {
@@ -41,9 +41,12 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetReleaseGroup] (@{releaseGroupIdParameter.ParameterName})";
 
-        ReleaseGroupDto? releaseGroup = await context.ReleaseGroups.FromSqlRaw(query, releaseGroupIdParameter).AsNoTracking()
+        ReleaseGroupDto? releaseGroup = await context.ReleaseGroups
+            .FromSqlRaw(query, releaseGroupIdParameter)
             .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
             .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (releaseGroup is not null)
@@ -59,15 +62,9 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ReleaseGroupDto[] releaseGroups = await context.ReleaseGroups.AsNoTracking()
-            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
-            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
+        ReleaseGroupDto[] releaseGroups = await context.ReleaseGroups
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
-        {
-            OrderReleaseGroupRelationships(releaseGroup);
-        }
 
         return releaseGroups;
     }
@@ -86,15 +83,10 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetReleaseGroups] (@{releaseGroupIdsParameter.ParameterName})";
 
-        ReleaseGroupDto[] releaseGroups = await context.ReleaseGroups.FromSqlRaw(query, releaseGroupIdsParameter).AsNoTracking()
-            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
-            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
+        ReleaseGroupDto[] releaseGroups = await context.ReleaseGroups
+            .FromSqlRaw(query, releaseGroupIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
-        {
-            OrderReleaseGroupRelationships(releaseGroup);
-        }
 
         return releaseGroups;
     }
@@ -104,50 +96,38 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ReleaseGroupDto[] releaseGroups = await collectionProcessor(context.ReleaseGroups.AsNoTracking())
-            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
-            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
+        ReleaseGroupDto[] releaseGroups = await collectionProcessor(context.ReleaseGroups)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
-        {
-            OrderReleaseGroupRelationships(releaseGroup);
-        }
 
         return releaseGroups;
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupRequestDto releaseGroupRequest)
+    public async Task<PageResponseDto<ReleaseGroupDto>> GetReleaseGroupsAsync(ReleaseGroupPageRequestDto releaseGroupPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<ReleaseGroupDto> baseCollection = context.ReleaseGroups.AsNoTracking();
+        IQueryable<ReleaseGroupDto> baseCollection = context.ReleaseGroups;
 
-        if (releaseGroupRequest.Title is not null)
-            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Title.Contains(releaseGroupRequest.Title));
+        if (releaseGroupPageRequest.Title is not null)
+            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Title.Contains(releaseGroupPageRequest.Title));
 
-        if (releaseGroupRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Enabled == (bool)releaseGroupRequest.Enabled);
+        if (releaseGroupPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(releaseGroup => releaseGroup.Enabled == (bool)releaseGroupPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ReleaseGroupDto> releaseGroups = await baseCollection
-            .Include(releaseGroup => releaseGroup.ReleaseGroupRelationships)
-            .ThenInclude(releaseGroupRelationship => releaseGroupRelationship.DependentReleaseGroup)
             .OrderBy(releaseGroup => releaseGroup.Title)
-            .Skip(releaseGroupRequest.PageSize * releaseGroupRequest.PageIndex)
-            .Take(releaseGroupRequest.PageSize)
+            .Skip(releaseGroupPageRequest.PageSize * releaseGroupPageRequest.PageIndex)
+            .Take(releaseGroupPageRequest.PageSize)
+            .AsNoTracking()
             .ToListAsync();
-
-        foreach (ReleaseGroupDto releaseGroup in releaseGroups)
-        {
-            OrderReleaseGroupRelationships(releaseGroup);
-        }
 
         return new PageResponseDto<ReleaseGroupDto>()
         {
-            PageSize = releaseGroupRequest.PageSize,
-            PageIndex = releaseGroupRequest.PageIndex,
+            PageSize = releaseGroupPageRequest.PageSize,
+            PageIndex = releaseGroupPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = releaseGroups,
         };
@@ -323,7 +303,7 @@ public class SqlServerReleaseGroupRepository : IReleaseGroupRepository
             .ToList();
     }
 
-    private static void SetReleaseGroupRelationshipOrders(ICollection<ReleaseGroupRelationshipDto> releaseGroupRelationships)
+    private static void SetReleaseGroupRelationshipOrders(IEnumerable<ReleaseGroupRelationshipDto> releaseGroupRelationships)
     {
         var i = 0;
         foreach (ReleaseGroupRelationshipDto releaseGroupRelationship in releaseGroupRelationships)

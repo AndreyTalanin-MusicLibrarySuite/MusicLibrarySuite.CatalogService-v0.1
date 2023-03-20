@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the work repository.
+/// Represents a SQL-Server-specific implementation of the work repository.
 /// </summary>
 public class SqlServerWorkRepository : IWorkRepository
 {
@@ -41,9 +41,12 @@ public class SqlServerWorkRepository : IWorkRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetWork] (@{workIdParameter.ParameterName})";
 
-        WorkDto? work = await context.Works.FromSqlRaw(query, workIdParameter).AsNoTracking()
+        WorkDto? work = await context.Works
+            .FromSqlRaw(query, workIdParameter)
             .Include(work => work.WorkRelationships)
             .ThenInclude(workRelationship => workRelationship.DependentWork)
+            .Include(work => work.WorkToProductRelationships)
+            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .Include(work => work.WorkArtists)
             .ThenInclude(workArtist => workArtist.Artist)
             .Include(work => work.WorkFeaturedArtists)
@@ -54,19 +57,19 @@ public class SqlServerWorkRepository : IWorkRepository
             .ThenInclude(workComposer => workComposer.Artist)
             .Include(work => work.WorkGenres)
             .ThenInclude(workGenre => workGenre.Genre)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (work is not null)
         {
             OrderWorkRelationships(work);
+            OrderWorkToProductRelationships(work);
             OrderWorkArtists(work);
             OrderWorkFeaturedArtists(work);
             OrderWorkPerformers(work);
             OrderWorkComposers(work);
             OrderWorkGenres(work);
-            OrderWorkToProductRelationships(work);
         }
 
         return work;
@@ -77,33 +80,9 @@ public class SqlServerWorkRepository : IWorkRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        WorkDto[] works = await context.Works.AsNoTracking()
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
+        WorkDto[] works = await context.Works
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-            OrderWorkToProductRelationships(work);
-        }
 
         return works;
     }
@@ -122,33 +101,10 @@ public class SqlServerWorkRepository : IWorkRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetWorks] (@{workIdsParameter.ParameterName})";
 
-        WorkDto[] works = await context.Works.FromSqlRaw(query, workIdsParameter).AsNoTracking()
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
+        WorkDto[] works = await context.Works
+            .FromSqlRaw(query, workIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-            OrderWorkToProductRelationships(work);
-        }
 
         return works;
     }
@@ -158,87 +114,39 @@ public class SqlServerWorkRepository : IWorkRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        WorkDto[] works = await collectionProcessor(context.Works.AsNoTracking())
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
+        WorkDto[] works = await collectionProcessor(context.Works)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-            OrderWorkToProductRelationships(work);
-        }
 
         return works;
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkRequestDto workRequest)
+    public async Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkPageRequestDto workPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<WorkDto> baseCollection = context.Works.AsNoTracking();
+        IQueryable<WorkDto> baseCollection = context.Works;
 
-        if (workRequest.Title is not null)
-            baseCollection = baseCollection.Where(work => work.Title.Contains(workRequest.Title));
+        if (workPageRequest.Title is not null)
+            baseCollection = baseCollection.Where(work => work.Title.Contains(workPageRequest.Title));
 
-        if (workRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(work => work.Enabled == (bool)workRequest.Enabled);
+        if (workPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(work => work.Enabled == (bool)workPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<WorkDto> works = await baseCollection
-            .Include(work => work.WorkRelationships)
-            .ThenInclude(workRelationship => workRelationship.DependentWork)
-            .Include(work => work.WorkArtists)
-            .ThenInclude(workArtist => workArtist.Artist)
-            .Include(work => work.WorkFeaturedArtists)
-            .ThenInclude(workFeaturedArtist => workFeaturedArtist.Artist)
-            .Include(work => work.WorkPerformers)
-            .ThenInclude(workPerformer => workPerformer.Artist)
-            .Include(work => work.WorkComposers)
-            .ThenInclude(workComposer => workComposer.Artist)
-            .Include(work => work.WorkGenres)
-            .ThenInclude(workGenre => workGenre.Genre)
-            .Include(work => work.WorkToProductRelationships)
-            .ThenInclude(workToProductRelationship => workToProductRelationship.Product)
             .OrderByDescending(work => work.SystemEntity)
             .ThenBy(work => work.Title)
-            .Skip(workRequest.PageSize * workRequest.PageIndex)
-            .Take(workRequest.PageSize)
+            .Skip(workPageRequest.PageSize * workPageRequest.PageIndex)
+            .Take(workPageRequest.PageSize)
+            .AsNoTracking()
             .ToListAsync();
-
-        foreach (WorkDto work in works)
-        {
-            OrderWorkRelationships(work);
-            OrderWorkArtists(work);
-            OrderWorkFeaturedArtists(work);
-            OrderWorkPerformers(work);
-            OrderWorkComposers(work);
-            OrderWorkGenres(work);
-            OrderWorkToProductRelationships(work);
-        }
 
         return new PageResponseDto<WorkDto>()
         {
-            PageSize = workRequest.PageSize,
-            PageIndex = workRequest.PageIndex,
+            PageSize = workPageRequest.PageSize,
+            PageIndex = workPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = works,
         };
@@ -309,12 +217,12 @@ public class SqlServerWorkRepository : IWorkRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         SetWorkRelationshipOrders(work.WorkRelationships);
+        SetWorkToProductRelationshipOrders(work.WorkToProductRelationships);
         SetWorkArtistOrders(work.WorkArtists);
         SetWorkFeaturedArtistOrders(work.WorkFeaturedArtists);
         SetWorkPerformerOrders(work.WorkPerformers);
         SetWorkComposerOrders(work.WorkComposers);
         SetWorkGenreOrders(work.WorkGenres);
-        SetWorkToProductRelationshipOrders(work.WorkToProductRelationships);
 
         using var workRelationshipsDataTable = new DataTable();
         workRelationshipsDataTable.Columns.Add(nameof(WorkRelationshipDto.WorkId), typeof(Guid));
@@ -330,6 +238,24 @@ public class SqlServerWorkRepository : IWorkRepository
                 workRelationship.Name.AsDbValue(),
                 workRelationship.Description.AsDbValue(),
                 workRelationship.Order.AsDbValue());
+        }
+
+        using var workToProductRelationshipsDataTable = new DataTable();
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (WorkToProductRelationshipDto workToProductRelationship in work.WorkToProductRelationships)
+        {
+            workToProductRelationshipsDataTable.Rows.Add(
+                workToProductRelationship.WorkId.AsDbValue(),
+                workToProductRelationship.ProductId.AsDbValue(),
+                workToProductRelationship.Name.AsDbValue(),
+                workToProductRelationship.Description.AsDbValue(),
+                workToProductRelationship.Order.AsDbValue(),
+                workToProductRelationship.ReferenceOrder.AsDbValue());
         }
 
         using var workArtistsDataTable = new DataTable();
@@ -392,24 +318,6 @@ public class SqlServerWorkRepository : IWorkRepository
                 workGenre.Order.AsDbValue());
         }
 
-        using var workToProductRelationshipsDataTable = new DataTable();
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
-        foreach (WorkToProductRelationshipDto workToProductRelationship in work.WorkToProductRelationships)
-        {
-            workToProductRelationshipsDataTable.Rows.Add(
-                workToProductRelationship.WorkId.AsDbValue(),
-                workToProductRelationship.ProductId.AsDbValue(),
-                workToProductRelationship.Name.AsDbValue(),
-                workToProductRelationship.Description.AsDbValue(),
-                workToProductRelationship.Order.AsDbValue(),
-                workToProductRelationship.ReferenceOrder.AsDbValue());
-        }
-
         SqlParameter resultIdParameter;
         SqlParameter resultCreatedOnParameter;
         SqlParameter resultUpdatedOnParameter;
@@ -425,12 +333,12 @@ public class SqlServerWorkRepository : IWorkRepository
             new SqlParameter(nameof(WorkDto.SystemEntity), work.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(WorkDto.Enabled), work.Enabled.AsDbValue()),
             new SqlParameter(nameof(WorkDto.WorkRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkRelationship]", Value = workRelationshipsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
             new SqlParameter(nameof(WorkDto.WorkArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkArtist]", Value = workArtistsDataTable },
             new SqlParameter(nameof(WorkDto.WorkFeaturedArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkFeaturedArtist]", Value = workFeaturedArtistsDataTable },
             new SqlParameter(nameof(WorkDto.WorkPerformers), SqlDbType.Structured) { TypeName = "[dbo].[WorkPerformer]", Value = workPerformersDataTable },
             new SqlParameter(nameof(WorkDto.WorkComposers), SqlDbType.Structured) { TypeName = "[dbo].[WorkComposer]", Value = workComposersDataTable },
             new SqlParameter(nameof(WorkDto.WorkGenres), SqlDbType.Structured) { TypeName = "[dbo].[WorkGenre]", Value = workGenresDataTable },
-            new SqlParameter(nameof(WorkDto.WorkToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
             resultIdParameter = new SqlParameter($"Result{nameof(WorkDto.Id)}", SqlDbType.UniqueIdentifier) { Direction = ParameterDirection.Output },
             resultCreatedOnParameter = new SqlParameter($"Result{nameof(WorkDto.CreatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
             resultUpdatedOnParameter = new SqlParameter($"Result{nameof(WorkDto.UpdatedOn)}", SqlDbType.DateTimeOffset) { Direction = ParameterDirection.Output },
@@ -448,12 +356,12 @@ public class SqlServerWorkRepository : IWorkRepository
                 @{nameof(WorkDto.SystemEntity)},
                 @{nameof(WorkDto.Enabled)},
                 @{nameof(WorkDto.WorkRelationships)},
+                @{nameof(WorkDto.WorkToProductRelationships)},
                 @{nameof(WorkDto.WorkArtists)},
                 @{nameof(WorkDto.WorkFeaturedArtists)},
                 @{nameof(WorkDto.WorkPerformers)},
                 @{nameof(WorkDto.WorkComposers)},
                 @{nameof(WorkDto.WorkGenres)},
-                @{nameof(WorkDto.WorkToProductRelationships)},
                 @{resultIdParameter.ParameterName} OUTPUT,
                 @{resultCreatedOnParameter.ParameterName} OUTPUT,
                 @{resultUpdatedOnParameter.ParameterName} OUTPUT;";
@@ -473,12 +381,12 @@ public class SqlServerWorkRepository : IWorkRepository
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
         SetWorkRelationshipOrders(work.WorkRelationships);
+        SetWorkToProductRelationshipOrders(work.WorkToProductRelationships);
         SetWorkArtistOrders(work.WorkArtists);
         SetWorkFeaturedArtistOrders(work.WorkFeaturedArtists);
         SetWorkPerformerOrders(work.WorkPerformers);
         SetWorkComposerOrders(work.WorkComposers);
         SetWorkGenreOrders(work.WorkGenres);
-        SetWorkToProductRelationshipOrders(work.WorkToProductRelationships);
 
         using var workRelationshipsDataTable = new DataTable();
         workRelationshipsDataTable.Columns.Add(nameof(WorkRelationshipDto.WorkId), typeof(Guid));
@@ -494,6 +402,24 @@ public class SqlServerWorkRepository : IWorkRepository
                 workRelationship.Name.AsDbValue(),
                 workRelationship.Description.AsDbValue(),
                 workRelationship.Order.AsDbValue());
+        }
+
+        using var workToProductRelationshipsDataTable = new DataTable();
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
+        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
+        foreach (WorkToProductRelationshipDto workToProductRelationship in work.WorkToProductRelationships)
+        {
+            workToProductRelationshipsDataTable.Rows.Add(
+                workToProductRelationship.WorkId.AsDbValue(),
+                workToProductRelationship.ProductId.AsDbValue(),
+                workToProductRelationship.Name.AsDbValue(),
+                workToProductRelationship.Description.AsDbValue(),
+                workToProductRelationship.Order.AsDbValue(),
+                workToProductRelationship.ReferenceOrder.AsDbValue());
         }
 
         using var workArtistsDataTable = new DataTable();
@@ -556,24 +482,6 @@ public class SqlServerWorkRepository : IWorkRepository
                 workGenre.Order.AsDbValue());
         }
 
-        using var workToProductRelationshipsDataTable = new DataTable();
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.WorkId), typeof(Guid));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ProductId), typeof(Guid));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Name), typeof(string));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Description), typeof(string));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.Order), typeof(int));
-        workToProductRelationshipsDataTable.Columns.Add(nameof(WorkToProductRelationshipDto.ReferenceOrder), typeof(int));
-        foreach (WorkToProductRelationshipDto workToProductRelationship in work.WorkToProductRelationships)
-        {
-            workToProductRelationshipsDataTable.Rows.Add(
-                workToProductRelationship.WorkId.AsDbValue(),
-                workToProductRelationship.ProductId.AsDbValue(),
-                workToProductRelationship.Name.AsDbValue(),
-                workToProductRelationship.Description.AsDbValue(),
-                workToProductRelationship.Order.AsDbValue(),
-                workToProductRelationship.ReferenceOrder.AsDbValue());
-        }
-
         SqlParameter resultRowsUpdatedParameter;
         var parameters = new SqlParameter[]
         {
@@ -587,12 +495,12 @@ public class SqlServerWorkRepository : IWorkRepository
             new SqlParameter(nameof(WorkDto.SystemEntity), work.SystemEntity.AsDbValue()),
             new SqlParameter(nameof(WorkDto.Enabled), work.Enabled.AsDbValue()),
             new SqlParameter(nameof(WorkDto.WorkRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkRelationship]", Value = workRelationshipsDataTable },
+            new SqlParameter(nameof(WorkDto.WorkToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
             new SqlParameter(nameof(WorkDto.WorkArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkArtist]", Value = workArtistsDataTable },
             new SqlParameter(nameof(WorkDto.WorkFeaturedArtists), SqlDbType.Structured) { TypeName = "[dbo].[WorkFeaturedArtist]", Value = workFeaturedArtistsDataTable },
             new SqlParameter(nameof(WorkDto.WorkPerformers), SqlDbType.Structured) { TypeName = "[dbo].[WorkPerformer]", Value = workPerformersDataTable },
             new SqlParameter(nameof(WorkDto.WorkComposers), SqlDbType.Structured) { TypeName = "[dbo].[WorkComposer]", Value = workComposersDataTable },
             new SqlParameter(nameof(WorkDto.WorkGenres), SqlDbType.Structured) { TypeName = "[dbo].[WorkGenre]", Value = workGenresDataTable },
-            new SqlParameter(nameof(WorkDto.WorkToProductRelationships), SqlDbType.Structured) { TypeName = "[dbo].[WorkToProductRelationship]", Value = workToProductRelationshipsDataTable },
             resultRowsUpdatedParameter = new SqlParameter("ResultRowsUpdated", SqlDbType.Int) { Direction = ParameterDirection.Output },
         };
 
@@ -608,12 +516,12 @@ public class SqlServerWorkRepository : IWorkRepository
                 @{nameof(WorkDto.SystemEntity)},
                 @{nameof(WorkDto.Enabled)},
                 @{nameof(WorkDto.WorkRelationships)},
+                @{nameof(WorkDto.WorkToProductRelationships)},
                 @{nameof(WorkDto.WorkArtists)},
                 @{nameof(WorkDto.WorkFeaturedArtists)},
                 @{nameof(WorkDto.WorkPerformers)},
                 @{nameof(WorkDto.WorkComposers)},
                 @{nameof(WorkDto.WorkGenres)},
-                @{nameof(WorkDto.WorkToProductRelationships)},
                 @{resultRowsUpdatedParameter.ParameterName} OUTPUT;";
 
         await context.Database.ExecuteSqlRawAsync(query, parameters);
@@ -671,7 +579,7 @@ public class SqlServerWorkRepository : IWorkRepository
         await context.Database.ExecuteSqlRawAsync(query, parameters);
 
         var rowsUpdated = (int)resultRowsUpdatedParameter.Value;
-        return rowsUpdated > 0;
+        return rowsUpdated >= 0;
     }
 
     /// <inheritdoc />
@@ -701,6 +609,13 @@ public class SqlServerWorkRepository : IWorkRepository
     {
         work.WorkRelationships = work.WorkRelationships
             .OrderBy(workRelationship => workRelationship.Order)
+            .ToList();
+    }
+
+    private static void OrderWorkToProductRelationships(WorkDto work)
+    {
+        work.WorkToProductRelationships = work.WorkToProductRelationships
+            .OrderBy(workToProductRelationship => workToProductRelationship.Order)
             .ToList();
     }
 
@@ -739,14 +654,7 @@ public class SqlServerWorkRepository : IWorkRepository
             .ToList();
     }
 
-    private static void OrderWorkToProductRelationships(WorkDto work)
-    {
-        work.WorkToProductRelationships = work.WorkToProductRelationships
-            .OrderBy(workToProductRelationship => workToProductRelationship.Order)
-            .ToList();
-    }
-
-    private static void SetWorkRelationshipOrders(ICollection<WorkRelationshipDto> workRelationships)
+    private static void SetWorkRelationshipOrders(IEnumerable<WorkRelationshipDto> workRelationships)
     {
         var i = 0;
         foreach (WorkRelationshipDto workRelationship in workRelationships)
@@ -755,7 +663,16 @@ public class SqlServerWorkRepository : IWorkRepository
         }
     }
 
-    private static void SetWorkArtistOrders(ICollection<WorkArtistDto> workArtists)
+    private static void SetWorkToProductRelationshipOrders(IEnumerable<WorkToProductRelationshipDto> workToProductRelationships)
+    {
+        var i = 0;
+        foreach (WorkToProductRelationshipDto workToProductRelationship in workToProductRelationships)
+        {
+            workToProductRelationship.Order = i++;
+        }
+    }
+
+    private static void SetWorkArtistOrders(IEnumerable<WorkArtistDto> workArtists)
     {
         var i = 0;
         foreach (WorkArtistDto workArtist in workArtists)
@@ -764,7 +681,7 @@ public class SqlServerWorkRepository : IWorkRepository
         }
     }
 
-    private static void SetWorkFeaturedArtistOrders(ICollection<WorkFeaturedArtistDto> workFeaturedArtists)
+    private static void SetWorkFeaturedArtistOrders(IEnumerable<WorkFeaturedArtistDto> workFeaturedArtists)
     {
         var i = 0;
         foreach (WorkFeaturedArtistDto workFeaturedArtist in workFeaturedArtists)
@@ -773,7 +690,7 @@ public class SqlServerWorkRepository : IWorkRepository
         }
     }
 
-    private static void SetWorkPerformerOrders(ICollection<WorkPerformerDto> workPerformers)
+    private static void SetWorkPerformerOrders(IEnumerable<WorkPerformerDto> workPerformers)
     {
         var i = 0;
         foreach (WorkPerformerDto workPerformer in workPerformers)
@@ -782,7 +699,7 @@ public class SqlServerWorkRepository : IWorkRepository
         }
     }
 
-    private static void SetWorkComposerOrders(ICollection<WorkComposerDto> workComposers)
+    private static void SetWorkComposerOrders(IEnumerable<WorkComposerDto> workComposers)
     {
         var i = 0;
         foreach (WorkComposerDto workComposer in workComposers)
@@ -791,21 +708,12 @@ public class SqlServerWorkRepository : IWorkRepository
         }
     }
 
-    private static void SetWorkGenreOrders(ICollection<WorkGenreDto> workGenres)
+    private static void SetWorkGenreOrders(IEnumerable<WorkGenreDto> workGenres)
     {
         var i = 0;
         foreach (WorkGenreDto workGenre in workGenres)
         {
             workGenre.Order = i++;
-        }
-    }
-
-    private static void SetWorkToProductRelationshipOrders(ICollection<WorkToProductRelationshipDto> workToProductRelationships)
-    {
-        var i = 0;
-        foreach (WorkToProductRelationshipDto workToProductRelationship in workToProductRelationships)
-        {
-            workToProductRelationship.Order = i++;
         }
     }
 }

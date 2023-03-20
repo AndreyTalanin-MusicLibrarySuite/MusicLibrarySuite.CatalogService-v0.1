@@ -54,12 +54,12 @@ public interface IWorkRepository
     /// <summary>
     /// Asynchronously gets works by a work page request.
     /// </summary>
-    /// <param name="workRequest">The work page request configuration.</param>
+    /// <param name="workPageRequest">The work page request configuration.</param>
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// The task's result will be an array containing all works corresponding to the request configuration.
     /// </returns>
-    public Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkRequestDto workRequest);
+    public Task<PageResponseDto<WorkDto>> GetWorksAsync(WorkPageRequestDto workPageRequest);
 
     /// <summary>
     /// Asynchronously gets all work relationships by a work's unique identifier.

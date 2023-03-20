@@ -28,7 +28,7 @@ public class Work
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple works have the same name.
+    /// Gets or sets the work's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 
@@ -75,42 +75,42 @@ public class Work
     /// Gets or sets a collection of work-to-work relationships where the current work is the principal entity.
     /// </summary>
     [Required]
-    public ICollection<WorkRelationship> WorkRelationships { get; set; } = Enumerable.Empty<WorkRelationship>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-artist relationships associated to the current work.
-    /// </summary>
-    [Required]
-    public ICollection<WorkArtist> WorkArtists { get; set; } = Enumerable.Empty<WorkArtist>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "featured artist" role.
-    /// </summary>
-    [Required]
-    public ICollection<WorkFeaturedArtist> WorkFeaturedArtists { get; set; } = Enumerable.Empty<WorkFeaturedArtist>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "performer" role.
-    /// </summary>
-    [Required]
-    public ICollection<WorkPerformer> WorkPerformers { get; set; } = Enumerable.Empty<WorkPerformer>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "composer" role.
-    /// </summary>
-    [Required]
-    public ICollection<WorkComposer> WorkComposers { get; set; } = Enumerable.Empty<WorkComposer>().ToList();
-
-    /// <summary>
-    /// Gets or sets a collection of work-to-genre relationships associated to the current work.
-    /// </summary>
-    [Required]
-    public ICollection<WorkGenre> WorkGenres { get; set; } = Enumerable.Empty<WorkGenre>().ToList();
+    public ICollection<WorkRelationship> WorkRelationships { get; set; } = new List<WorkRelationship>();
 
     /// <summary>
     /// Gets or sets a collection of work-to-product relationships associated to the current work.
     /// </summary>
     /// <remarks>An entity of the <see cref="WorkToProductRelationship" /> type has a display order on each end of the relationship.</remarks>
     [Required]
-    public ICollection<WorkToProductRelationship> WorkToProductRelationships { get; set; } = Enumerable.Empty<WorkToProductRelationship>().ToList();
+    public ICollection<WorkToProductRelationship> WorkToProductRelationships { get; set; } = new List<WorkToProductRelationship>();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work.
+    /// </summary>
+    [Required]
+    public ICollection<WorkArtist> WorkArtists { get; set; } = new List<WorkArtist>();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "featured artist" role.
+    /// </summary>
+    [Required]
+    public ICollection<WorkFeaturedArtist> WorkFeaturedArtists { get; set; } = new List<WorkFeaturedArtist>();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "performer" role.
+    /// </summary>
+    [Required]
+    public ICollection<WorkPerformer> WorkPerformers { get; set; } = new List<WorkPerformer>();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-artist relationships associated to the current work where the artist has the "composer" role.
+    /// </summary>
+    [Required]
+    public ICollection<WorkComposer> WorkComposers { get; set; } = new List<WorkComposer>();
+
+    /// <summary>
+    /// Gets or sets a collection of work-to-genre relationships associated to the current work.
+    /// </summary>
+    [Required]
+    public ICollection<WorkGenre> WorkGenres { get; set; } = new List<WorkGenre>();
 }

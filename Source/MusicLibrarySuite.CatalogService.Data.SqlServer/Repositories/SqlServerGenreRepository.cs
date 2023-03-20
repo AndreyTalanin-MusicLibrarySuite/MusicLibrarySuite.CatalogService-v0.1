@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the genre repository.
+/// Represents a SQL-Server-specific implementation of the genre repository.
 /// </summary>
 public class SqlServerGenreRepository : IGenreRepository
 {
@@ -41,9 +41,12 @@ public class SqlServerGenreRepository : IGenreRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetGenre] (@{genreIdParameter.ParameterName})";
 
-        GenreDto? genre = await context.Genres.FromSqlRaw(query, genreIdParameter).AsNoTracking()
+        GenreDto? genre = await context.Genres
+            .FromSqlRaw(query, genreIdParameter)
             .Include(genre => genre.GenreRelationships)
             .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (genre is not null)
@@ -59,15 +62,9 @@ public class SqlServerGenreRepository : IGenreRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        GenreDto[] genres = await context.Genres.AsNoTracking()
-            .Include(genre => genre.GenreRelationships)
-            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
+        GenreDto[] genres = await context.Genres
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (GenreDto genre in genres)
-        {
-            OrderGenreRelationships(genre);
-        }
 
         return genres;
     }
@@ -86,15 +83,10 @@ public class SqlServerGenreRepository : IGenreRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetGenres] (@{genreIdsParameter.ParameterName})";
 
-        GenreDto[] genres = await context.Genres.FromSqlRaw(query, genreIdsParameter).AsNoTracking()
-            .Include(genre => genre.GenreRelationships)
-            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
+        GenreDto[] genres = await context.Genres
+            .FromSqlRaw(query, genreIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (GenreDto genre in genres)
-        {
-            OrderGenreRelationships(genre);
-        }
 
         return genres;
     }
@@ -104,51 +96,39 @@ public class SqlServerGenreRepository : IGenreRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        GenreDto[] genres = await collectionProcessor(context.Genres.AsNoTracking())
-            .Include(genre => genre.GenreRelationships)
-            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
+        GenreDto[] genres = await collectionProcessor(context.Genres)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (GenreDto genre in genres)
-        {
-            OrderGenreRelationships(genre);
-        }
 
         return genres;
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<GenreDto>> GetGenresAsync(GenreRequestDto genreRequest)
+    public async Task<PageResponseDto<GenreDto>> GetGenresAsync(GenrePageRequestDto genrePageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<GenreDto> baseCollection = context.Genres.AsNoTracking();
+        IQueryable<GenreDto> baseCollection = context.Genres;
 
-        if (genreRequest.Name is not null)
-            baseCollection = baseCollection.Where(genre => genre.Name.Contains(genreRequest.Name));
+        if (genrePageRequest.Name is not null)
+            baseCollection = baseCollection.Where(genre => genre.Name.Contains(genrePageRequest.Name));
 
-        if (genreRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(genre => genre.Enabled == (bool)genreRequest.Enabled);
+        if (genrePageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(genre => genre.Enabled == (bool)genrePageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<GenreDto> genres = await baseCollection
-            .Include(genre => genre.GenreRelationships)
-            .ThenInclude(genreRelationship => genreRelationship.DependentGenre)
             .OrderByDescending(genre => genre.SystemEntity)
             .ThenBy(genre => genre.Name)
-            .Skip(genreRequest.PageSize * genreRequest.PageIndex)
-            .Take(genreRequest.PageSize)
+            .Skip(genrePageRequest.PageSize * genrePageRequest.PageIndex)
+            .Take(genrePageRequest.PageSize)
+            .AsNoTracking()
             .ToListAsync();
-
-        foreach (GenreDto genre in genres)
-        {
-            OrderGenreRelationships(genre);
-        }
 
         return new PageResponseDto<GenreDto>()
         {
-            PageSize = genreRequest.PageSize,
-            PageIndex = genreRequest.PageIndex,
+            PageSize = genrePageRequest.PageSize,
+            PageIndex = genrePageRequest.PageIndex,
             TotalCount = totalCount,
             Items = genres,
         };
@@ -324,7 +304,7 @@ public class SqlServerGenreRepository : IGenreRepository
             .ToList();
     }
 
-    private static void SetGenreRelationshipOrders(ICollection<GenreRelationshipDto> genreRelationships)
+    private static void SetGenreRelationshipOrders(IEnumerable<GenreRelationshipDto> genreRelationships)
     {
         var i = 0;
         foreach (GenreRelationshipDto genreRelationship in genreRelationships)

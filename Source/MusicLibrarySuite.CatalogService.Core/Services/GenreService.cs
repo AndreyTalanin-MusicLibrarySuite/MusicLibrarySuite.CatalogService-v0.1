@@ -56,15 +56,15 @@ public class GenreService : IGenreService
     }
 
     /// <inheritdoc/>
-    public async Task<GenrePageResponse> GetGenresAsync(GenreRequest genreRequest)
+    public async Task<GenrePageResponse> GetGenresAsync(GenrePageRequest genrePageRequest)
     {
-        GenreRequestDto genreRequestDto = m_mapper.Map<GenreRequestDto>(genreRequest);
-        PageResponseDto<GenreDto> pageResponseDto = await m_genreRepository.GetGenresAsync(genreRequestDto);
-        GenrePageResponse pageResponse = m_mapper.Map<GenrePageResponse>(pageResponseDto);
+        GenrePageRequestDto genrePageRequestDto = m_mapper.Map<GenrePageRequestDto>(genrePageRequest);
+        PageResponseDto<GenreDto> genrePageResponseDto = await m_genreRepository.GetGenresAsync(genrePageRequestDto);
+        GenrePageResponse genrePageResponse = m_mapper.Map<GenrePageResponse>(genrePageResponseDto);
 
-        pageResponse.CompletedOn = DateTimeOffset.Now;
+        genrePageResponse.CompletedOn = DateTimeOffset.Now;
 
-        return pageResponse;
+        return genrePageResponse;
     }
 
     /// <inheritdoc />

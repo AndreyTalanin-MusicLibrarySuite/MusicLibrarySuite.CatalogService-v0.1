@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -28,7 +27,7 @@ public class Product
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple products have the same name.
+    /// Gets or sets the product's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 
@@ -70,5 +69,5 @@ public class Product
     /// Gets or sets a collection of product-to-product relationships where the current product is the principal entity.
     /// </summary>
     [Required]
-    public ICollection<ProductRelationship> ProductRelationships { get; set; } = Enumerable.Empty<ProductRelationship>().ToList();
+    public ICollection<ProductRelationship> ProductRelationships { get; set; } = new List<ProductRelationship>();
 }

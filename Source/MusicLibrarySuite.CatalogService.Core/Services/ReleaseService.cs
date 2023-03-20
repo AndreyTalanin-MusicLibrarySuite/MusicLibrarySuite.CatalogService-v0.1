@@ -86,13 +86,13 @@ public class ReleaseService : IReleaseService
     }
 
     /// <inheritdoc />
-    public async Task<ReleasePageResponse> GetReleasesAsync(ReleaseRequest releaseRequest)
+    public async Task<ReleasePageResponse> GetReleasesAsync(ReleasePageRequest releasePageRequest)
     {
-        ReleaseRequestDto releaseRequestDto = m_mapper.Map<ReleaseRequestDto>(releaseRequest);
-        PageResponseDto<ReleaseDto> pageResponseDto = await m_releaseRepository.GetReleasesAsync(releaseRequestDto);
-        ReleasePageResponse pageResponse = m_mapper.Map<ReleasePageResponse>(pageResponseDto);
+        ReleasePageRequestDto releasePageRequestDto = m_mapper.Map<ReleasePageRequestDto>(releasePageRequest);
+        PageResponseDto<ReleaseDto> releasePageResponseDto = await m_releaseRepository.GetReleasesAsync(releasePageRequestDto);
+        ReleasePageResponse releasePageResponse = m_mapper.Map<ReleasePageResponse>(releasePageResponseDto);
 
-        foreach (Release release in pageResponse.Items)
+        foreach (Release release in releasePageResponse.Items)
         {
             SetReleaseMediaDisplayProperties(release);
             foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
@@ -101,9 +101,9 @@ public class ReleaseService : IReleaseService
             }
         }
 
-        pageResponse.CompletedOn = DateTimeOffset.Now;
+        releasePageResponse.CompletedOn = DateTimeOffset.Now;
 
-        return pageResponse;
+        return releasePageResponse;
     }
 
     /// <inheritdoc />

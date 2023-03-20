@@ -56,15 +56,15 @@ public class WorkService : IWorkService
     }
 
     /// <inheritdoc />
-    public async Task<WorkPageResponse> GetWorksAsync(WorkRequest workRequest)
+    public async Task<WorkPageResponse> GetWorksAsync(WorkPageRequest workPageRequest)
     {
-        WorkRequestDto workRequestDto = m_mapper.Map<WorkRequestDto>(workRequest);
-        PageResponseDto<WorkDto> pageResponseDto = await m_workRepository.GetWorksAsync(workRequestDto);
-        WorkPageResponse pageResponse = m_mapper.Map<WorkPageResponse>(pageResponseDto);
+        WorkPageRequestDto workPageRequestDto = m_mapper.Map<WorkPageRequestDto>(workPageRequest);
+        PageResponseDto<WorkDto> workPageResponseDto = await m_workRepository.GetWorksAsync(workPageRequestDto);
+        WorkPageResponse workPageResponse = m_mapper.Map<WorkPageResponse>(workPageResponseDto);
 
-        pageResponse.CompletedOn = DateTimeOffset.Now;
+        workPageResponse.CompletedOn = DateTimeOffset.Now;
 
-        return pageResponse;
+        return workPageResponse;
     }
 
     /// <inheritdoc />

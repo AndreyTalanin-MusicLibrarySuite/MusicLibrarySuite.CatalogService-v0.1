@@ -56,15 +56,15 @@ public class ArtistService : IArtistService
     }
 
     /// <inheritdoc />
-    public async Task<ArtistPageResponse> GetArtistsAsync(ArtistRequest artistRequest)
+    public async Task<ArtistPageResponse> GetArtistsAsync(ArtistPageRequest artistPageRequest)
     {
-        ArtistRequestDto artistRequestDto = m_mapper.Map<ArtistRequestDto>(artistRequest);
-        PageResponseDto<ArtistDto> pageResponseDto = await m_artistRepository.GetArtistsAsync(artistRequestDto);
-        ArtistPageResponse pageResponse = m_mapper.Map<ArtistPageResponse>(pageResponseDto);
+        ArtistPageRequestDto artistPageRequestDto = m_mapper.Map<ArtistPageRequestDto>(artistPageRequest);
+        PageResponseDto<ArtistDto> artistPageResponseDto = await m_artistRepository.GetArtistsAsync(artistPageRequestDto);
+        ArtistPageResponse artistPageResponse = m_mapper.Map<ArtistPageResponse>(artistPageResponseDto);
 
-        pageResponse.CompletedOn = DateTimeOffset.Now;
+        artistPageResponse.CompletedOn = DateTimeOffset.Now;
 
-        return pageResponse;
+        return artistPageResponse;
     }
 
     /// <inheritdoc />

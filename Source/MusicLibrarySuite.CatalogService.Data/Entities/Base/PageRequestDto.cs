@@ -1,7 +1,7 @@
 namespace MusicLibrarySuite.CatalogService.Data.Entities.Base;
 
 /// <summary>
-/// Represents a data-transfer object for a base page request.
+/// Represents a data transfer object for a base page request.
 /// </summary>
 public class PageRequestDto
 {

@@ -12,7 +12,7 @@ using MusicLibrarySuite.CatalogService.Data.SqlServer.Contexts;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
 {
     [DbContext(typeof(SqlServerCatalogServiceDbContext))]
-    [Migration("20230113182104_ReleaseMediaMigration")]
+    [Migration($"20230113182104_{nameof(ReleaseMediaMigration)}")]
     partial class ReleaseMediaMigration
     {
         /// <inheritdoc />

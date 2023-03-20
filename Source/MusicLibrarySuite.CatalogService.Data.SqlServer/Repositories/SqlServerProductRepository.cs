@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the product repository.
+/// Represents a SQL-Server-specific implementation of the product repository.
 /// </summary>
 public class SqlServerProductRepository : IProductRepository
 {
@@ -41,9 +41,12 @@ public class SqlServerProductRepository : IProductRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetProduct] (@{productIdParameter.ParameterName})";
 
-        ProductDto? product = await context.Products.FromSqlRaw(query, productIdParameter).AsNoTracking()
+        ProductDto? product = await context.Products
+            .FromSqlRaw(query, productIdParameter)
             .Include(product => product.ProductRelationships)
             .ThenInclude(productRelationship => productRelationship.DependentProduct)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (product is not null)
@@ -59,15 +62,9 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ProductDto[] products = await context.Products.AsNoTracking()
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
+        ProductDto[] products = await context.Products
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return products;
     }
@@ -86,15 +83,10 @@ public class SqlServerProductRepository : IProductRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetProducts] (@{productIdsParameter.ParameterName})";
 
-        ProductDto[] products = await context.Products.FromSqlRaw(query, productIdsParameter).AsNoTracking()
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
+        ProductDto[] products = await context.Products
+            .FromSqlRaw(query, productIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return products;
     }
@@ -104,51 +96,40 @@ public class SqlServerProductRepository : IProductRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ProductDto[] products = await collectionProcessor(context.Products.AsNoTracking())
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
+        ProductDto[] products = await collectionProcessor(context.Products)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return products;
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ProductDto>> GetProductsAsync(ProductRequestDto productRequest)
+    public async Task<PageResponseDto<ProductDto>> GetProductsAsync(ProductPageRequestDto productPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<ProductDto> baseCollection = context.Products.AsNoTracking();
+        IQueryable<ProductDto> baseCollection = context.Products;
 
-        if (productRequest.Title is not null)
-            baseCollection = baseCollection.Where(product => product.Title.Contains(productRequest.Title));
+        if (productPageRequest.Title is not null)
+            baseCollection = baseCollection.Where(product => product.Title.Contains(productPageRequest.Title));
 
-        if (productRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(product => product.Enabled == (bool)productRequest.Enabled);
+        if (productPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(product => product.Enabled == (bool)productPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ProductDto> products = await baseCollection
-            .Include(product => product.ProductRelationships)
-            .ThenInclude(productRelationship => productRelationship.DependentProduct)
             .OrderByDescending(product => product.SystemEntity)
             .ThenBy(product => product.Title)
-            .Skip(productRequest.PageSize * productRequest.PageIndex)
-            .Take(productRequest.PageSize)
+            .Skip(productPageRequest.PageSize * productPageRequest.PageIndex)
+            .Take(productPageRequest.PageSize)
+            .AsNoTracking()
+            .AsSplitQuery()
             .ToListAsync();
-
-        foreach (ProductDto product in products)
-        {
-            OrderProductRelationships(product);
-        }
 
         return new PageResponseDto<ProductDto>()
         {
-            PageSize = productRequest.PageSize,
-            PageIndex = productRequest.PageIndex,
+            PageSize = productPageRequest.PageSize,
+            PageIndex = productPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = products,
         };
@@ -336,7 +317,7 @@ public class SqlServerProductRepository : IProductRepository
             .ToList();
     }
 
-    private static void SetProductRelationshipOrders(ICollection<ProductRelationshipDto> productRelationships)
+    private static void SetProductRelationshipOrders(IEnumerable<ProductRelationshipDto> productRelationships)
     {
         var i = 0;
         foreach (ProductRelationshipDto productRelationship in productRelationships)

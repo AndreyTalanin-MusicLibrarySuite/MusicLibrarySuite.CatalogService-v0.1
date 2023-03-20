@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
 /// <summary>
-/// Represents a database model and a data-transfer object for a product.
+/// Represents a database model and a data transfer object for a product.
 /// </summary>
 public class ProductDto
 {
@@ -31,7 +30,7 @@ public class ProductDto
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple products have the same name.
+    /// Gets or sets the product's disambiguation text.
     /// </summary>
     [StringLength(2048)]
     public string? DisambiguationText { get; set; }
@@ -71,5 +70,5 @@ public class ProductDto
     /// <summary>
     /// Gets or sets a collection of product-to-product relationships where the current product is the principal entity.
     /// </summary>
-    public ICollection<ProductRelationshipDto> ProductRelationships { get; set; } = Enumerable.Empty<ProductRelationshipDto>().ToList();
+    public ICollection<ProductRelationshipDto> ProductRelationships { get; set; } = new List<ProductRelationshipDto>();
 }

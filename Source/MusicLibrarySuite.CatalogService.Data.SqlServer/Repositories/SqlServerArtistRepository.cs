@@ -17,7 +17,7 @@ using MusicLibrarySuite.CatalogService.Data.Repositories.Abstractions;
 namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Repositories;
 
 /// <summary>
-/// Represents a SQL Server - specific implementation of the artist repository.
+/// Represents a SQL-Server-specific implementation of the artist repository.
 /// </summary>
 public class SqlServerArtistRepository : IArtistRepository
 {
@@ -41,11 +41,14 @@ public class SqlServerArtistRepository : IArtistRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetArtist] (@{artistIdParameter.ParameterName})";
 
-        ArtistDto? artist = await context.Artists.FromSqlRaw(query, artistIdParameter).AsNoTracking()
+        ArtistDto? artist = await context.Artists
+            .FromSqlRaw(query, artistIdParameter)
             .Include(artist => artist.ArtistRelationships)
             .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
             .Include(artist => artist.ArtistGenres)
             .ThenInclude(artistGenre => artistGenre.Genre)
+            .AsNoTracking()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
 
         if (artist is not null)
@@ -62,18 +65,9 @@ public class SqlServerArtistRepository : IArtistRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ArtistDto[] artists = await context.Artists.AsNoTracking()
-            .Include(artist => artist.ArtistRelationships)
-            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
-            .Include(artist => artist.ArtistGenres)
-            .ThenInclude(artistGenre => artistGenre.Genre)
+        ArtistDto[] artists = await context.Artists
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ArtistDto artist in artists)
-        {
-            OrderArtistRelationships(artist);
-            OrderArtistGenres(artist);
-        }
 
         return artists;
     }
@@ -92,18 +86,10 @@ public class SqlServerArtistRepository : IArtistRepository
 
         var query = $"SELECT * FROM [dbo].[ufn_GetArtists] (@{artistIdsParameter.ParameterName})";
 
-        ArtistDto[] artists = await context.Artists.FromSqlRaw(query, artistIdsParameter).AsNoTracking()
-            .Include(artist => artist.ArtistRelationships)
-            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
-            .Include(artist => artist.ArtistGenres)
-            .ThenInclude(artistGenre => artistGenre.Genre)
+        ArtistDto[] artists = await context.Artists
+            .FromSqlRaw(query, artistIdsParameter)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ArtistDto artist in artists)
-        {
-            OrderArtistRelationships(artist);
-            OrderArtistGenres(artist);
-        }
 
         return artists;
     }
@@ -113,57 +99,39 @@ public class SqlServerArtistRepository : IArtistRepository
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        ArtistDto[] artists = await collectionProcessor(context.Artists.AsNoTracking())
-            .Include(artist => artist.ArtistRelationships)
-            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
-            .Include(artist => artist.ArtistGenres)
-            .ThenInclude(artistGenre => artistGenre.Genre)
+        ArtistDto[] artists = await collectionProcessor(context.Artists)
+            .AsNoTracking()
             .ToArrayAsync();
-
-        foreach (ArtistDto artist in artists)
-        {
-            OrderArtistRelationships(artist);
-            OrderArtistGenres(artist);
-        }
 
         return artists;
     }
 
     /// <inheritdoc />
-    public async Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistRequestDto artistRequest)
+    public async Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistPageRequestDto artistPageRequest)
     {
         using CatalogServiceDbContext context = m_contextFactory.CreateDbContext();
 
-        IQueryable<ArtistDto> baseCollection = context.Artists.AsNoTracking();
+        IQueryable<ArtistDto> baseCollection = context.Artists;
 
-        if (artistRequest.Name is not null)
-            baseCollection = baseCollection.Where(artist => artist.Name.Contains(artistRequest.Name));
+        if (artistPageRequest.Name is not null)
+            baseCollection = baseCollection.Where(artist => artist.Name.Contains(artistPageRequest.Name));
 
-        if (artistRequest.Enabled is not null)
-            baseCollection = baseCollection.Where(artist => artist.Enabled == (bool)artistRequest.Enabled);
+        if (artistPageRequest.Enabled is not null)
+            baseCollection = baseCollection.Where(artist => artist.Enabled == (bool)artistPageRequest.Enabled);
 
         var totalCount = await baseCollection.CountAsync();
         List<ArtistDto> artists = await baseCollection
-            .Include(artist => artist.ArtistRelationships)
-            .ThenInclude(artistRelationship => artistRelationship.DependentArtist)
-            .Include(artist => artist.ArtistGenres)
-            .ThenInclude(artistGenre => artistGenre.Genre)
             .OrderByDescending(artist => artist.SystemEntity)
             .ThenBy(artist => artist.Name)
-            .Skip(artistRequest.PageSize * artistRequest.PageIndex)
-            .Take(artistRequest.PageSize)
+            .Skip(artistPageRequest.PageSize * artistPageRequest.PageIndex)
+            .Take(artistPageRequest.PageSize)
+            .AsNoTracking()
             .ToListAsync();
-
-        foreach (ArtistDto artist in artists)
-        {
-            OrderArtistRelationships(artist);
-            OrderArtistGenres(artist);
-        }
 
         return new PageResponseDto<ArtistDto>()
         {
-            PageSize = artistRequest.PageSize,
-            PageIndex = artistRequest.PageIndex,
+            PageSize = artistPageRequest.PageSize,
+            PageIndex = artistPageRequest.PageIndex,
             TotalCount = totalCount,
             Items = artists,
         };
@@ -380,7 +348,7 @@ public class SqlServerArtistRepository : IArtistRepository
             .ToList();
     }
 
-    private static void SetArtistRelationshipOrders(ICollection<ArtistRelationshipDto> artistRelationships)
+    private static void SetArtistRelationshipOrders(IEnumerable<ArtistRelationshipDto> artistRelationships)
     {
         var i = 0;
         foreach (ArtistRelationshipDto artistRelationship in artistRelationships)
@@ -389,7 +357,7 @@ public class SqlServerArtistRepository : IArtistRepository
         }
     }
 
-    private static void SetArtistGenreOrders(ICollection<ArtistGenreDto> artistGenres)
+    private static void SetArtistGenreOrders(IEnumerable<ArtistGenreDto> artistGenres)
     {
         var i = 0;
         foreach (ArtistGenreDto artistGenre in artistGenres)

@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Data.Entities;
 
 /// <summary>
-/// Represents a database model and a data-transfer object for a genre.
+/// Represents a database model and a data transfer object for a genre.
 /// </summary>
 public class GenreDto
 {
@@ -55,5 +54,5 @@ public class GenreDto
     /// <summary>
     /// Gets or sets a collection of genre-to-genre relationships where the current genre is the principal entity.
     /// </summary>
-    public ICollection<GenreRelationshipDto> GenreRelationships { get; set; } = Enumerable.Empty<GenreRelationshipDto>().ToList();
+    public ICollection<GenreRelationshipDto> GenreRelationships { get; set; } = new List<GenreRelationshipDto>();
 }

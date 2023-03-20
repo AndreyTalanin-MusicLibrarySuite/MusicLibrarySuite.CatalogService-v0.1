@@ -34,7 +34,7 @@ public class PageResponse<T>
     /// Gets or sets a collection of entities corresponding to the page configuration.
     /// </summary>
     [Required]
-    public ICollection<T> Items { get; set; } = Enumerable.Empty<T>().ToList();
+    public ICollection<T> Items { get; set; } = new List<T>();
 
     /// <summary>
     /// Gets or sets a value representing the moment of time when the response was completed.

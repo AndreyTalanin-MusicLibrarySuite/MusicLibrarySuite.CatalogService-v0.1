@@ -97,7 +97,7 @@ public class ArtistController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<ArtistPageResponse>> GetPagedArtistsAsync([Required][FromQuery] int pageSize, [Required][FromQuery] int pageIndex, [FromQuery] string? name, [FromQuery] bool? enabled)
     {
-        var artistRequest = new ArtistRequest()
+        var artistRequest = new ArtistPageRequest()
         {
             PageSize = pageSize,
             PageIndex = pageIndex,

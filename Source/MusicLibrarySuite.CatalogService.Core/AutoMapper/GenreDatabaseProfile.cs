@@ -22,7 +22,7 @@ public class GenreDatabaseProfile : Profile
 
         CreateMap<Genre, GenreDto>().ReverseMap();
         CreateMap<GenreRelationship, GenreRelationshipDto>().ReverseMap();
-        CreateMap<GenreRequest, GenreRequestDto>().ReverseMap();
+        CreateMap<GenrePageRequest, GenrePageRequestDto>().ReverseMap();
         CreateMap<GenrePageResponse, PageResponseDto<GenreDto>>().ReverseMap();
         CreateMap<PageResponse<Genre>, PageResponseDto<GenreDto>>().ReverseMap();
     }

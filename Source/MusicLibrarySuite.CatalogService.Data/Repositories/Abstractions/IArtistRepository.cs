@@ -54,12 +54,12 @@ public interface IArtistRepository
     /// <summary>
     /// Asynchronously gets artists by an artist page request.
     /// </summary>
-    /// <param name="artistRequest">The artist page request configuration.</param>
+    /// <param name="artistPageRequest">The artist page request configuration.</param>
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// The task's result will be an array containing all artists corresponding to the request configuration.
     /// </returns>
-    public Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistRequestDto artistRequest);
+    public Task<PageResponseDto<ArtistDto>> GetArtistsAsync(ArtistPageRequestDto artistPageRequest);
 
     /// <summary>
     /// Asynchronously gets all artist relationships by an artist's unique identifier.

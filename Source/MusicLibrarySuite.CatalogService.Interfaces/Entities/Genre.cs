@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -53,5 +52,5 @@ public class Genre
     /// Gets or sets a collection of genre-to-genre relationships where the current genre is the principal entity.
     /// </summary>
     [Required]
-    public ICollection<GenreRelationship> GenreRelationships { get; set; } = Enumerable.Empty<GenreRelationship>().ToList();
+    public ICollection<GenreRelationship> GenreRelationships { get; set; } = new List<GenreRelationship>();
 }

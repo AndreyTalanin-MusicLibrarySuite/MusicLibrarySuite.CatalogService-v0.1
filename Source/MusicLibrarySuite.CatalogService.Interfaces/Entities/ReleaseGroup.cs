@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities;
 
@@ -28,7 +27,7 @@ public class ReleaseGroup
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the disambiguation text in case multiple release groups have the same name.
+    /// Gets or sets the release group's disambiguation text.
     /// </summary>
     public string? DisambiguationText { get; set; }
 
@@ -52,5 +51,5 @@ public class ReleaseGroup
     /// Gets or sets a collection of release-group-to-release-group relationships where the current release group is the principal entity.
     /// </summary>
     [Required]
-    public ICollection<ReleaseGroupRelationship> ReleaseGroupRelationships { get; set; } = Enumerable.Empty<ReleaseGroupRelationship>().ToList();
+    public ICollection<ReleaseGroupRelationship> ReleaseGroupRelationships { get; set; } = new List<ReleaseGroupRelationship>();
 }

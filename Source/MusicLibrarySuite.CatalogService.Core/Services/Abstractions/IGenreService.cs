@@ -43,12 +43,12 @@ public interface IGenreService
     /// <summary>
     /// Asynchronously gets genres by a genre page request.
     /// </summary>
-    /// <param name="genreRequest">The genre page request configuration.</param>
+    /// <param name="genrePageRequest">The genre page request configuration.</param>
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// The task's result will be an array containing all genres corresponding to the request configuration.
     /// </returns>
-    public Task<GenrePageResponse> GetGenresAsync(GenreRequest genreRequest);
+    public Task<GenrePageResponse> GetGenresAsync(GenrePageRequest genrePageRequest);
 
     /// <summary>
     /// Asynchronously gets all genre relationships by a genre's unique identifier.

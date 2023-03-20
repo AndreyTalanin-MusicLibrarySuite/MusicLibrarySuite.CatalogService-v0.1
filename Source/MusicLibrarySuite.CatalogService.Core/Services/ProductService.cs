@@ -56,15 +56,15 @@ public class ProductService : IProductService
     }
 
     /// <inheritdoc />
-    public async Task<ProductPageResponse> GetProductsAsync(ProductRequest productRequest)
+    public async Task<ProductPageResponse> GetProductsAsync(ProductPageRequest productPageRequest)
     {
-        ProductRequestDto productRequestDto = m_mapper.Map<ProductRequestDto>(productRequest);
-        PageResponseDto<ProductDto> pageResponseDto = await m_productRepository.GetProductsAsync(productRequestDto);
-        ProductPageResponse pageResponse = m_mapper.Map<ProductPageResponse>(pageResponseDto);
+        ProductPageRequestDto productPageRequestDto = m_mapper.Map<ProductPageRequestDto>(productPageRequest);
+        PageResponseDto<ProductDto> productPageResponseDto = await m_productRepository.GetProductsAsync(productPageRequestDto);
+        ProductPageResponse productPageResponse = m_mapper.Map<ProductPageResponse>(productPageResponseDto);
 
-        pageResponse.CompletedOn = DateTimeOffset.Now;
+        productPageResponse.CompletedOn = DateTimeOffset.Now;
 
-        return pageResponse;
+        return productPageResponse;
     }
 
     /// <inheritdoc />

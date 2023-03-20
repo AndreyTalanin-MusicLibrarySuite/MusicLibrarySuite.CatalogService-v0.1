@@ -22,24 +22,24 @@ public class ReleaseDatabaseProfile : Profile
 
         CreateMap<Release, ReleaseDto>().ReverseMap();
         CreateMap<ReleaseRelationship, ReleaseRelationshipDto>().ReverseMap();
+        CreateMap<ReleaseToProductRelationship, ReleaseToProductRelationshipDto>().ReverseMap();
+        CreateMap<ReleaseToReleaseGroupRelationship, ReleaseToReleaseGroupRelationshipDto>().ReverseMap();
         CreateMap<ReleaseArtist, ReleaseArtistDto>().ReverseMap();
         CreateMap<ReleaseFeaturedArtist, ReleaseFeaturedArtistDto>().ReverseMap();
         CreateMap<ReleasePerformer, ReleasePerformerDto>().ReverseMap();
         CreateMap<ReleaseComposer, ReleaseComposerDto>().ReverseMap();
         CreateMap<ReleaseGenre, ReleaseGenreDto>().ReverseMap();
-        CreateMap<ReleaseToProductRelationship, ReleaseToProductRelationshipDto>().ReverseMap();
-        CreateMap<ReleaseToReleaseGroupRelationship, ReleaseToReleaseGroupRelationshipDto>().ReverseMap();
         CreateMap<ReleaseMedia, ReleaseMediaDto>().ReverseMap();
         CreateMap<ReleaseMediaToProductRelationship, ReleaseMediaToProductRelationshipDto>().ReverseMap();
         CreateMap<ReleaseTrack, ReleaseTrackDto>().ReverseMap();
+        CreateMap<ReleaseTrackToProductRelationship, ReleaseTrackToProductRelationshipDto>().ReverseMap();
+        CreateMap<ReleaseTrackToWorkRelationship, ReleaseTrackToWorkRelationshipDto>().ReverseMap();
         CreateMap<ReleaseTrackArtist, ReleaseTrackArtistDto>().ReverseMap();
         CreateMap<ReleaseTrackFeaturedArtist, ReleaseTrackFeaturedArtistDto>().ReverseMap();
         CreateMap<ReleaseTrackPerformer, ReleaseTrackPerformerDto>().ReverseMap();
         CreateMap<ReleaseTrackComposer, ReleaseTrackComposerDto>().ReverseMap();
         CreateMap<ReleaseTrackGenre, ReleaseTrackGenreDto>().ReverseMap();
-        CreateMap<ReleaseTrackToProductRelationship, ReleaseTrackToProductRelationshipDto>().ReverseMap();
-        CreateMap<ReleaseTrackToWorkRelationship, ReleaseTrackToWorkRelationshipDto>().ReverseMap();
-        CreateMap<ReleaseRequest, ReleaseRequestDto>().ReverseMap();
+        CreateMap<ReleasePageRequest, ReleasePageRequestDto>().ReverseMap();
         CreateMap<ReleasePageResponse, PageResponseDto<ReleaseDto>>().ReverseMap();
         CreateMap<PageResponse<Release>, PageResponseDto<ReleaseDto>>().ReverseMap();
     }

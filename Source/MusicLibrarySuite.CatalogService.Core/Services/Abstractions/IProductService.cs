@@ -43,12 +43,12 @@ public interface IProductService
     /// <summary>
     /// Asynchronously gets products by a product page request.
     /// </summary>
-    /// <param name="productRequest">The product page request configuration.</param>
+    /// <param name="productPageRequest">The product page request configuration.</param>
     /// <returns>
     /// The task object representing the asynchronous operation.
     /// The task's result will be an array containing all products corresponding to the request configuration.
     /// </returns>
-    public Task<ProductPageResponse> GetProductsAsync(ProductRequest productRequest);
+    public Task<ProductPageResponse> GetProductsAsync(ProductPageRequest productPageRequest);
 
     /// <summary>
     /// Asynchronously gets all product relationships by a product's unique identifier.
