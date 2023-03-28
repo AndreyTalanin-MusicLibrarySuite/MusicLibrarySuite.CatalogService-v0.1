@@ -131,8 +131,11 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                         [sourceReleaseTrackToWorkRelationship].[Description],
                         [sourceReleaseTrackToWorkRelationship].[Order],
                         COALESCE([targetReleaseTrackToWorkRelationship].[ReferenceOrder],
-                            MAX([workReleaseTrackToWorkRelationship].[ReferenceOrder]) + 1,
-                            0) AS [ReferenceOrder]
+                            ROW_NUMBER() OVER (PARTITION BY [sourceReleaseTrackToWorkRelationship].[WorkId],
+                                CASE WHEN [targetReleaseTrackToWorkRelationship].[ReferenceOrder] IS NOT NULL THEN 1 ELSE 0 END
+                                ORDER BY [sourceReleaseTrackToWorkRelationship].[MediaNumber],
+                                    [sourceReleaseTrackToWorkRelationship].[TrackNumber])
+                                + COALESCE(MAX([workReleaseTrackToWorkRelationship].[ReferenceOrder]) + 1, 0) - 1) AS [ReferenceOrder]
                     FROM @ReleaseTrackToWorkRelationships AS [sourceReleaseTrackToWorkRelationship]
                     LEFT JOIN [dbo].[ReleaseTrackToWorkRelationship] AS [targetReleaseTrackToWorkRelationship]
                         ON [targetReleaseTrackToWorkRelationship].[TrackNumber] = [sourceReleaseTrackToWorkRelationship].[TrackNumber]
@@ -188,6 +191,26 @@ public partial class ReleaseTrackToWorkRelationshipMigration : Migration
                     [source].[ReferenceOrder]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+
+                WITH [UpdatedReleaseTrackToWorkRelationship] AS
+                (
+                    SELECT
+                        [releaseTrackToWorkRelationship].[TrackNumber],
+                        [releaseTrackToWorkRelationship].[MediaNumber],
+                        [releaseTrackToWorkRelationship].[ReleaseId],
+                        [releaseTrackToWorkRelationship].[WorkId],
+                        ROW_NUMBER() OVER (PARTITION BY [releaseTrackToWorkRelationship].[WorkId]
+                            ORDER BY [releaseTrackToWorkRelationship].[ReferenceOrder]) - 1 AS [UpdatedReferenceOrder]
+                    FROM [dbo].[ReleaseTrackToWorkRelationship] [releaseTrackToWorkRelationship]
+                )
+                UPDATE [releaseTrackToWorkRelationship]
+                SET [ReferenceOrder] = [updatedReleaseTrackToWorkRelationship].[UpdatedReferenceOrder]
+                FROM [dbo].[ReleaseTrackToWorkRelationship] AS [releaseTrackToWorkRelationship]
+                INNER JOIN [UpdatedReleaseTrackToWorkRelationship] AS [updatedReleaseTrackToWorkRelationship]
+                    ON [updatedReleaseTrackToWorkRelationship].[TrackNumber] = [releaseTrackToWorkRelationship].[TrackNumber]
+                    AND [updatedReleaseTrackToWorkRelationship].[MediaNumber] = [releaseTrackToWorkRelationship].[MediaNumber]
+                    AND [updatedReleaseTrackToWorkRelationship].[ReleaseId] = [releaseTrackToWorkRelationship].[ReleaseId]
+                    AND [updatedReleaseTrackToWorkRelationship].[WorkId] = [releaseTrackToWorkRelationship].[WorkId];
             END;");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");
