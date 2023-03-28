@@ -171,6 +171,22 @@ public partial class ReleaseToReleaseGroupRelationshipMigration : Migration
                     [source].[ReferenceOrder]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
+
+                WITH [UpdatedReleaseToReleaseGroupRelationship] AS
+                (
+                    SELECT
+                        [releaseToReleaseGroupRelationship].[ReleaseId],
+                        [releaseToReleaseGroupRelationship].[ReleaseGroupId],
+                        ROW_NUMBER() OVER (PARTITION BY [releaseToReleaseGroupRelationship].[ReleaseGroupId]
+                            ORDER BY [releaseToReleaseGroupRelationship].[ReferenceOrder]) - 1 AS [UpdatedReferenceOrder]
+                    FROM [dbo].[ReleaseToReleaseGroupRelationship] [releaseToReleaseGroupRelationship]
+                )
+                UPDATE [releaseToReleaseGroupRelationship]
+                SET [ReferenceOrder] = [updatedReleaseToReleaseGroupRelationship].[UpdatedReferenceOrder]
+                FROM [dbo].[ReleaseToReleaseGroupRelationship] AS [releaseToReleaseGroupRelationship]
+                INNER JOIN [UpdatedReleaseToReleaseGroupRelationship] AS [updatedReleaseToReleaseGroupRelationship]
+                    ON [updatedReleaseToReleaseGroupRelationship].[ReleaseId] = [releaseToReleaseGroupRelationship].[ReleaseId]
+                    AND [updatedReleaseToReleaseGroupRelationship].[ReleaseGroupId] = [releaseToReleaseGroupRelationship].[ReleaseGroupId];
             END;");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateRelease];");

@@ -171,6 +171,22 @@ public partial class WorkToProductRelationshipMigration : Migration
                     [source].[ReferenceOrder]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[WorkId] = @Id THEN DELETE;
+
+                WITH [UpdatedWorkToProductRelationship] AS
+                (
+                    SELECT
+                        [workToProductRelationship].[WorkId],
+                        [workToProductRelationship].[ProductId],
+                        ROW_NUMBER() OVER (PARTITION BY [workToProductRelationship].[ProductId]
+                            ORDER BY [workToProductRelationship].[ReferenceOrder]) - 1 AS [UpdatedReferenceOrder]
+                    FROM [dbo].[WorkToProductRelationship] [workToProductRelationship]
+                )
+                UPDATE [workToProductRelationship]
+                SET [ReferenceOrder] = [updatedWorkToProductRelationship].[UpdatedReferenceOrder]
+                FROM [dbo].[WorkToProductRelationship] AS [workToProductRelationship]
+                INNER JOIN [UpdatedWorkToProductRelationship] AS [updatedWorkToProductRelationship]
+                    ON [updatedWorkToProductRelationship].[WorkId] = [workToProductRelationship].[WorkId]
+                    AND [updatedWorkToProductRelationship].[ProductId] = [workToProductRelationship].[ProductId];
             END;");
 
         migrationBuilder.Sql("DROP PROCEDURE [dbo].[sp_CreateWork];");
