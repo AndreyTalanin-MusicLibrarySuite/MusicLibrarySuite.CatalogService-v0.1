@@ -36,18 +36,6 @@ public class ReleaseDto
     public string? DisambiguationText { get; set; }
 
     /// <summary>
-    /// Gets or sets the release's barcode.
-    /// </summary>
-    [StringLength(32)]
-    public string? Barcode { get; set; }
-
-    /// <summary>
-    /// Gets or sets the release's catalog number.
-    /// </summary>
-    [StringLength(32)]
-    public string? CatalogNumber { get; set; }
-
-    /// <summary>
     /// Gets or sets the release's media format.
     /// </summary>
     [StringLength(256)]
@@ -58,6 +46,18 @@ public class ReleaseDto
     /// </summary>
     [StringLength(256)]
     public string? PublishFormat { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release's catalog number.
+    /// </summary>
+    [StringLength(32)]
+    public string? CatalogNumber { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release's barcode.
+    /// </summary>
+    [StringLength(32)]
+    public string? Barcode { get; set; }
 
     /// <summary>
     /// Gets or sets the release's release date.

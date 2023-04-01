@@ -32,16 +32,6 @@ public class Release
     public string? DisambiguationText { get; set; }
 
     /// <summary>
-    /// Gets or sets the release's barcode.
-    /// </summary>
-    public string? Barcode { get; set; }
-
-    /// <summary>
-    /// Gets or sets the release's catalog number.
-    /// </summary>
-    public string? CatalogNumber { get; set; }
-
-    /// <summary>
     /// Gets or sets the release's media format.
     /// </summary>
     public string? MediaFormat { get; set; }
@@ -50,6 +40,16 @@ public class Release
     /// Gets or sets the release's publish format.
     /// </summary>
     public string? PublishFormat { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release's catalog number.
+    /// </summary>
+    public string? CatalogNumber { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release's barcode.
+    /// </summary>
+    public string? Barcode { get; set; }
 
     /// <summary>
     /// Gets or sets the release's release date.
