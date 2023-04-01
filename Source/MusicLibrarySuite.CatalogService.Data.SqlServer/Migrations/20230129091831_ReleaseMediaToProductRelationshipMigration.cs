@@ -213,21 +213,21 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
@@ -251,10 +251,10 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -263,6 +263,14 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
                     @Id,
                     @ReleaseRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
@@ -283,14 +291,6 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseGenres]
                     @Id,
                     @ReleaseGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
@@ -321,21 +321,21 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseMediaToProductRelationships [dbo].[ReleaseMediaToProductRelationship] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
@@ -350,10 +350,10 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -362,6 +362,14 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
                     @Id,
                     @ReleaseRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
@@ -382,14 +390,6 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseGenres]
                     @Id,
                     @ReleaseGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
@@ -455,21 +455,21 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ResultId UNIQUEIDENTIFIER OUTPUT,
@@ -492,10 +492,10 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -504,6 +504,14 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
                     @Id,
                     @ReleaseRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
@@ -524,14 +532,6 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseGenres]
                     @Id,
                     @ReleaseGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
@@ -558,21 +558,21 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
                 @ReleaseRelationships [dbo].[ReleaseRelationship] READONLY,
+                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
+                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseArtists [dbo].[ReleaseArtist] READONLY,
                 @ReleaseFeaturedArtists [dbo].[ReleaseFeaturedArtist] READONLY,
                 @ReleasePerformers [dbo].[ReleasePerformer] READONLY,
                 @ReleaseComposers [dbo].[ReleaseComposer] READONLY,
                 @ReleaseGenres [dbo].[ReleaseGenre] READONLY,
-                @ReleaseToProductRelationships [dbo].[ReleaseToProductRelationship] READONLY,
-                @ReleaseToReleaseGroupRelationships [dbo].[ReleaseToReleaseGroupRelationship] READONLY,
                 @ReleaseMediaCollection [dbo].[ReleaseMedia] READONLY,
                 @ReleaseTrackCollection [dbo].[ReleaseTrack] READONLY,
                 @ResultRowsUpdated INT OUTPUT
@@ -586,10 +586,10 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -598,6 +598,14 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseRelationships]
                     @Id,
                     @ReleaseRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
+                    @Id,
+                    @ReleaseToProductRelationships;
+
+                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
+                    @Id,
+                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseArtists]
                     @Id,
@@ -618,14 +626,6 @@ public partial class ReleaseMediaToProductRelationshipMigration : Migration
                 EXEC [dbo].[sp_Internal_MergeReleaseGenres]
                     @Id,
                     @ReleaseGenres;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToProductRelationships]
-                    @Id,
-                    @ReleaseToProductRelationships;
-
-                EXEC [dbo].[sp_Internal_MergeReleaseToReleaseGroupRelationships]
-                    @Id,
-                    @ReleaseToReleaseGroupRelationships;
 
                 EXEC [dbo].[sp_Internal_MergeReleaseMediaCollection]
                     @Id,
