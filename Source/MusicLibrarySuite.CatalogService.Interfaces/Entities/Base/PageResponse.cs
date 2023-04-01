@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace MusicLibrarySuite.CatalogService.Interfaces.Entities.Base;
 
@@ -35,10 +33,4 @@ public class PageResponse<T>
     /// </summary>
     [Required]
     public ICollection<T> Items { get; set; } = new List<T>();
-
-    /// <summary>
-    /// Gets or sets a value representing the moment of time when the response was completed.
-    /// </summary>
-    [Required]
-    public DateTimeOffset CompletedOn { get; set; }
 }

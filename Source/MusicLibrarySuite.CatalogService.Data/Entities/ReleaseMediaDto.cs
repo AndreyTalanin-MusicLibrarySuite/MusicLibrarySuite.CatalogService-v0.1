@@ -38,28 +38,28 @@ public class ReleaseMediaDto
     public string? DisambiguationText { get; set; }
 
     /// <summary>
-    /// Gets or sets the release media's catalog number.
-    /// </summary>
-    [StringLength(32)]
-    public string? CatalogNumber { get; set; }
-
-    /// <summary>
     /// Gets or sets the release media's media format.
     /// </summary>
     [StringLength(256)]
     public string? MediaFormat { get; set; }
 
     /// <summary>
-    /// Gets or sets the release media's ToC checksum (an 8-digit hexadecimal number used by CDDB).
+    /// Gets or sets the release media's catalog number.
+    /// </summary>
+    [StringLength(32)]
+    public string? CatalogNumber { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release media's ToC checksum (an 8-digit hexadecimal number used by FreeDb).
     /// </summary>
     [StringLength(64)]
-    public string? TableOfContentsChecksum { get; set; }
+    public string? FreeDbChecksum { get; set; }
 
     /// <summary>
     /// Gets or sets the release media's ToC checksum (a 28-character Base64 string used by MusicBrainz).
     /// </summary>
     [StringLength(64)]
-    public string? TableOfContentsChecksumLong { get; set; }
+    public string? MusicBrainzChecksum { get; set; }
 
     /// <summary>
     /// Gets or sets a collection of release tracks associated to the current release media.

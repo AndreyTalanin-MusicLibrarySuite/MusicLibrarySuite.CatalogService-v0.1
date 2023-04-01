@@ -61,9 +61,6 @@ public class WorkService : IWorkService
         WorkPageRequestDto workPageRequestDto = m_mapper.Map<WorkPageRequestDto>(workPageRequest);
         PageResponseDto<WorkDto> workPageResponseDto = await m_workRepository.GetWorksAsync(workPageRequestDto);
         WorkPageResponse workPageResponse = m_mapper.Map<WorkPageResponse>(workPageResponseDto);
-
-        workPageResponse.CompletedOn = DateTimeOffset.Now;
-
         return workPageResponse;
     }
 

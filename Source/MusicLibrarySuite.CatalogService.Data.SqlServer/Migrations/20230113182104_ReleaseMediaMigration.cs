@@ -24,10 +24,10 @@ public partial class ReleaseMediaMigration : Migration
                 Title = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
                 DisambiguationText = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
-                CatalogNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                 MediaFormat = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                TableOfContentsChecksum = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                TableOfContentsChecksumLong = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true)
+                CatalogNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                FreeDbChecksum = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
+                MusicBrainzChecksum = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true)
             },
             constraints: table =>
             {
@@ -42,10 +42,10 @@ public partial class ReleaseMediaMigration : Migration
                 table.CheckConstraint(name: "CK_ReleaseMedia_Title", sql: "LEN(TRIM([Title])) > 0");
                 table.CheckConstraint(name: "CK_ReleaseMedia_Description", sql: "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
                 table.CheckConstraint(name: "CK_ReleaseMedia_DisambiguationText", sql: "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
-                table.CheckConstraint(name: "CK_ReleaseMedia_CatalogNumber", sql: "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
                 table.CheckConstraint(name: "CK_ReleaseMedia_MediaFormat", sql: "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
-                table.CheckConstraint(name: "CK_ReleaseMedia_TableOfContentsChecksum", sql: "[TableOfContentsChecksum] IS NULL OR LEN(TRIM([TableOfContentsChecksum])) > 0");
-                table.CheckConstraint(name: "CK_ReleaseMedia_TableOfContentsChecksumLong", sql: "[TableOfContentsChecksumLong] IS NULL OR LEN(TRIM([TableOfContentsChecksumLong])) > 0");
+                table.CheckConstraint(name: "CK_ReleaseMedia_CatalogNumber", sql: "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
+                table.CheckConstraint(name: "CK_ReleaseMedia_FreeDbChecksum", sql: "[FreeDbChecksum] IS NULL OR LEN(TRIM([FreeDbChecksum])) > 0");
+                table.CheckConstraint(name: "CK_ReleaseMedia_MusicBrainzChecksum", sql: "[MusicBrainzChecksum] IS NULL OR LEN(TRIM([MusicBrainzChecksum])) > 0");
             });
 
         migrationBuilder.CreateIndex(
@@ -61,16 +61,16 @@ public partial class ReleaseMediaMigration : Migration
             column: "CatalogNumber");
 
         migrationBuilder.CreateIndex(
-            name: "IX_ReleaseMedia_TableOfContentsChecksum",
+            name: "IX_ReleaseMedia_FreeDbChecksum",
             schema: "dbo",
             table: "ReleaseMedia",
-            column: "TableOfContentsChecksum");
+            column: "FreeDbChecksum");
 
         migrationBuilder.CreateIndex(
-            name: "IX_ReleaseMedia_TableOfContentsChecksumLong",
+            name: "IX_ReleaseMedia_MusicBrainzChecksum",
             schema: "dbo",
             table: "ReleaseMedia",
-            column: "TableOfContentsChecksumLong");
+            column: "MusicBrainzChecksum");
 
         migrationBuilder.Sql(@"
             CREATE TRIGGER [dbo].[TR_ReleaseMedia_AfterInsertUpdateDelete_SetReleaseUpdatedOn]
@@ -102,10 +102,10 @@ public partial class ReleaseMediaMigration : Migration
                 [Title] NVARCHAR(256) NOT NULL,
                 [Description] NVARCHAR(2048) NULL,
                 [DisambiguationText] NVARCHAR(2048) NULL,
-                [CatalogNumber] NVARCHAR(32) NULL,
                 [MediaFormat] NVARCHAR(256) NULL,
-                [TableOfContentsChecksum] NVARCHAR(64) NULL,
-                [TableOfContentsChecksumLong] NVARCHAR(64) NULL
+                [CatalogNumber] NVARCHAR(32) NULL,
+                [FreeDbChecksum] NVARCHAR(64) NULL,
+                [MusicBrainzChecksum] NVARCHAR(64) NULL
             );");
 
         migrationBuilder.Sql(@"
@@ -126,10 +126,10 @@ public partial class ReleaseMediaMigration : Migration
                         [Title],
                         [Description],
                         [DisambiguationText],
-                        [CatalogNumber],
                         [MediaFormat],
-                        [TableOfContentsChecksum],
-                        [TableOfContentsChecksumLong]
+                        [CatalogNumber],
+                        [FreeDbChecksum],
+                        [MusicBrainzChecksum]
                     FROM @ReleaseMediaCollection
                     WHERE [ReleaseId] = CAST('00000000-0000-0000-0000-000000000000' AS UNIQUEIDENTIFIER)
                         OR [ReleaseId] = @Id
@@ -143,10 +143,10 @@ public partial class ReleaseMediaMigration : Migration
                     [target].[Title] = [source].[Title],
                     [target].[Description] = [source].[Description],
                     [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[CatalogNumber] = [source].[CatalogNumber],
                     [target].[MediaFormat] = [source].[MediaFormat],
-                    [target].[TableOfContentsChecksum] = [source].[TableOfContentsChecksum],
-                    [target].[TableOfContentsChecksumLong] = [source].[TableOfContentsChecksumLong]
+                    [target].[CatalogNumber] = [source].[CatalogNumber],
+                    [target].[FreeDbChecksum] = [source].[FreeDbChecksum],
+                    [target].[MusicBrainzChecksum] = [source].[MusicBrainzChecksum]
                 WHEN NOT MATCHED THEN INSERT
                 (
                     [MediaNumber],
@@ -154,10 +154,10 @@ public partial class ReleaseMediaMigration : Migration
                     [Title],
                     [Description],
                     [DisambiguationText],
-                    [CatalogNumber],
                     [MediaFormat],
-                    [TableOfContentsChecksum],
-                    [TableOfContentsChecksumLong]
+                    [CatalogNumber],
+                    [FreeDbChecksum],
+                    [MusicBrainzChecksum]
                 )
                 VALUES
                 (
@@ -166,10 +166,10 @@ public partial class ReleaseMediaMigration : Migration
                     [source].[Title],
                     [source].[Description],
                     [source].[DisambiguationText],
-                    [source].[CatalogNumber],
                     [source].[MediaFormat],
-                    [source].[TableOfContentsChecksum],
-                    [source].[TableOfContentsChecksumLong]
+                    [source].[CatalogNumber],
+                    [source].[FreeDbChecksum],
+                    [source].[MusicBrainzChecksum]
                 )
                 WHEN NOT MATCHED BY SOURCE AND [target].[ReleaseId] = @Id THEN DELETE;
             END;");
@@ -185,10 +185,10 @@ public partial class ReleaseMediaMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -213,10 +213,10 @@ public partial class ReleaseMediaMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -243,10 +243,10 @@ public partial class ReleaseMediaMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -262,10 +262,10 @@ public partial class ReleaseMediaMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -299,10 +299,10 @@ public partial class ReleaseMediaMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -324,10 +324,10 @@ public partial class ReleaseMediaMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -348,10 +348,10 @@ public partial class ReleaseMediaMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -364,10 +364,10 @@ public partial class ReleaseMediaMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,

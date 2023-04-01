@@ -61,9 +61,6 @@ public class ArtistService : IArtistService
         ArtistPageRequestDto artistPageRequestDto = m_mapper.Map<ArtistPageRequestDto>(artistPageRequest);
         PageResponseDto<ArtistDto> artistPageResponseDto = await m_artistRepository.GetArtistsAsync(artistPageRequestDto);
         ArtistPageResponse artistPageResponse = m_mapper.Map<ArtistPageResponse>(artistPageResponseDto);
-
-        artistPageResponse.CompletedOn = DateTimeOffset.Now;
-
         return artistPageResponse;
     }
 

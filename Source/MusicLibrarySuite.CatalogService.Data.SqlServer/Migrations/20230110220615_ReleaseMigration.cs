@@ -23,10 +23,10 @@ public partial class ReleaseMigration : Migration
                 Title = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                 Description = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
                 DisambiguationText = table.Column<string>(type: "nvarchar(2048)", maxLength: 2048, nullable: true),
-                Barcode = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
-                CatalogNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                 MediaFormat = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                 PublishFormat = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                CatalogNumber = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
+                Barcode = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true),
                 ReleasedOn = table.Column<DateTime>(type: "date", nullable: false),
                 ReleasedOnYearOnly = table.Column<bool>(type: "bit", nullable: false),
                 Enabled = table.Column<bool>(type: "bit", nullable: false),
@@ -39,10 +39,10 @@ public partial class ReleaseMigration : Migration
                 table.CheckConstraint(name: "CK_Release_Title", sql: "LEN(TRIM([Title])) > 0");
                 table.CheckConstraint(name: "CK_Release_Description", sql: "[Description] IS NULL OR LEN(TRIM([Description])) > 0");
                 table.CheckConstraint(name: "CK_Release_DisambiguationText", sql: "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
-                table.CheckConstraint(name: "CK_Release_Barcode", sql: "[Barcode] IS NULL OR LEN(TRIM([Barcode])) > 0");
-                table.CheckConstraint(name: "CK_Release_CatalogNumber", sql: "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
                 table.CheckConstraint(name: "CK_Release_MediaFormat", sql: "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
                 table.CheckConstraint(name: "CK_Release_PublishFormat", sql: "[PublishFormat] IS NULL OR LEN(TRIM([PublishFormat])) > 0");
+                table.CheckConstraint(name: "CK_Release_CatalogNumber", sql: "[CatalogNumber] IS NULL OR LEN(TRIM([CatalogNumber])) > 0");
+                table.CheckConstraint(name: "CK_Release_Barcode", sql: "[Barcode] IS NULL OR LEN(TRIM([Barcode])) > 0");
             });
 
         migrationBuilder.Sql(@"
@@ -58,16 +58,16 @@ public partial class ReleaseMigration : Migration
             ADD CONSTRAINT [DF_Release_UpdatedOn] DEFAULT SYSDATETIMEOFFSET() FOR [UpdatedOn];");
 
         migrationBuilder.CreateIndex(
-            name: "IX_Release_Barcode",
-            schema: "dbo",
-            table: "Release",
-            column: "Barcode");
-
-        migrationBuilder.CreateIndex(
             name: "IX_Release_CatalogNumber",
             schema: "dbo",
             table: "Release",
             column: "CatalogNumber");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_Release_Barcode",
+            schema: "dbo",
+            table: "Release",
+            column: "Barcode");
 
         migrationBuilder.Sql(@"
             CREATE TRIGGER [dbo].[TR_Release_AfterUpdate_SetUpdatedOn]
@@ -90,10 +90,10 @@ public partial class ReleaseMigration : Migration
                 [Title] NVARCHAR(256) NOT NULL,
                 [Description] NVARCHAR(2048) NULL,
                 [DisambiguationText] NVARCHAR(2048) NULL,
-                [Barcode] NVARCHAR(32) NULL,
-                [CatalogNumber] NVARCHAR(32) NULL,
                 [MediaFormat] NVARCHAR(256) NULL,
                 [PublishFormat] NVARCHAR(256) NULL,
+                [CatalogNumber] NVARCHAR(32) NULL,
+                [Barcode] NVARCHAR(32) NULL,
                 [ReleasedOn] DATE NOT NULL,
                 [ReleasedOnYearOnly] BIT NOT NULL,
                 [Enabled] BIT NOT NULL,
@@ -126,10 +126,10 @@ public partial class ReleaseMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -144,10 +144,10 @@ public partial class ReleaseMigration : Migration
                         @Title AS [Title],
                         @Description AS [Description],
                         @DisambiguationText AS [DisambiguationText],
-                        @Barcode AS [Barcode],
-                        @CatalogNumber AS [CatalogNumber],
                         @MediaFormat AS [MediaFormat],
                         @PublishFormat AS [PublishFormat],
+                        @CatalogNumber AS [CatalogNumber],
+                        @Barcode AS [Barcode],
                         @ReleasedOn AS [ReleasedOn],
                         @ReleasedOnYearOnly AS [ReleasedOnYearOnly],
                         @Enabled AS [Enabled]
@@ -160,10 +160,10 @@ public partial class ReleaseMigration : Migration
                     [target].[Title] = [source].[Title],
                     [target].[Description] = [source].[Description],
                     [target].[DisambiguationText] = [source].[DisambiguationText],
-                    [target].[Barcode] = [source].[Barcode],
-                    [target].[CatalogNumber] = [source].[CatalogNumber],
                     [target].[MediaFormat] = [source].[MediaFormat],
                     [target].[PublishFormat] = [source].[PublishFormat],
+                    [target].[CatalogNumber] = [source].[CatalogNumber],
+                    [target].[Barcode] = [source].[Barcode],
                     [target].[ReleasedOn] = [source].[ReleasedOn],
                     [target].[ReleasedOnYearOnly] = [source].[ReleasedOnYearOnly],
                     [target].[Enabled] = [source].[Enabled]
@@ -173,10 +173,10 @@ public partial class ReleaseMigration : Migration
                     [Title],
                     [Description],
                     [DisambiguationText],
-                    [Barcode],
-                    [CatalogNumber],
                     [MediaFormat],
                     [PublishFormat],
+                    [CatalogNumber],
+                    [Barcode],
                     [ReleasedOn],
                     [ReleasedOnYearOnly],
                     [Enabled]
@@ -187,10 +187,10 @@ public partial class ReleaseMigration : Migration
                     [source].[Title],
                     [source].[Description],
                     [source].[DisambiguationText],
-                    [source].[Barcode],
-                    [source].[CatalogNumber],
                     [source].[MediaFormat],
                     [source].[PublishFormat],
+                    [source].[CatalogNumber],
+                    [source].[Barcode],
                     [source].[ReleasedOn],
                     [source].[ReleasedOnYearOnly],
                     [source].[Enabled]
@@ -206,10 +206,10 @@ public partial class ReleaseMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -231,10 +231,10 @@ public partial class ReleaseMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,
@@ -255,10 +255,10 @@ public partial class ReleaseMigration : Migration
                 @Title NVARCHAR(256),
                 @Description NVARCHAR(2048),
                 @DisambiguationText NVARCHAR(2048),
-                @Barcode NVARCHAR(32),
-                @CatalogNumber NVARCHAR(32),
                 @MediaFormat NVARCHAR(256),
                 @PublishFormat NVARCHAR(256),
+                @CatalogNumber NVARCHAR(32),
+                @Barcode NVARCHAR(32),
                 @ReleasedOn DATE,
                 @ReleasedOnYearOnly BIT,
                 @Enabled BIT,
@@ -271,10 +271,10 @@ public partial class ReleaseMigration : Migration
                     @Title,
                     @Description,
                     @DisambiguationText,
-                    @Barcode,
-                    @CatalogNumber,
                     @MediaFormat,
                     @PublishFormat,
+                    @CatalogNumber,
+                    @Barcode,
                     @ReleasedOn,
                     @ReleasedOnYearOnly,
                     @Enabled,

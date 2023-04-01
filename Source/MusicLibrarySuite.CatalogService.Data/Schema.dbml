@@ -438,10 +438,10 @@ Table "dbo"."Release" {
     "Title" nvarchar(256) [not null]
     "Description" nvarchar(2048) [null]
     "DisambiguationText" nvarchar(2048) [null]
-    "Barcode" nvarchar(32) [null]
-    "CatalogNumber" nvarchar(32) [null]
     "MediaFormat" nvarchar(256) [null]
     "PublishFormat" nvarchar(256) [null]
+    "CatalogNumber" nvarchar(32) [null]
+    "Barcode" nvarchar(32) [null]
     "ReleasedOn" date [not null]
     "ReleasedOnYearOnly" bit [not null]
     "Enabled" bit [not null]
@@ -449,8 +449,8 @@ Table "dbo"."Release" {
     "UpdatedOn" datetimeoffset [not null, default: `SYSDATETIMEOFFSET()`]
 
     Indexes {
-        "Barcode" [name: "IX_Release_Barcode"]
         "CatalogNumber" [name: "IX_Release_CatalogNumber"]
+        "Barcode" [name: "IX_Release_Barcode"]
     }
 }
 
@@ -640,16 +640,16 @@ Table "dbo"."ReleaseMedia" {
     "Title" nvarchar(256) [not null]
     "Description" nvarchar(2048) [null]
     "DisambiguationText" nvarchar(2048) [null]
-    "CatalogNumber" nvarchar(32) [null]
     "MediaFormat" nvarchar(256) [null]
-    "TableOfContentsChecksum" nvarchar(64) [null]
-    "TableOfContentsChecksumLong" nvarchar(64) [null]
+    "CatalogNumber" nvarchar(32) [null]
+    "FreeDbChecksum" nvarchar(64) [null]
+    "MusicBrainzChecksum" nvarchar(64) [null]
 
     Indexes {
         "ReleaseId" [name: "IX_ReleaseMedia_ReleaseId"]
         "CatalogNumber" [name: "IX_ReleaseMedia_CatalogNumber"]
-        "TableOfContentsChecksum" [name: "IX_ReleaseMedia_TableOfContentsChecksum"]
-        "TableOfContentsChecksumLong" [name: "IX_ReleaseMedia_TableOfContentsChecksumLong"]
+        "FreeDbChecksum" [name: "IX_ReleaseMedia_FreeDbChecksum"]
+        "MusicBrainzChecksum" [name: "IX_ReleaseMedia_MusicBrainzChecksum"]
     }
 }
 

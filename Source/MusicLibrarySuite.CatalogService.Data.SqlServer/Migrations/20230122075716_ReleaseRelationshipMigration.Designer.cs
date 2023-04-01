@@ -477,15 +477,15 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
+                    b.Property<string>("FreeDbChecksum")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
                     b.Property<string>("MediaFormat")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("TableOfContentsChecksum")
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<string>("TableOfContentsChecksumLong")
+                    b.Property<string>("MusicBrainzChecksum")
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
@@ -499,14 +499,14 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
                     b.HasIndex("CatalogNumber")
                         .HasDatabaseName("IX_ReleaseMedia_CatalogNumber");
 
+                    b.HasIndex("FreeDbChecksum")
+                        .HasDatabaseName("IX_ReleaseMedia_FreeDbChecksum");
+
+                    b.HasIndex("MusicBrainzChecksum")
+                        .HasDatabaseName("IX_ReleaseMedia_MusicBrainzChecksum");
+
                     b.HasIndex("ReleaseId")
                         .HasDatabaseName("IX_ReleaseMedia_ReleaseId");
-
-                    b.HasIndex("TableOfContentsChecksum")
-                        .HasDatabaseName("IX_ReleaseMedia_TableOfContentsChecksum");
-
-                    b.HasIndex("TableOfContentsChecksumLong")
-                        .HasDatabaseName("IX_ReleaseMedia_TableOfContentsChecksumLong");
 
                     b.ToTable("ReleaseMedia", "dbo");
 
@@ -516,11 +516,11 @@ namespace MusicLibrarySuite.CatalogService.Data.SqlServer.Migrations
 
                     b.HasCheckConstraint("CK_ReleaseMedia_DisambiguationText", "[DisambiguationText] IS NULL OR LEN(TRIM([DisambiguationText])) > 0");
 
+                    b.HasCheckConstraint("CK_ReleaseMedia_FreeDbChecksum", "[FreeDbChecksum] IS NULL OR LEN(TRIM([FreeDbChecksum])) > 0");
+
                     b.HasCheckConstraint("CK_ReleaseMedia_MediaFormat", "[MediaFormat] IS NULL OR LEN(TRIM([MediaFormat])) > 0");
 
-                    b.HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksum", "[TableOfContentsChecksum] IS NULL OR LEN(TRIM([TableOfContentsChecksum])) > 0");
-
-                    b.HasCheckConstraint("CK_ReleaseMedia_TableOfContentsChecksumLong", "[TableOfContentsChecksumLong] IS NULL OR LEN(TRIM([TableOfContentsChecksumLong])) > 0");
+                    b.HasCheckConstraint("CK_ReleaseMedia_MusicBrainzChecksum", "[MusicBrainzChecksum] IS NULL OR LEN(TRIM([MusicBrainzChecksum])) > 0");
 
                     b.HasCheckConstraint("CK_ReleaseMedia_Title", "LEN(TRIM([Title])) > 0");
                 });

@@ -61,9 +61,6 @@ public class ProductService : IProductService
         ProductPageRequestDto productPageRequestDto = m_mapper.Map<ProductPageRequestDto>(productPageRequest);
         PageResponseDto<ProductDto> productPageResponseDto = await m_productRepository.GetProductsAsync(productPageRequestDto);
         ProductPageResponse productPageResponse = m_mapper.Map<ProductPageResponse>(productPageResponseDto);
-
-        productPageResponse.CompletedOn = DateTimeOffset.Now;
-
         return productPageResponse;
     }
 

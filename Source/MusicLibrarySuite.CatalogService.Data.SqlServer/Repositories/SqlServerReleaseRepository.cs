@@ -535,10 +535,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Title), typeof(string));
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Description), typeof(string));
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.DisambiguationText), typeof(string));
-        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.CatalogNumber), typeof(string));
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MediaFormat), typeof(string));
-        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksum), typeof(string));
-        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksumLong), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.CatalogNumber), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.FreeDbChecksum), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MusicBrainzChecksum), typeof(string));
         foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
         {
             releaseMediaCollectionDataTable.Rows.Add(
@@ -547,10 +547,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 releaseMedia.Title.AsDbValue(),
                 releaseMedia.Description.AsDbValue(),
                 releaseMedia.DisambiguationText.AsDbValue(),
-                releaseMedia.CatalogNumber.AsDbValue(),
                 releaseMedia.MediaFormat.AsDbValue(),
-                releaseMedia.TableOfContentsChecksum.AsDbValue(),
-                releaseMedia.TableOfContentsChecksumLong.AsDbValue());
+                releaseMedia.CatalogNumber.AsDbValue(),
+                releaseMedia.FreeDbChecksum.AsDbValue(),
+                releaseMedia.MusicBrainzChecksum.AsDbValue());
         }
 
         using var releaseMediaToProductRelationshipsDataTable = new DataTable();
@@ -742,10 +742,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseDto.Title), release.Title.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.Description), release.Description.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.DisambiguationText), release.DisambiguationText.AsDbValue()),
-            new SqlParameter(nameof(ReleaseDto.Barcode), release.Barcode.AsDbValue()),
-            new SqlParameter(nameof(ReleaseDto.CatalogNumber), release.CatalogNumber.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.MediaFormat), release.MediaFormat.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.PublishFormat), release.PublishFormat.AsDbValue()),
+            new SqlParameter(nameof(ReleaseDto.CatalogNumber), release.CatalogNumber.AsDbValue()),
+            new SqlParameter(nameof(ReleaseDto.Barcode), release.Barcode.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.ReleasedOn), release.ReleasedOn.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.ReleasedOnYearOnly), release.ReleasedOnYearOnly.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.Enabled), release.Enabled.AsDbValue()),
@@ -778,10 +778,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseDto.Title)},
                 @{nameof(ReleaseDto.Description)},
                 @{nameof(ReleaseDto.DisambiguationText)},
-                @{nameof(ReleaseDto.Barcode)},
-                @{nameof(ReleaseDto.CatalogNumber)},
                 @{nameof(ReleaseDto.MediaFormat)},
                 @{nameof(ReleaseDto.PublishFormat)},
+                @{nameof(ReleaseDto.CatalogNumber)},
+                @{nameof(ReleaseDto.Barcode)},
                 @{nameof(ReleaseDto.ReleasedOn)},
                 @{nameof(ReleaseDto.ReleasedOnYearOnly)},
                 @{nameof(ReleaseDto.Enabled)},
@@ -966,10 +966,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Title), typeof(string));
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.Description), typeof(string));
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.DisambiguationText), typeof(string));
-        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.CatalogNumber), typeof(string));
         releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MediaFormat), typeof(string));
-        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksum), typeof(string));
-        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.TableOfContentsChecksumLong), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.CatalogNumber), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.FreeDbChecksum), typeof(string));
+        releaseMediaCollectionDataTable.Columns.Add(nameof(ReleaseMediaDto.MusicBrainzChecksum), typeof(string));
         foreach (ReleaseMediaDto releaseMedia in release.ReleaseMediaCollection)
         {
             releaseMediaCollectionDataTable.Rows.Add(
@@ -978,10 +978,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 releaseMedia.Title.AsDbValue(),
                 releaseMedia.Description.AsDbValue(),
                 releaseMedia.DisambiguationText.AsDbValue(),
-                releaseMedia.CatalogNumber.AsDbValue(),
                 releaseMedia.MediaFormat.AsDbValue(),
-                releaseMedia.TableOfContentsChecksum.AsDbValue(),
-                releaseMedia.TableOfContentsChecksumLong.AsDbValue());
+                releaseMedia.CatalogNumber.AsDbValue(),
+                releaseMedia.FreeDbChecksum.AsDbValue(),
+                releaseMedia.MusicBrainzChecksum.AsDbValue());
         }
 
         using var releaseMediaToProductRelationshipsDataTable = new DataTable();
@@ -1171,10 +1171,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
             new SqlParameter(nameof(ReleaseDto.Title), release.Title.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.Description), release.Description.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.DisambiguationText), release.DisambiguationText.AsDbValue()),
-            new SqlParameter(nameof(ReleaseDto.Barcode), release.Barcode.AsDbValue()),
-            new SqlParameter(nameof(ReleaseDto.CatalogNumber), release.CatalogNumber.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.MediaFormat), release.MediaFormat.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.PublishFormat), release.PublishFormat.AsDbValue()),
+            new SqlParameter(nameof(ReleaseDto.CatalogNumber), release.CatalogNumber.AsDbValue()),
+            new SqlParameter(nameof(ReleaseDto.Barcode), release.Barcode.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.ReleasedOn), release.ReleasedOn.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.ReleasedOnYearOnly), release.ReleasedOnYearOnly.AsDbValue()),
             new SqlParameter(nameof(ReleaseDto.Enabled), release.Enabled.AsDbValue()),
@@ -1205,10 +1205,10 @@ public class SqlServerReleaseRepository : IReleaseRepository
                 @{nameof(ReleaseDto.Title)},
                 @{nameof(ReleaseDto.Description)},
                 @{nameof(ReleaseDto.DisambiguationText)},
-                @{nameof(ReleaseDto.Barcode)},
-                @{nameof(ReleaseDto.CatalogNumber)},
                 @{nameof(ReleaseDto.MediaFormat)},
                 @{nameof(ReleaseDto.PublishFormat)},
+                @{nameof(ReleaseDto.CatalogNumber)},
+                @{nameof(ReleaseDto.Barcode)},
                 @{nameof(ReleaseDto.ReleasedOn)},
                 @{nameof(ReleaseDto.ReleasedOnYearOnly)},
                 @{nameof(ReleaseDto.Enabled)},

@@ -16,12 +16,6 @@ public class ReleaseMedia
     public byte MediaNumber { get; set; }
 
     /// <summary>
-    /// Gets or sets the release's total media count.
-    /// </summary>
-    /// <remarks>This property is only used to store data returned by the application.</remarks>
-    public short TotalMediaCount { get; set; }
-
-    /// <summary>
     /// Gets or sets the release's unique identifier.
     /// </summary>
     [Required]
@@ -44,24 +38,24 @@ public class ReleaseMedia
     public string? DisambiguationText { get; set; }
 
     /// <summary>
-    /// Gets or sets the release media's catalog number.
-    /// </summary>
-    public string? CatalogNumber { get; set; }
-
-    /// <summary>
     /// Gets or sets the release media's media format.
     /// </summary>
     public string? MediaFormat { get; set; }
 
     /// <summary>
-    /// Gets or sets the release media's ToC checksum (an 8-digit hexadecimal number used by CDDB).
+    /// Gets or sets the release media's catalog number.
     /// </summary>
-    public string? TableOfContentsChecksum { get; set; }
+    public string? CatalogNumber { get; set; }
+
+    /// <summary>
+    /// Gets or sets the release media's ToC checksum (an 8-digit hexadecimal number used by FreeDb).
+    /// </summary>
+    public string? FreeDbChecksum { get; set; }
 
     /// <summary>
     /// Gets or sets the release media's ToC checksum (a 28-character Base64 string used by MusicBrainz).
     /// </summary>
-    public string? TableOfContentsChecksumLong { get; set; }
+    public string? MusicBrainzChecksum { get; set; }
 
     /// <summary>
     /// Gets or sets a collection of release-media-to-product relationships associated to the current release media.
