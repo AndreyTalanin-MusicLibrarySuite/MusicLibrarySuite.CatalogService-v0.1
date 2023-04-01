@@ -16,22 +16,10 @@ public class ReleaseTrack
     public byte TrackNumber { get; set; }
 
     /// <summary>
-    /// Gets or sets the release media's total track count.
-    /// </summary>
-    /// <remarks>This property is only used to store data returned by the application.</remarks>
-    public short TotalTrackCount { get; set; }
-
-    /// <summary>
     /// Gets or sets the release media's number.
     /// </summary>
     [Required]
     public byte MediaNumber { get; set; }
-
-    /// <summary>
-    /// Gets or sets the release's total media count.
-    /// </summary>
-    /// <remarks>This property is only used to store data returned by the application.</remarks>
-    public short TotalMediaCount { get; set; }
 
     /// <summary>
     /// Gets or sets the release's unique identifier.

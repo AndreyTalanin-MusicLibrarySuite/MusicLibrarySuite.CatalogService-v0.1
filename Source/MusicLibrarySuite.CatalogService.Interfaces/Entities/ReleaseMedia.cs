@@ -16,12 +16,6 @@ public class ReleaseMedia
     public byte MediaNumber { get; set; }
 
     /// <summary>
-    /// Gets or sets the release's total media count.
-    /// </summary>
-    /// <remarks>This property is only used to store data returned by the application.</remarks>
-    public short TotalMediaCount { get; set; }
-
-    /// <summary>
     /// Gets or sets the release's unique identifier.
     /// </summary>
     [Required]
