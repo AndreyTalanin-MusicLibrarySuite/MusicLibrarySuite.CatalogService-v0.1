@@ -36,16 +36,6 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto? releaseDto = await m_releaseRepository.GetReleaseAsync(releaseId);
         Release? release = m_mapper.Map<Release?>(releaseDto);
-
-        if (release is not null)
-        {
-            SetReleaseMediaDisplayProperties(release);
-            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
-            {
-                SetReleaseTrackDisplayProperties(releaseMedia);
-            }
-        }
-
         return release;
     }
 
@@ -54,16 +44,6 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto[] releaseDtoArray = await m_releaseRepository.GetReleasesAsync();
         Release[] releaseArray = m_mapper.Map<Release[]>(releaseDtoArray);
-
-        foreach (Release release in releaseArray)
-        {
-            SetReleaseMediaDisplayProperties(release);
-            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
-            {
-                SetReleaseTrackDisplayProperties(releaseMedia);
-            }
-        }
-
         return releaseArray;
     }
 
@@ -72,16 +52,6 @@ public class ReleaseService : IReleaseService
     {
         ReleaseDto[] releaseDtoArray = await m_releaseRepository.GetReleasesAsync(releaseIds);
         Release[] releaseArray = m_mapper.Map<Release[]>(releaseDtoArray);
-
-        foreach (Release release in releaseArray)
-        {
-            SetReleaseMediaDisplayProperties(release);
-            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
-            {
-                SetReleaseTrackDisplayProperties(releaseMedia);
-            }
-        }
-
         return releaseArray;
     }
 
@@ -91,18 +61,6 @@ public class ReleaseService : IReleaseService
         ReleasePageRequestDto releasePageRequestDto = m_mapper.Map<ReleasePageRequestDto>(releasePageRequest);
         PageResponseDto<ReleaseDto> releasePageResponseDto = await m_releaseRepository.GetReleasesAsync(releasePageRequestDto);
         ReleasePageResponse releasePageResponse = m_mapper.Map<ReleasePageResponse>(releasePageResponseDto);
-
-        foreach (Release release in releasePageResponse.Items)
-        {
-            SetReleaseMediaDisplayProperties(release);
-            foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
-            {
-                SetReleaseTrackDisplayProperties(releaseMedia);
-            }
-        }
-
-        releasePageResponse.CompletedOn = DateTimeOffset.Now;
-
         return releasePageResponse;
     }
 
@@ -256,22 +214,5 @@ public class ReleaseService : IReleaseService
     {
         var deleted = await m_releaseRepository.DeleteReleaseAsync(releaseId);
         return deleted;
-    }
-
-    private static void SetReleaseMediaDisplayProperties(Release release)
-    {
-        foreach (ReleaseMedia releaseMedia in release.ReleaseMediaCollection)
-        {
-            releaseMedia.TotalMediaCount = (short)release.ReleaseMediaCollection.Count;
-        }
-    }
-
-    private static void SetReleaseTrackDisplayProperties(ReleaseMedia releaseMedia)
-    {
-        foreach (ReleaseTrack releaseTrack in releaseMedia.ReleaseTrackCollection)
-        {
-            releaseTrack.TotalTrackCount = (short)releaseMedia.ReleaseTrackCollection.Count;
-            releaseTrack.TotalMediaCount = releaseMedia.TotalMediaCount;
-        }
     }
 }

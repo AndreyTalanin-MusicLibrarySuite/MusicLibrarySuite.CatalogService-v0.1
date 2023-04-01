@@ -61,9 +61,6 @@ public class ReleaseGroupService : IReleaseGroupService
         ReleaseGroupPageRequestDto releaseGroupPageRequestDto = m_mapper.Map<ReleaseGroupPageRequestDto>(releaseGroupPageRequest);
         PageResponseDto<ReleaseGroupDto> releaseGroupPageResponseDto = await m_releaseGroupRepository.GetReleaseGroupsAsync(releaseGroupPageRequestDto);
         ReleaseGroupPageResponse releaseGroupPageResponse = m_mapper.Map<ReleaseGroupPageResponse>(releaseGroupPageResponseDto);
-
-        releaseGroupPageResponse.CompletedOn = DateTimeOffset.Now;
-
         return releaseGroupPageResponse;
     }
 

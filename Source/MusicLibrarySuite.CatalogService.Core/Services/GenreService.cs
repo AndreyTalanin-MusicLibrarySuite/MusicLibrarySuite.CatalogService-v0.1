@@ -61,9 +61,6 @@ public class GenreService : IGenreService
         GenrePageRequestDto genrePageRequestDto = m_mapper.Map<GenrePageRequestDto>(genrePageRequest);
         PageResponseDto<GenreDto> genrePageResponseDto = await m_genreRepository.GetGenresAsync(genrePageRequestDto);
         GenrePageResponse genrePageResponse = m_mapper.Map<GenrePageResponse>(genrePageResponseDto);
-
-        genrePageResponse.CompletedOn = DateTimeOffset.Now;
-
         return genrePageResponse;
     }
 
